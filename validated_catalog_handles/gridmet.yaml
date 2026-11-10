@@ -1,4 +1,3 @@
-# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
 schema_version: 0.1.0
 data_sources:
 - id: amadeus:source/climatology_lab
@@ -83,7 +82,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.827547+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei14d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -122,7 +124,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.828126+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei30d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -161,7 +166,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.728427+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei90d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -200,7 +208,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.859124+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei180d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -239,7 +250,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.460253+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei270d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -278,7 +292,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.609205+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei1y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -317,7 +334,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.109958+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei2y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -356,7 +376,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.336065+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei5y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -395,7 +418,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.821531+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi14d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -434,7 +460,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.090313+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi30d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -473,7 +502,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.794039+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi90d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -512,7 +544,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.908251+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi180d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -551,7 +586,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.524583+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi270d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -590,7 +628,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.640119+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi1y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -629,7 +670,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.263967+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi2y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -668,7 +712,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.298822+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi5y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326

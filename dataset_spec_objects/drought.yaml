@@ -3234,3 +3234,532 @@ product_variables:
     date selection, target areas and each vintage topology.
   quality_flag_vocabulary: 0=D0 abnormally dry; 1=D1 moderate drought; 2=D2 severe drought; 3=D3 extreme
     drought; 4=D4 exceptional drought
+assets:
+- id: amadeus:asset/speibase_211/spei01.nc
+  product: amadeus:product/speibase_211_01month
+  asset_key: spei01.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei01.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_01month.spei01
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei02.nc
+  product: amadeus:product/speibase_211_02month
+  asset_key: spei02.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei02.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_02month.spei02
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei03.nc
+  product: amadeus:product/speibase_211_03month
+  asset_key: spei03.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei03.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_03month.spei03
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei04.nc
+  product: amadeus:product/speibase_211_04month
+  asset_key: spei04.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei04.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_04month.spei04
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei05.nc
+  product: amadeus:product/speibase_211_05month
+  asset_key: spei05.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei05.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_05month.spei05
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei06.nc
+  product: amadeus:product/speibase_211_06month
+  asset_key: spei06.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei06.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_06month.spei06
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei07.nc
+  product: amadeus:product/speibase_211_07month
+  asset_key: spei07.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei07.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_07month.spei07
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei08.nc
+  product: amadeus:product/speibase_211_08month
+  asset_key: spei08.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei08.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_08month.spei08
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei09.nc
+  product: amadeus:product/speibase_211_09month
+  asset_key: spei09.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei09.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_09month.spei09
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei10.nc
+  product: amadeus:product/speibase_211_10month
+  asset_key: spei10.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei10.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_10month.spei10
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei11.nc
+  product: amadeus:product/speibase_211_11month
+  asset_key: spei11.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei11.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_11month.spei11
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei12.nc
+  product: amadeus:product/speibase_211_12month
+  asset_key: spei12.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei12.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_12month.spei12
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei13.nc
+  product: amadeus:product/speibase_211_13month
+  asset_key: spei13.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei13.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_13month.spei13
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei14.nc
+  product: amadeus:product/speibase_211_14month
+  asset_key: spei14.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei14.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_14month.spei14
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei15.nc
+  product: amadeus:product/speibase_211_15month
+  asset_key: spei15.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei15.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_15month.spei15
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei16.nc
+  product: amadeus:product/speibase_211_16month
+  asset_key: spei16.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei16.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_16month.spei16
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei17.nc
+  product: amadeus:product/speibase_211_17month
+  asset_key: spei17.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei17.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_17month.spei17
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei18.nc
+  product: amadeus:product/speibase_211_18month
+  asset_key: spei18.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei18.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_18month.spei18
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei19.nc
+  product: amadeus:product/speibase_211_19month
+  asset_key: spei19.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei19.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_19month.spei19
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei20.nc
+  product: amadeus:product/speibase_211_20month
+  asset_key: spei20.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei20.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_20month.spei20
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei21.nc
+  product: amadeus:product/speibase_211_21month
+  asset_key: spei21.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei21.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_21month.spei21
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei22.nc
+  product: amadeus:product/speibase_211_22month
+  asset_key: spei22.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei22.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_22month.spei22
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei23.nc
+  product: amadeus:product/speibase_211_23month
+  asset_key: spei23.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei23.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_23month.spei23
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei24.nc
+  product: amadeus:product/speibase_211_24month
+  asset_key: spei24.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei24.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_24month.spei24
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei25.nc
+  product: amadeus:product/speibase_211_25month
+  asset_key: spei25.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei25.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_25month.spei25
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei26.nc
+  product: amadeus:product/speibase_211_26month
+  asset_key: spei26.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei26.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_26month.spei26
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei27.nc
+  product: amadeus:product/speibase_211_27month
+  asset_key: spei27.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei27.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_27month.spei27
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei28.nc
+  product: amadeus:product/speibase_211_28month
+  asset_key: spei28.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei28.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_28month.spei28
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei29.nc
+  product: amadeus:product/speibase_211_29month
+  asset_key: spei29.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei29.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_29month.spei29
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei30.nc
+  product: amadeus:product/speibase_211_30month
+  asset_key: spei30.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei30.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_30month.spei30
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei31.nc
+  product: amadeus:product/speibase_211_31month
+  asset_key: spei31.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei31.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_31month.spei31
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei32.nc
+  product: amadeus:product/speibase_211_32month
+  asset_key: spei32.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei32.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_32month.spei32
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei33.nc
+  product: amadeus:product/speibase_211_33month
+  asset_key: spei33.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei33.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_33month.spei33
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei34.nc
+  product: amadeus:product/speibase_211_34month
+  asset_key: spei34.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei34.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_34month.spei34
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei35.nc
+  product: amadeus:product/speibase_211_35month
+  asset_key: spei35.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei35.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_35month.spei35
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei36.nc
+  product: amadeus:product/speibase_211_36month
+  asset_key: spei36.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei36.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_36month.spei36
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei37.nc
+  product: amadeus:product/speibase_211_37month
+  asset_key: spei37.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei37.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_37month.spei37
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei38.nc
+  product: amadeus:product/speibase_211_38month
+  asset_key: spei38.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei38.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_38month.spei38
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei39.nc
+  product: amadeus:product/speibase_211_39month
+  asset_key: spei39.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei39.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_39month.spei39
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei40.nc
+  product: amadeus:product/speibase_211_40month
+  asset_key: spei40.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei40.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_40month.spei40
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei41.nc
+  product: amadeus:product/speibase_211_41month
+  asset_key: spei41.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei41.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_41month.spei41
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei42.nc
+  product: amadeus:product/speibase_211_42month
+  asset_key: spei42.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei42.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_42month.spei42
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei43.nc
+  product: amadeus:product/speibase_211_43month
+  asset_key: spei43.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei43.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_43month.spei43
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei44.nc
+  product: amadeus:product/speibase_211_44month
+  asset_key: spei44.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei44.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_44month.spei44
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei45.nc
+  product: amadeus:product/speibase_211_45month
+  asset_key: spei45.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei45.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_45month.spei45
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei46.nc
+  product: amadeus:product/speibase_211_46month
+  asset_key: spei46.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei46.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_46month.spei46
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei47.nc
+  product: amadeus:product/speibase_211_47month
+  asset_key: spei47.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei47.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_47month.spei47
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei48.nc
+  product: amadeus:product/speibase_211_48month
+  asset_key: spei48.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei48.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_48month.spei48
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326

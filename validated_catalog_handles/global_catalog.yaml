@@ -4000,7 +4000,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.827547+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei14d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4039,7 +4042,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.828126+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei30d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4078,7 +4084,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.728427+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei90d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4117,7 +4126,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.859124+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei180d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4156,7 +4168,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.460253+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei270d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4195,7 +4210,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.609205+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei1y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4234,7 +4252,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.109958+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei2y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4273,7 +4294,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.336065+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei5y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4312,7 +4336,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.821531+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi14d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4351,7 +4378,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.090313+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi30d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4390,7 +4420,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.794039+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi90d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4429,7 +4462,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.908251+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi180d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4468,7 +4504,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.524583+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi270d_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4507,7 +4546,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.640119+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi1y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4546,7 +4588,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.263967+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi2y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -4585,7 +4630,10 @@ products:
     invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
     formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
     [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
-    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
+    Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.298822+00:00; 3419 native
+    time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi5y_native.xml.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -28299,6 +28347,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.NO2
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no2_mean
@@ -28326,6 +28375,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.O3
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_o3_mean
@@ -28353,6 +28403,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_mean
@@ -28380,6 +28431,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.SO2
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_so2_mean
@@ -28407,6 +28459,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ACET
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_acet_mean
@@ -28434,6 +28487,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Acetone (CH3C(O)CH3, MW = 58.08 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALD2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ald2_mean
@@ -28461,6 +28515,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Acetaldehyde (CH3CHO, MW = 44.05 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALK4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_alk4_mean
@@ -28488,6 +28543,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped >= C4 Alkanes (MW = 58.12 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPI
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_bcpi_mean
@@ -28516,6 +28572,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_bcpo_mean
@@ -28544,6 +28601,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BENZ
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_benz_mean
@@ -28571,6 +28629,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Benzene (C6H6, MW = 78.11 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C2H6
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_c2h6_mean
@@ -28598,6 +28657,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ethane (C2H6, MW = 30.07 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C3H8
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_c3h8_mean
@@ -28625,6 +28685,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Propane (C3H8, MW = 44.10 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CH4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ch4_mean
@@ -28652,6 +28713,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methane (CH4, MW = 16.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_co_mean
@@ -28679,6 +28741,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST1
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst1_mean
@@ -28707,6 +28770,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst2_mean
@@ -28735,6 +28799,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst3_mean
@@ -28763,6 +28828,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst4_mean
@@ -28791,6 +28857,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.EOH
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_eoh_mean
@@ -28818,6 +28885,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ethanol (C2H5OH, MW = 46.07 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.H2O2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_h2o2_mean
@@ -28846,6 +28914,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrogen peroxide (H2O2, MW = 34.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HCHO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hcho_mean
@@ -28873,6 +28942,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hno3_mean
@@ -28900,6 +28970,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hno4_mean
@@ -28928,6 +28999,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Peroxynitric acid (HNO4, MW = 79.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ISOP
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_isop_mean
@@ -28956,6 +29028,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Isoprene (CH2=C(CH3)CH=CH2, MW = 68.12 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MACR
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_macr_mean
@@ -28984,6 +29057,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methacrolein (CH2=C(CH3)CHO, MW = 70.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MEK
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_mek_mean
@@ -29012,6 +29086,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methyl Ethyl Ketone (RC(O)R, MW = 72.11 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MVK
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_mvk_mean
@@ -29040,6 +29115,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methyl vinyl ketone (CH2=CHC(=O)CH3, MW = 70.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.N2O5
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_n2o5_mean
@@ -29068,6 +29144,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dinitrogen pentoxide (N2O5, MW = 108.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nh3_mean
@@ -29095,6 +29172,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nh4_mean
@@ -29122,6 +29200,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NIT
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nit_mean
@@ -29149,6 +29228,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no_mean
@@ -29176,6 +29256,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen oxide (NO, MW = 30.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no2_mean
@@ -29203,6 +29284,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NOy
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_noy_mean
@@ -29231,6 +29313,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Reactive_nitrogen_=_NO_NO2_HNO3_HNO4_HONO_2xN2O5_PAN_OrganicNitrates_AerosolNitrates
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.O3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_o3_mean
@@ -29258,6 +29341,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPI
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ocpi_mean
@@ -29286,6 +29370,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ocpo_mean
@@ -29314,6 +29399,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PAN
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pan_mean
@@ -29342,6 +29428,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Peroxyacetyl nitrate (CH3C(O)OONO2, MW = 121.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_mean
@@ -29369,6 +29456,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GOCART
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gocart_mean
@@ -29395,6 +29483,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Total reconstructed PM2.5 RH 35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25bc_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25bc_rh35_gcc_mean
@@ -29422,6 +29511,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25du_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25du_rh35_gcc_mean
@@ -29449,6 +29539,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ni_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25ni_rh35_gcc_mean
@@ -29476,6 +29567,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25oc_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25oc_rh35_gcc_mean
@@ -29503,6 +29595,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25soa_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25soa_rh35_gcc_mean
@@ -29531,6 +29624,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Secondary_organic_aerosol_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ss_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25ss_rh35_gcc_mean
@@ -29558,6 +29652,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Seasalt_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25su_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25su_rh35_gcc_mean
@@ -29585,6 +29680,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PRPE
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_prpe_mean
@@ -29613,6 +29709,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped >= C3 alkenes (C3H6, MW = 42.08 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.RCHO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_rcho_mean
@@ -29641,6 +29738,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped aldehyde >= C3 (CH3CH2CHO, MW = 58.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALA
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_sala_mean
@@ -29669,6 +29767,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) volume mixing ratio
+    dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_salc_mean
@@ -29697,6 +29797,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) volume mixing ratio dry
+    air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SO2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_so2_mean
@@ -29724,6 +29826,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAP
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_soap_mean
@@ -29752,6 +29855,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: SOA Precursor - lumped species for simplified SOA parameterization (MW = 150.00 g
+    mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAS
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_soas_mean
@@ -29780,6 +29885,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: SOA Simple - simplified non-volatile SOA parameterization (MW = 150.00 g mol-1) volume
+    mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.TOLU
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_tolu_mean
@@ -29807,6 +29914,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Toluene (C7H8, MW = 92.14 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.XYLE
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_xyle_mean
@@ -29834,6 +29942,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Xylene (C8H10, MW = 106.16 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.CLDTT
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_cldtt_mean
@@ -29860,6 +29969,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: total_cloud_area_fraction
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.PHIS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_phis_mean
@@ -29886,6 +29996,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface geopotential height
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.PS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_ps_mean
@@ -29912,6 +30023,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_pressure
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q_mean
@@ -29939,6 +30051,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q10m_mean
@@ -29965,6 +30078,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q2m_mean
@@ -29991,6 +30105,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.RH
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_rh_mean
@@ -30018,6 +30133,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: relative_humidity_after_moist
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.SLP
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_slp_mean
@@ -30044,6 +30160,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: sea_level_pressure
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t_mean
@@ -30071,6 +30188,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t10m_mean
@@ -30097,6 +30215,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t2m_mean
@@ -30123,6 +30242,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TPREC
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tprec_mean
@@ -30149,6 +30269,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: total_precipitation
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TROPPB
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_troppb_mean
@@ -30175,6 +30296,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: tropopause_pressure_based_on_blended_estimate
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_ts_mean
@@ -30201,6 +30323,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_skin_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u_mean
@@ -30228,6 +30351,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u10m_mean
@@ -30254,6 +30378,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u2m_mean
@@ -30280,6 +30405,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v_mean
@@ -30307,6 +30433,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v10m_mean
@@ -30333,6 +30460,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v2m_mean
@@ -30359,6 +30487,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZL
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_zl_mean
@@ -30386,6 +30515,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: mid_layer_heights
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZPBL
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_zpbl_mean
@@ -30412,6 +30542,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: planetary_boundary_layer_height
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_BC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_bc_mean
@@ -30438,6 +30569,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_CLOUD
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_cloud_mean
@@ -30464,6 +30596,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Cloud_optical_depth
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst1_mean
@@ -30490,6 +30623,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin1_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst2_mean
@@ -30516,6 +30650,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin2_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst3_mean
@@ -30542,6 +30677,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin3_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst4_mean
@@ -30568,6 +30704,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin4_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST5
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst5_mean
@@ -30594,6 +30731,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin5_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST6
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst6_mean
@@ -30620,6 +30758,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin6_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST7
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst7_mean
@@ -30646,6 +30785,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin7_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DUST
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dust_mean
@@ -30672,6 +30812,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_OC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_oc_mean
@@ -30698,6 +30839,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_sala_mean
@@ -30724,6 +30866,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Accumulation_mode_sea_salt_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_salc_mean
@@ -30750,6 +30893,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse_mode_sea_salt_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SULFATE
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_sulfate_mean
@@ -30776,6 +30920,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_bcpi_mean
@@ -30803,6 +30948,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_bcpo_mean
@@ -30830,6 +30976,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst1_mean
@@ -30857,6 +31004,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst2_mean
@@ -30884,6 +31032,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst3_mean
@@ -30911,6 +31060,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst4_mean
@@ -30938,6 +31088,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_hcho_mean
@@ -30964,6 +31115,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HNO3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_hno3_mean
@@ -30990,6 +31142,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nh3_mean
@@ -31016,6 +31169,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nh4_mean
@@ -31042,6 +31196,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NIT
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nit_mean
@@ -31068,6 +31223,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_no2_mean
@@ -31094,6 +31250,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_o3_mean
@@ -31120,6 +31277,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_ocpi_mean
@@ -31147,6 +31305,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_ocpo_mean
@@ -31174,6 +31333,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_sala_mean
@@ -31201,6 +31361,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_salc_mean
@@ -31228,6 +31389,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_BrO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_bro_mean
@@ -31256,6 +31418,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Bromine_monoxide_(BrO,_MW_=_96.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_CO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_co_mean
@@ -31284,6 +31447,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon_monoxide_(CO,_MW_=_28.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_hcho_mean
@@ -31312,6 +31476,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde_(CH2O,_MW_=_30.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_IO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_io_mean
@@ -31340,6 +31505,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Iodine_monoxide_(IO,_MW_=_143.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_no2_mean
@@ -31368,6 +31534,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen_dioxide_(NO2,_MW_=_46.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_o3_mean
@@ -31398,6 +31565,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone_(O3,_MW_=_48.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_so2_mean
@@ -31426,6 +31594,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur_dioxide_(SO2,_MW_=_64.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_BrO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_bro_mean
@@ -31454,6 +31623,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Bromine_monoxide_(BrO,_MW_=_96.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_CO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_co_mean
@@ -31482,6 +31652,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon_monoxide_(CO,_MW_=_28.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_hcho_mean
@@ -31510,6 +31681,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde_(CH2O,_MW_=_30.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_IO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_io_mean
@@ -31538,6 +31710,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Iodine_monoxide_(IO,_MW_=_143.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_no2_mean
@@ -31566,6 +31739,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen_dioxide_(NO2,_MW_=_46.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_o3_mean
@@ -31596,6 +31770,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone_(O3,_MW_=_48.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_so2_mean
@@ -31624,6 +31799,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur_dioxide_(SO2,_MW_=_64.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_bcpi_mean
@@ -31651,6 +31827,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_bcpo_mean
@@ -31678,6 +31856,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst1_mean
@@ -31705,6 +31885,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst2_mean
@@ -31732,6 +31914,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst3_mean
@@ -31759,6 +31943,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst4_mean
@@ -31786,6 +31972,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_hcho_mean
@@ -31813,6 +32001,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HNO3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_hno3_mean
@@ -31840,6 +32029,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nh3_mean
@@ -31867,6 +32057,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nh4_mean
@@ -31894,6 +32085,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NIT
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nit_mean
@@ -31921,6 +32113,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_ocpi_mean
@@ -31948,6 +32141,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_ocpo_mean
@@ -31975,6 +32170,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_sala_mean
@@ -32002,6 +32199,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) vertical integrated
+    loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_salc_mean
@@ -32029,6 +32228,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) vertical integrated loss
+    due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_so2_mean
@@ -32056,6 +32257,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_so4_mean
@@ -32083,6 +32285,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate (SO4, MW = 96.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.CO
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_co_instantaneous
@@ -32108,6 +32311,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.NO2
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_no2_instantaneous
@@ -32133,6 +32337,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.NOy
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_noy_instantaneous
@@ -32159,6 +32364,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Reactive_nitrogen_=_NO_NO2_HNO3_HNO4_HONO_2xN2O5_PAN_OrganicNitrates_AerosolNitrates
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.O3
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_o3_instantaneous
@@ -32184,6 +32390,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_instantaneous
@@ -32209,6 +32416,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25bc_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25bc_rh35_gcc_instantaneous
@@ -32234,6 +32442,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25du_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25du_rh35_gcc_instantaneous
@@ -32259,6 +32468,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ni_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25ni_rh35_gcc_instantaneous
@@ -32284,6 +32494,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25oc_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25oc_rh35_gcc_instantaneous
@@ -32309,6 +32520,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25soa_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25soa_rh35_gcc_instantaneous
@@ -32335,6 +32547,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Secondary_organic_aerosol_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ss_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25ss_rh35_gcc_instantaneous
@@ -32360,6 +32573,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Seasalt_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25su_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25su_rh35_gcc_instantaneous
@@ -32385,6 +32599,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.SO2
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_so2_instantaneous
@@ -32410,6 +32625,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRDENS
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_airdens_instantaneous
@@ -32435,6 +32651,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: moist_air_density
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRVOL_CHEM
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_airvol_chem_instantaneous
@@ -32460,6 +32677,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: GEOS-Chem_chemistry_box_volume
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.EPV
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_epv_instantaneous
@@ -32485,6 +32703,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: ertels_potential_vorticity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.ETH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_eth_instantaneous
@@ -32510,6 +32729,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: potential_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.H
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_h_instantaneous
@@ -32535,6 +32755,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: edge_heights
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.OMEGA
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_omega_instantaneous
@@ -32560,6 +32781,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: vertical_pressure_velocity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.PS
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_ps_instantaneous
@@ -32584,6 +32806,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_pressure
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.Q
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_q_instantaneous
@@ -32609,6 +32832,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: specific_humidity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.RH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_rh_instantaneous
@@ -32634,6 +32858,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: relative_humidity_after_moist
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.SLP
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_slp_instantaneous
@@ -32658,6 +32883,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: sea_level_pressure
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.T
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_t_instantaneous
@@ -32683,6 +32909,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: air_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.TH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_th_instantaneous
@@ -32708,6 +32935,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: potential_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.U
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_u_instantaneous
@@ -32733,6 +32961,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: eastward_wind
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.V
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_v_instantaneous
@@ -32758,6 +32987,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: northward_wind
 - id: amadeus:pvar/gmted2010_be15_arcgrid.be
   product: amadeus:product/gmted2010_be15_arcgrid
   canonical_variable: amadeus:var/gmted2010_be_terrain_statistic
@@ -52897,6 +53127,1063 @@ product_variables:
     processor-normalized names; arbitrary regex matches need review.'
   unit_conversion_formula: canonical = raw_native * 0.45359237; mask native missing values first
 assets:
+- id: amadeus:asset/speibase_211/spei01.nc
+  product: amadeus:product/speibase_211_01month
+  asset_key: spei01.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei01.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_01month.spei01
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei02.nc
+  product: amadeus:product/speibase_211_02month
+  asset_key: spei02.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei02.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_02month.spei02
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei03.nc
+  product: amadeus:product/speibase_211_03month
+  asset_key: spei03.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei03.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_03month.spei03
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei04.nc
+  product: amadeus:product/speibase_211_04month
+  asset_key: spei04.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei04.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_04month.spei04
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei05.nc
+  product: amadeus:product/speibase_211_05month
+  asset_key: spei05.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei05.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_05month.spei05
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei06.nc
+  product: amadeus:product/speibase_211_06month
+  asset_key: spei06.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei06.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_06month.spei06
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei07.nc
+  product: amadeus:product/speibase_211_07month
+  asset_key: spei07.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei07.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_07month.spei07
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei08.nc
+  product: amadeus:product/speibase_211_08month
+  asset_key: spei08.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei08.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_08month.spei08
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei09.nc
+  product: amadeus:product/speibase_211_09month
+  asset_key: spei09.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei09.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_09month.spei09
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei10.nc
+  product: amadeus:product/speibase_211_10month
+  asset_key: spei10.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei10.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_10month.spei10
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei11.nc
+  product: amadeus:product/speibase_211_11month
+  asset_key: spei11.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei11.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_11month.spei11
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei12.nc
+  product: amadeus:product/speibase_211_12month
+  asset_key: spei12.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei12.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_12month.spei12
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei13.nc
+  product: amadeus:product/speibase_211_13month
+  asset_key: spei13.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei13.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_13month.spei13
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei14.nc
+  product: amadeus:product/speibase_211_14month
+  asset_key: spei14.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei14.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_14month.spei14
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei15.nc
+  product: amadeus:product/speibase_211_15month
+  asset_key: spei15.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei15.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_15month.spei15
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei16.nc
+  product: amadeus:product/speibase_211_16month
+  asset_key: spei16.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei16.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_16month.spei16
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei17.nc
+  product: amadeus:product/speibase_211_17month
+  asset_key: spei17.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei17.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_17month.spei17
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei18.nc
+  product: amadeus:product/speibase_211_18month
+  asset_key: spei18.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei18.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_18month.spei18
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei19.nc
+  product: amadeus:product/speibase_211_19month
+  asset_key: spei19.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei19.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_19month.spei19
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei20.nc
+  product: amadeus:product/speibase_211_20month
+  asset_key: spei20.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei20.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_20month.spei20
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei21.nc
+  product: amadeus:product/speibase_211_21month
+  asset_key: spei21.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei21.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_21month.spei21
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei22.nc
+  product: amadeus:product/speibase_211_22month
+  asset_key: spei22.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei22.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_22month.spei22
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei23.nc
+  product: amadeus:product/speibase_211_23month
+  asset_key: spei23.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei23.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_23month.spei23
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei24.nc
+  product: amadeus:product/speibase_211_24month
+  asset_key: spei24.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei24.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_24month.spei24
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei25.nc
+  product: amadeus:product/speibase_211_25month
+  asset_key: spei25.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei25.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_25month.spei25
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei26.nc
+  product: amadeus:product/speibase_211_26month
+  asset_key: spei26.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei26.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_26month.spei26
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei27.nc
+  product: amadeus:product/speibase_211_27month
+  asset_key: spei27.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei27.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_27month.spei27
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei28.nc
+  product: amadeus:product/speibase_211_28month
+  asset_key: spei28.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei28.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_28month.spei28
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei29.nc
+  product: amadeus:product/speibase_211_29month
+  asset_key: spei29.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei29.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_29month.spei29
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei30.nc
+  product: amadeus:product/speibase_211_30month
+  asset_key: spei30.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei30.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_30month.spei30
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei31.nc
+  product: amadeus:product/speibase_211_31month
+  asset_key: spei31.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei31.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_31month.spei31
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei32.nc
+  product: amadeus:product/speibase_211_32month
+  asset_key: spei32.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei32.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_32month.spei32
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei33.nc
+  product: amadeus:product/speibase_211_33month
+  asset_key: spei33.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei33.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_33month.spei33
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei34.nc
+  product: amadeus:product/speibase_211_34month
+  asset_key: spei34.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei34.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_34month.spei34
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei35.nc
+  product: amadeus:product/speibase_211_35month
+  asset_key: spei35.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei35.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_35month.spei35
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei36.nc
+  product: amadeus:product/speibase_211_36month
+  asset_key: spei36.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei36.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_36month.spei36
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei37.nc
+  product: amadeus:product/speibase_211_37month
+  asset_key: spei37.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei37.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_37month.spei37
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei38.nc
+  product: amadeus:product/speibase_211_38month
+  asset_key: spei38.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei38.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_38month.spei38
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei39.nc
+  product: amadeus:product/speibase_211_39month
+  asset_key: spei39.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei39.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_39month.spei39
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei40.nc
+  product: amadeus:product/speibase_211_40month
+  asset_key: spei40.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei40.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_40month.spei40
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei41.nc
+  product: amadeus:product/speibase_211_41month
+  asset_key: spei41.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei41.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_41month.spei41
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei42.nc
+  product: amadeus:product/speibase_211_42month
+  asset_key: spei42.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei42.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_42month.spei42
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei43.nc
+  product: amadeus:product/speibase_211_43month
+  asset_key: spei43.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei43.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_43month.spei43
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei44.nc
+  product: amadeus:product/speibase_211_44month
+  asset_key: spei44.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei44.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_44month.spei44
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei45.nc
+  product: amadeus:product/speibase_211_45month
+  asset_key: spei45.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei45.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_45month.spei45
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei46.nc
+  product: amadeus:product/speibase_211_46month
+  asset_key: spei46.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei46.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_46month.spei46
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei47.nc
+  product: amadeus:product/speibase_211_47month
+  asset_key: spei47.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei47.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_47month.spei47
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/speibase_211/spei48.nc
+  product: amadeus:product/speibase_211_48month
+  asset_key: spei48.nc
+  url: https://spei.csic.es/spei_database_2_11/nc/spei48.nc
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/speibase_211_48month.spei48
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  srid: 4326
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
+  asset_key: GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.CO
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.NO2
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.O3
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.SO2
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 6609716
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-12-17T21:45:10+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  product: amadeus:product/chm_tavg_1hr_g1440x721_v1
+  asset_key: GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ACET
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALD2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALK4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPI
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BENZ
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C2H6
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C3H8
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CH4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST1
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.EOH
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.H2O2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HCHO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ISOP
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MACR
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MEK
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MVK
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.N2O5
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NIT
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NOy
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.O3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPI
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PAN
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GOCART
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25bc_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25du_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ni_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25oc_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25soa_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ss_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25su_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PRPE
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.RCHO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALA
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SO2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAP
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAS
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.TOLU
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.XYLE
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 75929486
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-06-28T20:23:36+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  product: amadeus:product/met_tavg_1hr_g1440x721_x1
+  asset_key: GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.CLDTT
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.PHIS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.PS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.RH
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.SLP
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TPREC
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TROPPB
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZL
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZPBL
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 26789355
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-06-18T16:56:41+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
+  asset_key: GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_BC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_CLOUD
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST5
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST6
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST7
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DUST
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_OC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SULFATE
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HNO3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NIT
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_BrO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_CO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_IO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_BrO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_CO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_IO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HNO3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NIT
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO4
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 63269105
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  source_last_modified: '2019-06-18T16:56:53+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  product: amadeus:product/chm_inst_1hr_g1440x721_p23
+  asset_key: GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.CO
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.NO2
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.NOy
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.O3
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25bc_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25du_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ni_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25oc_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25soa_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ss_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25su_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.SO2
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 377607338
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  vertical_levels_present:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 850.0
+  - 800.0
+  - 750.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 250.0
+  - 200.0
+  - 150.0
+  - 100.0
+  - 50.0
+  - 10.0
+  source_last_modified: '2019-05-28T20:28:13+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  product: amadeus:product/met_inst_1hr_g1440x721_p23
+  asset_key: GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRDENS
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRVOL_CHEM
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.EPV
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.ETH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.H
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.OMEGA
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.PS
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.Q
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.RH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.SLP
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.T
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.TH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.U
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.V
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 311072011
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  vertical_levels_present:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 850.0
+  - 800.0
+  - 750.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 250.0
+  - 200.0
+  - 150.0
+  - 100.0
+  - 50.0
+  - 10.0
+  source_last_modified: '2019-05-28T20:27:59+00:00'
+- id: amadeus:asset/gmted2010/be15_grd.zip
+  product: amadeus:product/gmted2010_be15_arcgrid
+  asset_key: be15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_be15_arcgrid.be
+  media_type: application/zip
+  size_bytes: 887482505
+  srid: 4326
+- id: amadeus:asset/gmted2010/be30_grd.zip
+  product: amadeus:product/gmted2010_be30_arcgrid
+  asset_key: be30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_be30_arcgrid.be
+  media_type: application/zip
+  size_bytes: 244572593
+  srid: 4326
+- id: amadeus:asset/gmted2010/be75_grd.zip
+  product: amadeus:product/gmted2010_be75_arcgrid
+  asset_key: be75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_be75_arcgrid.be
+  media_type: application/zip
+  size_bytes: 3053712331
+  srid: 4326
+- id: amadeus:asset/gmted2010/ds15_grd.zip
+  product: amadeus:product/gmted2010_ds15_arcgrid
+  asset_key: ds15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_ds15_arcgrid.ds
+  media_type: application/zip
+  size_bytes: 901267025
+  srid: 4326
+- id: amadeus:asset/gmted2010/ds30_grd.zip
+  product: amadeus:product/gmted2010_ds30_arcgrid
+  asset_key: ds30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_ds30_arcgrid.ds
+  media_type: application/zip
+  size_bytes: 286417947
+  srid: 4326
+- id: amadeus:asset/gmted2010/ds75_grd.zip
+  product: amadeus:product/gmted2010_ds75_arcgrid
+  asset_key: ds75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_ds75_arcgrid.ds
+  media_type: application/zip
+  size_bytes: 3063773897
+  srid: 4326
+- id: amadeus:asset/gmted2010/md15_grd.zip
+  product: amadeus:product/gmted2010_md15_arcgrid
+  asset_key: md15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_md15_arcgrid.md
+  media_type: application/zip
+  size_bytes: 861807887
+  srid: 4326
+- id: amadeus:asset/gmted2010/md30_grd.zip
+  product: amadeus:product/gmted2010_md30_arcgrid
+  asset_key: md30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_md30_arcgrid.md
+  media_type: application/zip
+  size_bytes: 239530890
+  srid: 4326
+- id: amadeus:asset/gmted2010/md75_grd.zip
+  product: amadeus:product/gmted2010_md75_arcgrid
+  asset_key: md75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_md75_arcgrid.md
+  media_type: application/zip
+  size_bytes: 2932412226
+  srid: 4326
+- id: amadeus:asset/gmted2010/mi15_grd.zip
+  product: amadeus:product/gmted2010_mi15_arcgrid
+  asset_key: mi15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mi15_arcgrid.mi
+  media_type: application/zip
+  size_bytes: 854319493
+  srid: 4326
+- id: amadeus:asset/gmted2010/mi30_grd.zip
+  product: amadeus:product/gmted2010_mi30_arcgrid
+  asset_key: mi30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mi30_arcgrid.mi
+  media_type: application/zip
+  size_bytes: 235598365
+  srid: 4326
+- id: amadeus:asset/gmted2010/mi75_grd.zip
+  product: amadeus:product/gmted2010_mi75_arcgrid
+  asset_key: mi75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mi75_arcgrid.mi
+  media_type: application/zip
+  size_bytes: 2899830057
+  srid: 4326
+- id: amadeus:asset/gmted2010/mn15_grd.zip
+  product: amadeus:product/gmted2010_mn15_arcgrid
+  asset_key: mn15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mn15_arcgrid.mn
+  media_type: application/zip
+  size_bytes: 862136494
+  srid: 4326
+- id: amadeus:asset/gmted2010/mn30_grd.zip
+  product: amadeus:product/gmted2010_mn30_arcgrid
+  asset_key: mn30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mn30_arcgrid.mn
+  media_type: application/zip
+  size_bytes: 277229566
+  srid: 4326
+- id: amadeus:asset/gmted2010/mn75_grd.zip
+  product: amadeus:product/gmted2010_mn75_arcgrid
+  asset_key: mn75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mn75_arcgrid.mn
+  media_type: application/zip
+  size_bytes: 2919537239
+  srid: 4326
+- id: amadeus:asset/gmted2010/mx15_grd.zip
+  product: amadeus:product/gmted2010_mx15_arcgrid
+  asset_key: mx15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mx15_arcgrid.mx
+  media_type: application/zip
+  size_bytes: 888597853
+  srid: 4326
+- id: amadeus:asset/gmted2010/mx30_grd.zip
+  product: amadeus:product/gmted2010_mx30_arcgrid
+  asset_key: mx30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mx30_arcgrid.mx
+  media_type: application/zip
+  size_bytes: 248593143
+  srid: 4326
+- id: amadeus:asset/gmted2010/mx75_grd.zip
+  product: amadeus:product/gmted2010_mx75_arcgrid
+  asset_key: mx75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_mx75_arcgrid.mx
+  media_type: application/zip
+  size_bytes: 2982530281
+  srid: 4326
+- id: amadeus:asset/gmted2010/sd15_grd.zip
+  product: amadeus:product/gmted2010_sd15_arcgrid
+  asset_key: sd15_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd15_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_sd15_arcgrid.sd
+  media_type: application/zip
+  size_bytes: 414791680
+  srid: 4326
+- id: amadeus:asset/gmted2010/sd30_grd.zip
+  product: amadeus:product/gmted2010_sd30_arcgrid
+  asset_key: sd30_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd30_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_sd30_arcgrid.sd
+  media_type: application/zip
+  size_bytes: 126192743
+  srid: 4326
+- id: amadeus:asset/gmted2010/sd75_grd.zip
+  product: amadeus:product/gmted2010_sd75_arcgrid
+  asset_key: sd75_grd.zip
+  url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd75_grd.zip
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gmted2010_sd75_arcgrid.sd
+  media_type: application/zip
+  size_bytes: 1262882704
+  srid: 4326
 - id: amadeus:asset/gridmet_drought.spei14d
   product: amadeus:product/gridmet_drought_spei14d
   asset_key: spei14d.nc
@@ -53057,3 +54344,531 @@ assets:
   variables_present:
   - amadeus:pvar/gridmet_drought.eddi5y
   - amadeus:pvar/gridmet_drought.eddi5y.category
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b0cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1785702233
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b100cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1791559648
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b10cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b10cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b10cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b10
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1786976230
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 10.0
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b200cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b200cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b200cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b200
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1792213658
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 200.0
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b30cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b30cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b30cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b30
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1787661953
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 30.0
+- id: amadeus:asset/olm/ph.h2o_usda.4c1a2a_m_250m_b60cm
+  product: amadeus:product/olm_soil_ph_h2o_usda_4c1a2a_v02
+  asset_key: ph.h2o_usda.4c1a2a_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/ph.h2o_usda.4c1a2a_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_ph_h2o_usda_4c1a2a_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1788459760
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b0cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2855137578
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b100cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2822470379
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b10cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b10cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b10cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b10
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2840576992
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 10.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b200cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b200cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b200cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b200
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2815994788
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 200.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b30cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b30cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b30cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b30
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2821698132
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 30.0
+- id: amadeus:asset/olm/bulkdens.fineearth_usda.4a1h_m_250m_b60cm
+  product: amadeus:product/olm_soil_bulk_density_fineearth_v02
+  asset_key: bulkdens.fineearth_usda.4a1h_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/bulkdens.fineearth_usda.4a1h_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_bulk_density_fineearth_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2818524497
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b0cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1448336279
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b100cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1174686631
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b10cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b10cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b10cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b10
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1390326143
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 10.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b200cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b200cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b200cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b200
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1154534784
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 200.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b30cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b30cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b30cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b30
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1260517272
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 30.0
+- id: amadeus:asset/olm/organic.carbon_usda.6a1c_m_250m_b60cm
+  product: amadeus:product/olm_soil_organic_carbon_content_v02
+  asset_key: organic.carbon_usda.6a1c_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/organic.carbon_usda.6a1c_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_organic_carbon_content_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1190095546
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0
+- id: amadeus:asset/olm/sand.wfraction_usda.3a1a1a_m_250m_b0cm
+  product: amadeus:product/olm_soil_sand_mass_percent_v02
+  asset_key: sand.wfraction_usda.3a1a1a_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/sand.wfraction_usda.3a1a1a_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_sand_mass_percent_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2108219036
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/sand.wfraction_usda.3a1a1a_m_250m_b100cm
+  product: amadeus:product/olm_soil_sand_mass_percent_v02
+  asset_key: sand.wfraction_usda.3a1a1a_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/sand.wfraction_usda.3a1a1a_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_sand_mass_percent_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2121766702
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/sand.wfraction_usda.3a1a1a_m_250m_b10cm
+  product: amadeus:product/olm_soil_sand_mass_percent_v02
+  asset_key: sand.wfraction_usda.3a1a1a_m_250m_b10cm
+  url: https://s3.openlandmap.org/arco/sand.wfraction_usda.3a1a1a_m_250m_b10cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_sand_mass_percent_v02.b10
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2112781458
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 10.0
+- id: amadeus:asset/olm/sand.wfraction_usda.3a1a1a_m_250m_b60cm
+  product: amadeus:product/olm_soil_sand_mass_percent_v02
+  asset_key: sand.wfraction_usda.3a1a1a_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/sand.wfraction_usda.3a1a1a_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_sand_mass_percent_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 2125648783
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0
+- id: amadeus:asset/olm/watercontent.33kPa_usda.4b1c_m_250m_b0cm
+  product: amadeus:product/olm_soil_water_vol_percent_33kpa_v02
+  asset_key: watercontent.33kPa_usda.4b1c_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/watercontent.33kPa_usda.4b1c_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.1.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_water_vol_percent_33kpa_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1891437058
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/watercontent.33kPa_usda.4b1c_m_250m_b100cm
+  product: amadeus:product/olm_soil_water_vol_percent_33kpa_v02
+  asset_key: watercontent.33kPa_usda.4b1c_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/watercontent.33kPa_usda.4b1c_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.1.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_water_vol_percent_33kpa_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1899108938
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/watercontent.33kPa_usda.4b1c_m_250m_b200cm
+  product: amadeus:product/olm_soil_water_vol_percent_33kpa_v02
+  asset_key: watercontent.33kPa_usda.4b1c_m_250m_b200cm
+  url: https://s3.openlandmap.org/arco/watercontent.33kPa_usda.4b1c_m_250m_b200cm_19500101_20171231_go_epsg.4326_v0.1.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_water_vol_percent_33kpa_v02.b200
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1902572908
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 200.0
+- id: amadeus:asset/olm/watercontent.33kPa_usda.4b1c_m_250m_b30cm
+  product: amadeus:product/olm_soil_water_vol_percent_33kpa_v02
+  asset_key: watercontent.33kPa_usda.4b1c_m_250m_b30cm
+  url: https://s3.openlandmap.org/arco/watercontent.33kPa_usda.4b1c_m_250m_b30cm_19500101_20171231_go_epsg.4326_v0.1.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_water_vol_percent_33kpa_v02.b30
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1892005123
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 30.0
+- id: amadeus:asset/olm/watercontent.33kPa_usda.4b1c_m_250m_b60cm
+  product: amadeus:product/olm_soil_water_vol_percent_33kpa_v02
+  asset_key: watercontent.33kPa_usda.4b1c_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/watercontent.33kPa_usda.4b1c_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.1.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_soil_water_vol_percent_33kpa_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 1891409338
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b0cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b0cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b0cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b0
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 437285396
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 0.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b100cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b100cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b100cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b100
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 403358427
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 100.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b10cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b10cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b10cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b10
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 366897543
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 10.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b200cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b200cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b200cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b200
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 403968173
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 200.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b30cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b30cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b30cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b30
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 378224820
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 30.0
+- id: amadeus:asset/olm/texture.class_usda.tt_m_250m_b60cm
+  product: amadeus:product/olm_usda_soil_texture_class_v02
+  asset_key: texture.class_usda.tt_m_250m_b60cm
+  url: https://s3.openlandmap.org/arco/texture.class_usda.tt_m_250m_b60cm_19500101_20171231_go_epsg.4326_v0.2.tif
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/olm_usda_soil_texture_class_v02.b60
+  native_format: cloud_optimized_geotiff
+  media_type: image/tiff
+  size_bytes: 398390324
+  srid: 4326
+  bbox_wkt: POLYGON ((-180.0 -62.00080943400002, 179.9999424 -62.00080943400002, 179.9999424 87.37, -180.0
+    87.37, -180.0 -62.00080943400002))
+  vertical_levels_present:
+  - 60.0

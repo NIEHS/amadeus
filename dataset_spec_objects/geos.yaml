@@ -2167,6 +2167,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.NO2
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no2_mean
@@ -2194,6 +2195,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.O3
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_o3_mean
@@ -2221,6 +2223,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_mean
@@ -2248,6 +2251,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.SO2
   product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_so2_mean
@@ -2275,6 +2279,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ACET
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_acet_mean
@@ -2302,6 +2307,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Acetone (CH3C(O)CH3, MW = 58.08 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALD2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ald2_mean
@@ -2329,6 +2335,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Acetaldehyde (CH3CHO, MW = 44.05 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALK4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_alk4_mean
@@ -2356,6 +2363,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped >= C4 Alkanes (MW = 58.12 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPI
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_bcpi_mean
@@ -2384,6 +2392,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_bcpo_mean
@@ -2412,6 +2421,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BENZ
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_benz_mean
@@ -2439,6 +2449,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Benzene (C6H6, MW = 78.11 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C2H6
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_c2h6_mean
@@ -2466,6 +2477,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ethane (C2H6, MW = 30.07 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C3H8
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_c3h8_mean
@@ -2493,6 +2505,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Propane (C3H8, MW = 44.10 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CH4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ch4_mean
@@ -2520,6 +2533,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methane (CH4, MW = 16.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_co_mean
@@ -2547,6 +2561,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST1
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst1_mean
@@ -2575,6 +2590,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst2_mean
@@ -2603,6 +2619,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst3_mean
@@ -2631,6 +2648,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_dst4_mean
@@ -2659,6 +2677,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.EOH
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_eoh_mean
@@ -2686,6 +2705,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ethanol (C2H5OH, MW = 46.07 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.H2O2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_h2o2_mean
@@ -2714,6 +2734,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrogen peroxide (H2O2, MW = 34.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HCHO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hcho_mean
@@ -2741,6 +2762,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hno3_mean
@@ -2768,6 +2790,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_hno4_mean
@@ -2796,6 +2819,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Peroxynitric acid (HNO4, MW = 79.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ISOP
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_isop_mean
@@ -2824,6 +2848,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Isoprene (CH2=C(CH3)CH=CH2, MW = 68.12 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MACR
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_macr_mean
@@ -2852,6 +2877,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methacrolein (CH2=C(CH3)CHO, MW = 70.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MEK
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_mek_mean
@@ -2880,6 +2906,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methyl Ethyl Ketone (RC(O)R, MW = 72.11 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MVK
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_mvk_mean
@@ -2908,6 +2935,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Methyl vinyl ketone (CH2=CHC(=O)CH3, MW = 70.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.N2O5
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_n2o5_mean
@@ -2936,6 +2964,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dinitrogen pentoxide (N2O5, MW = 108.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nh3_mean
@@ -2963,6 +2992,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH4
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nh4_mean
@@ -2990,6 +3020,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NIT
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_nit_mean
@@ -3017,6 +3048,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no_mean
@@ -3044,6 +3076,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen oxide (NO, MW = 30.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_no2_mean
@@ -3071,6 +3104,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NOy
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_noy_mean
@@ -3099,6 +3133,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Reactive_nitrogen_=_NO_NO2_HNO3_HNO4_HONO_2xN2O5_PAN_OrganicNitrates_AerosolNitrates
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.O3
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_o3_mean
@@ -3126,6 +3161,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPI
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ocpi_mean
@@ -3154,6 +3190,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_ocpo_mean
@@ -3182,6 +3219,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PAN
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pan_mean
@@ -3210,6 +3248,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Peroxyacetyl nitrate (CH3C(O)OONO2, MW = 121.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_mean
@@ -3237,6 +3276,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GOCART
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gocart_mean
@@ -3263,6 +3303,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Total reconstructed PM2.5 RH 35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25bc_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25bc_rh35_gcc_mean
@@ -3290,6 +3331,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25du_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25du_rh35_gcc_mean
@@ -3317,6 +3359,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ni_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25ni_rh35_gcc_mean
@@ -3344,6 +3387,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25oc_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25oc_rh35_gcc_mean
@@ -3371,6 +3415,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25soa_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25soa_rh35_gcc_mean
@@ -3399,6 +3444,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Secondary_organic_aerosol_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ss_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25ss_rh35_gcc_mean
@@ -3426,6 +3472,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Seasalt_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25su_RH35_GCC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_pm25su_rh35_gcc_mean
@@ -3453,6 +3500,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PRPE
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_prpe_mean
@@ -3481,6 +3529,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped >= C3 alkenes (C3H6, MW = 42.08 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.RCHO
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_rcho_mean
@@ -3509,6 +3558,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Lumped aldehyde >= C3 (CH3CH2CHO, MW = 58.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALA
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_sala_mean
@@ -3537,6 +3587,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) volume mixing ratio
+    dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALC
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_salc_mean
@@ -3565,6 +3617,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) volume mixing ratio dry
+    air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SO2
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_so2_mean
@@ -3592,6 +3646,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAP
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_soap_mean
@@ -3620,6 +3675,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: SOA Precursor - lumped species for simplified SOA parameterization (MW = 150.00 g
+    mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAS
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_soas_mean
@@ -3648,6 +3705,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: SOA Simple - simplified non-volatile SOA parameterization (MW = 150.00 g mol-1) volume
+    mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.TOLU
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_tolu_mean
@@ -3675,6 +3734,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Toluene (C7H8, MW = 92.14 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_tavg_1hr_g1440x721_v1.XYLE
   product: amadeus:product/chm_tavg_1hr_g1440x721_v1
   canonical_variable: amadeus:var/geos_cf_v1_xyle_mean
@@ -3702,6 +3762,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Xylene (C8H10, MW = 106.16 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.CLDTT
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_cldtt_mean
@@ -3728,6 +3789,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: total_cloud_area_fraction
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.PHIS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_phis_mean
@@ -3754,6 +3816,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface geopotential height
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.PS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_ps_mean
@@ -3780,6 +3843,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_pressure
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q_mean
@@ -3807,6 +3871,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q10m_mean
@@ -3833,6 +3898,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_q2m_mean
@@ -3859,6 +3925,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_specific_humidity
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.RH
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_rh_mean
@@ -3886,6 +3953,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: relative_humidity_after_moist
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.SLP
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_slp_mean
@@ -3912,6 +3980,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: sea_level_pressure
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t_mean
@@ -3939,6 +4008,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t10m_mean
@@ -3965,6 +4035,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.T2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_t2m_mean
@@ -3991,6 +4062,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_air_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TPREC
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tprec_mean
@@ -4017,6 +4089,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: total_precipitation
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TROPPB
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_troppb_mean
@@ -4043,6 +4116,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: tropopause_pressure_based_on_blended_estimate
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.TS
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_ts_mean
@@ -4069,6 +4143,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_skin_temperature
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u_mean
@@ -4096,6 +4171,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u10m_mean
@@ -4122,6 +4198,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.U2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_u2m_mean
@@ -4148,6 +4225,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_eastward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v_mean
@@ -4175,6 +4253,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V10M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v10m_mean
@@ -4201,6 +4280,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 10-meter_northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.V2M
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_v2m_mean
@@ -4227,6 +4307,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: 2-meter_northward_wind
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZL
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_zl_mean
@@ -4254,6 +4335,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: mid_layer_heights
 - id: amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZPBL
   product: amadeus:product/met_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_zpbl_mean
@@ -4280,6 +4362,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: planetary_boundary_layer_height
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_BC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_bc_mean
@@ -4306,6 +4389,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_CLOUD
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_cloud_mean
@@ -4332,6 +4416,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Cloud_optical_depth
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst1_mean
@@ -4358,6 +4443,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin1_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst2_mean
@@ -4384,6 +4470,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin2_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst3_mean
@@ -4410,6 +4497,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin3_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst4_mean
@@ -4436,6 +4524,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin4_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST5
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst5_mean
@@ -4462,6 +4551,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin5_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST6
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst6_mean
@@ -4488,6 +4578,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin6_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST7
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dst7_mean
@@ -4514,6 +4605,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_bin7_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DUST
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_dust_mean
@@ -4540,6 +4632,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_OC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_oc_mean
@@ -4566,6 +4659,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_sala_mean
@@ -4592,6 +4686,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Accumulation_mode_sea_salt_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_salc_mean
@@ -4618,6 +4713,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse_mode_sea_salt_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SULFATE
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_aod550_sulfate_mean
@@ -4644,6 +4740,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_optical_depth_at_550nm
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_bcpi_mean
@@ -4671,6 +4768,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_bcpo_mean
@@ -4698,6 +4796,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst1_mean
@@ -4725,6 +4824,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst2_mean
@@ -4752,6 +4852,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst3_mean
@@ -4779,6 +4880,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_dst4_mean
@@ -4806,6 +4908,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_hcho_mean
@@ -4832,6 +4935,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HNO3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_hno3_mean
@@ -4858,6 +4962,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nh3_mean
@@ -4884,6 +4989,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nh4_mean
@@ -4910,6 +5016,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NIT
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_nit_mean
@@ -4936,6 +5043,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_no2_mean
@@ -4962,6 +5070,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_o3_mean
@@ -4988,6 +5097,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_ocpi_mean
@@ -5015,6 +5125,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_ocpo_mean
@@ -5042,6 +5153,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_sala_mean
@@ -5069,6 +5181,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_drydepflx_salc_mean
@@ -5096,6 +5209,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) dry deposition flux
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_BrO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_bro_mean
@@ -5124,6 +5238,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Bromine_monoxide_(BrO,_MW_=_96.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_CO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_co_mean
@@ -5152,6 +5267,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon_monoxide_(CO,_MW_=_28.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_hcho_mean
@@ -5180,6 +5296,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde_(CH2O,_MW_=_30.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_IO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_io_mean
@@ -5208,6 +5325,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Iodine_monoxide_(IO,_MW_=_143.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_no2_mean
@@ -5236,6 +5354,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen_dioxide_(NO2,_MW_=_46.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_o3_mean
@@ -5266,6 +5385,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone_(O3,_MW_=_48.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_totcol_so2_mean
@@ -5294,6 +5414,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur_dioxide_(SO2,_MW_=_64.00_g_mol-1)_total_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_BrO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_bro_mean
@@ -5322,6 +5443,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Bromine_monoxide_(BrO,_MW_=_96.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_CO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_co_mean
@@ -5350,6 +5472,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon_monoxide_(CO,_MW_=_28.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_hcho_mean
@@ -5378,6 +5501,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde_(CH2O,_MW_=_30.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_IO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_io_mean
@@ -5406,6 +5530,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Iodine_monoxide_(IO,_MW_=_143.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_NO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_no2_mean
@@ -5434,6 +5559,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen_dioxide_(NO2,_MW_=_46.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_O3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_o3_mean
@@ -5464,6 +5590,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone_(O3,_MW_=_48.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_tropcol_so2_mean
@@ -5492,6 +5619,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur_dioxide_(SO2,_MW_=_64.00_g_mol-1)_tropospheric_column_density
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_bcpi_mean
@@ -5519,6 +5647,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic black carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_bcpo_mean
@@ -5546,6 +5676,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic black carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST1
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst1_mean
@@ -5573,6 +5705,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 0.7 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst2_mean
@@ -5600,6 +5734,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 1.4 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst3_mean
@@ -5627,6 +5763,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 2.4 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_dst4_mean
@@ -5654,6 +5792,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust aerosol, Reff = 4.5 microns (MW = 29.00 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HCHO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_hcho_mean
@@ -5681,6 +5821,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Formaldehyde (CH2O, MW = 30.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HNO3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_hno3_mean
@@ -5708,6 +5849,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitric acid (HNO3, MW = 63.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH3
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nh3_mean
@@ -5735,6 +5877,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonia (NH3, MW = 17.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nh4_mean
@@ -5762,6 +5905,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ammonium (NH4, MW = 18.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NIT
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_nit_mean
@@ -5789,6 +5933,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Inorganic nitrates (MW = 62.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPI
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_ocpi_mean
@@ -5816,6 +5961,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophilic organic carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPO
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_ocpo_mean
@@ -5843,6 +5990,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Hydrophobic organic carbon aerosol (MW = 12.01 g mol-1) vertical integrated loss due
+    to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALA
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_sala_mean
@@ -5870,6 +6019,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Fine (0.01-0.05 microns) sea salt aerosol (MW = 31.40 g mol-1) vertical integrated
+    loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALC
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_salc_mean
@@ -5897,6 +6048,8 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Coarse (0.5-8 microns) sea salt aerosol (MW = 31.40 g mol-1) vertical integrated loss
+    due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO2
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_so2_mean
@@ -5924,6 +6077,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO4
   product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
   canonical_variable: amadeus:var/geos_cf_v1_wetdepflx_so4_mean
@@ -5951,6 +6105,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate (SO4, MW = 96.00 g mol-1) vertical integrated loss due to wet scavenging
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.CO
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_co_instantaneous
@@ -5976,6 +6131,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Carbon monoxide (CO, MW = 28.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.NO2
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_no2_instantaneous
@@ -6001,6 +6157,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrogen dioxide (NO2, MW = 46.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.NOy
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_noy_instantaneous
@@ -6027,6 +6184,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Reactive_nitrogen_=_NO_NO2_HNO3_HNO4_HONO_2xN2O5_PAN_OrganicNitrates_AerosolNitrates
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.O3
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_o3_instantaneous
@@ -6052,6 +6210,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Ozone (O3, MW = 48.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25_rh35_gcc_instantaneous
@@ -6077,6 +6236,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25bc_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25bc_rh35_gcc_instantaneous
@@ -6102,6 +6262,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Black_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25du_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25du_rh35_gcc_instantaneous
@@ -6127,6 +6288,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Dust_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ni_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25ni_rh35_gcc_instantaneous
@@ -6152,6 +6314,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Nitrate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25oc_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25oc_rh35_gcc_instantaneous
@@ -6177,6 +6340,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Organic_carbon_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25soa_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25soa_rh35_gcc_instantaneous
@@ -6203,6 +6367,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Secondary_organic_aerosol_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ss_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25ss_rh35_gcc_instantaneous
@@ -6228,6 +6393,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Seasalt_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25su_RH35_GCC
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_pm25su_rh35_gcc_instantaneous
@@ -6253,6 +6419,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfate_particulate_matter_with_diameter_below_2.5_um_RH_35
 - id: amadeus:pvar/chm_inst_1hr_g1440x721_p23.SO2
   product: amadeus:product/chm_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_so2_instantaneous
@@ -6278,6 +6445,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: Sulfur dioxide (SO2, MW = 64.00 g mol-1) volume mixing ratio dry air
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRDENS
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_airdens_instantaneous
@@ -6303,6 +6471,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: moist_air_density
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRVOL_CHEM
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_airvol_chem_instantaneous
@@ -6328,6 +6497,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: GEOS-Chem_chemistry_box_volume
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.EPV
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_epv_instantaneous
@@ -6353,6 +6523,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: ertels_potential_vorticity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.ETH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_eth_instantaneous
@@ -6378,6 +6549,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: potential_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.H
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_h_instantaneous
@@ -6403,6 +6575,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: edge_heights
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.OMEGA
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_omega_instantaneous
@@ -6428,6 +6601,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: vertical_pressure_velocity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.PS
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_ps_instantaneous
@@ -6452,6 +6626,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: surface_pressure
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.Q
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_q_instantaneous
@@ -6477,6 +6652,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: specific_humidity
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.RH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_rh_instantaneous
@@ -6502,6 +6678,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: relative_humidity_after_moist
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.SLP
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_slp_instantaneous
@@ -6526,6 +6703,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: sea_level_pressure
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.T
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_t_instantaneous
@@ -6551,6 +6729,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: air_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.TH
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_th_instantaneous
@@ -6576,6 +6755,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: potential_temperature
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.U
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_u_instantaneous
@@ -6601,6 +6781,7 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: eastward_wind
 - id: amadeus:pvar/met_inst_1hr_g1440x721_p23.V
   product: amadeus:product/met_inst_1hr_g1440x721_p23
   canonical_variable: amadeus:var/geos_cf_v1_v_instantaneous
@@ -6626,3 +6807,303 @@ product_variables:
   missing_value_sentinel: '999999986991104.0'
   native_value_scale_factor: 1.0
   native_value_offset: 0.0
+  cf_standard_name: northward_wind
+assets:
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  product: amadeus:product/aqc_tavg_1hr_g1440x721_v1
+  asset_key: GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.CO
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.NO2
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.O3
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
+  - amadeus:pvar/aqc_tavg_1hr_g1440x721_v1.SO2
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 6609716
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-12-17T21:45:10+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  product: amadeus:product/chm_tavg_1hr_g1440x721_v1
+  asset_key: GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ACET
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALD2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ALK4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPI
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BCPO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.BENZ
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C2H6
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.C3H8
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CH4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.CO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST1
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.DST4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.EOH
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.H2O2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HCHO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.HNO4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.ISOP
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MACR
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MEK
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.MVK
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.N2O5
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NH4
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NIT
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NO2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.NOy
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.O3
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPI
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.OCPO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PAN
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25_RH35_GOCART
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25bc_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25du_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ni_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25oc_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25soa_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25ss_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PM25su_RH35_GCC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.PRPE
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.RCHO
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALA
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SALC
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SO2
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAP
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.SOAS
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.TOLU
+  - amadeus:pvar/chm_tavg_1hr_g1440x721_v1.XYLE
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 75929486
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-06-28T20:23:36+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  product: amadeus:product/met_tavg_1hr_g1440x721_x1
+  asset_key: GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.CLDTT
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.PHIS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.PS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.Q2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.RH
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.SLP
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.T2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TPREC
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TROPPB
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.TS
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.U2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V10M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.V2M
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZL
+  - amadeus:pvar/met_tavg_1hr_g1440x721_x1.ZPBL
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 26789355
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  vertical_levels_present:
+  - 72.0
+  source_last_modified: '2019-06-18T16:56:41+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  product: amadeus:product/xgc_tavg_1hr_g1440x721_x1
+  asset_key: GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_BC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_CLOUD
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST5
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST6
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DST7
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_DUST
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_OC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.AOD550_SULFATE
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_BCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_HNO3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NH4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NIT
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_OCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.DRYDEPFLX_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_BrO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_CO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_IO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TOTCOL_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_BrO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_CO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_IO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_NO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_O3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.TROPCOL_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_BCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST1
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_DST4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HCHO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_HNO3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH3
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NH4
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_NIT
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPI
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_OCPO
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALA
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SALC
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO2
+  - amadeus:pvar/xgc_tavg_1hr_g1440x721_x1.WETDEPFLX_SO4
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 63269105
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  valid_time_end: '2018-01-01T01:00:00.000000Z'
+  source_last_modified: '2019-06-18T16:56:53+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  product: amadeus:product/chm_inst_1hr_g1440x721_p23
+  asset_key: GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.CO
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.NO2
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.NOy
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.O3
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25bc_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25du_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ni_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25oc_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25soa_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25ss_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.PM25su_RH35_GCC
+  - amadeus:pvar/chm_inst_1hr_g1440x721_p23.SO2
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 377607338
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  vertical_levels_present:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 850.0
+  - 800.0
+  - 750.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 250.0
+  - 200.0
+  - 150.0
+  - 100.0
+  - 50.0
+  - 10.0
+  source_last_modified: '2019-05-28T20:28:13+00:00'
+- id: amadeus:asset/geos_v01_replay/GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  product: amadeus:product/met_inst_1hr_g1440x721_p23
+  asset_key: GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/Y2018/M01/D01/GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRDENS
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.AIRVOL_CHEM
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.EPV
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.ETH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.H
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.OMEGA
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.PS
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.Q
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.RH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.SLP
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.T
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.TH
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.U
+  - amadeus:pvar/met_inst_1hr_g1440x721_p23.V
+  native_format: netcdf4_cf
+  media_type: application/x-netcdf
+  size_bytes: 311072011
+  valid_time_start: '2018-01-01T00:00:00.000000Z'
+  vertical_levels_present:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 850.0
+  - 800.0
+  - 750.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 250.0
+  - 200.0
+  - 150.0
+  - 100.0
+  - 50.0
+  - 10.0
+  source_last_modified: '2019-05-28T20:27:59+00:00'
