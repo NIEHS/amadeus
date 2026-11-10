@@ -151,10 +151,7 @@ download_nei <- function(
   checkmate::assert_subset(int_year, c(2008, 2011, 2014, 2017, 2020, 2023))
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus::download_setup_dir(
-    amadeus::download_sanitize_path(directory_to_save),
-    zip = TRUE
-  )
+  chr_directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
