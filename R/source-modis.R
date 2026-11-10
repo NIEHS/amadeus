@@ -235,9 +235,6 @@ download_modis <- function(
     rate_limit = rate_limit
   )
   # ----------------------------------------------------------------------------
-  # Check first URL for validity, including before a preview.
-  amadeus:::check_preflight(df_download$url[1L])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(
@@ -245,6 +242,9 @@ download_modis <- function(
       df_download$destfile
     )))
   }
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity, including before a preview.
+  amadeus:::check_preflight(df_download$url[1L])
   # ----------------------------------------------------------------------------
   # Run download using the same retry and rate-limit inputs as discovery.
   download_result <- amadeus:::download_run_method(

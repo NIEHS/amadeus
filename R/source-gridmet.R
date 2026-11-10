@@ -140,14 +140,6 @@ download_gridmet <- function(
   )
   df_download$destfile <- with(df_download, paste0(vdir, file))
   # ----------------------------------------------------------------------------
-  # Create missing directories.
-  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity. First only because sequential `int_years` will
-  # ensure first URL is earliest year requested or only non-temporal SPEI/EDDI
-  # request.
-  amadeus:::check_preflight(df_download$url[1])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(
@@ -155,6 +147,12 @@ download_gridmet <- function(
       df_download$destfile
     )))
   }
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

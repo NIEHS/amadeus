@@ -201,13 +201,13 @@ download_nei <- function(
   # Generate download file names.
   chr_filenames <- paste0(chr_dir_to_download, chr_filemap)
   # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

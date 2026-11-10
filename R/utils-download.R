@@ -11,26 +11,25 @@
 #' @return character ending with a forward slash.
 #' @keywords internal
 #' @export
-download_sanitize_path <-
-  function(directory) {
-    # --------------------------------------------------------------------------
-    # Append a forward slash if the directory path does not end with one.
-    chars_dir <- nchar(directory)
-    if (
-      substr(
-        directory,
-        chars_dir,
-        chars_dir
-      ) !=
-        "/"
-    ) {
-      directory <-
-        paste(directory, "/", sep = "")
-    }
-    # --------------------------------------------------------------------------
-    # Return the directory path.
-    return(directory)
+download_sanitize_path <- function(directory) {
+  # ----------------------------------------------------------------------------
+  # Append a forward slash if the directory path does not end with one.
+  chars_dir <- nchar(directory)
+  if (
+    substr(
+      directory,
+      chars_dir,
+      chars_dir
+    ) !=
+      "/"
+  ) {
+    directory <-
+      paste(directory, "/", sep = "")
   }
+  # ----------------------------------------------------------------------------
+  # Return the directory path.
+  return(directory)
+}
 
 ################################################################################
 #' Set up download directories
@@ -52,48 +51,47 @@ download_sanitize_path <-
 #' download_setup_dir(directory, zip = TRUE)
 #' @keywords internal
 #' @export
-download_setup_dir <-
-  function(directory, zip = FALSE) {
-    # --------------------------------------------------------------------------
-    # Sanitize the download path and create missing parent directories.
-    chr_dir_sanitized <- amadeus:::download_sanitize_path(directory)
-    if (!dir.exists(chr_dir_sanitized)) {
-      dir.create(chr_dir_sanitized, recursive = TRUE)
-    }
-    # --------------------------------------------------------------------------
-    # Set up separate archive and data directories when requested.
-    if (zip) {
-      # ------------------------------------------------------------------------
-      # Create the archive directory.
-      directory_zip <- amadeus:::download_sanitize_path(
-        paste0(
-          chr_dir_sanitized,
-          "zip_files"
-        )
-      )
-      if (!dir.exists(directory_zip)) {
-        dir.create(directory_zip, recursive = TRUE)
-      }
-      # ------------------------------------------------------------------------
-      # Create the extracted data directory.
-      directory_data <- amadeus:::download_sanitize_path(
-        paste0(
-          chr_dir_sanitized,
-          "data_files"
-        )
-      )
-      if (!dir.exists(directory_data)) {
-        dir.create(directory_data, recursive = TRUE)
-      }
-      # ------------------------------------------------------------------------
-      # Return the archive and data paths, in that order.
-      return(c(directory_zip, directory_data))
-    } else {
-      # ------------------------------------------------------------------------
-      # Return the main download path.
-      chr_dir_sanitized
-    }
+download_setup_dir <- function(directory, zip = FALSE) {
+  # ----------------------------------------------------------------------------
+  # Sanitize the download path and create missing parent directories.
+  chr_dir_sanitized <- amadeus:::download_sanitize_path(directory)
+  if (!dir.exists(chr_dir_sanitized)) {
+    dir.create(chr_dir_sanitized, recursive = TRUE)
   }
+  # ----------------------------------------------------------------------------
+  # Set up separate archive and data directories when requested.
+  if (zip) {
+    # --------------------------------------------------------------------------
+    # Create the archive directory.
+    directory_zip <- amadeus:::download_sanitize_path(
+      paste0(
+        chr_dir_sanitized,
+        "zip_files"
+      )
+    )
+    if (!dir.exists(directory_zip)) {
+      dir.create(directory_zip, recursive = TRUE)
+    }
+    # --------------------------------------------------------------------------
+    # Create the extracted data directory.
+    directory_data <- amadeus:::download_sanitize_path(
+      paste0(
+        chr_dir_sanitized,
+        "data_files"
+      )
+    )
+    if (!dir.exists(directory_data)) {
+      dir.create(directory_data, recursive = TRUE)
+    }
+    # --------------------------------------------------------------------------
+    # Return the archive and data paths, in that order.
+    return(c(directory_zip, directory_data))
+  } else {
+    # --------------------------------------------------------------------------
+    # Return the main download path.
+    chr_dir_sanitized
+  }
+}
 
 ################################################################################
 #' Check if destination file exists or is 0 bytes.

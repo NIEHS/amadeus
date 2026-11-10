@@ -275,12 +275,6 @@ download_merra2 <- function(
     )
   )
   # ----------------------------------------------------------------------------
-  # Create missing directories.
-  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(
@@ -288,6 +282,12 @@ download_merra2 <- function(
       df_download$destfile
     )))
   }
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

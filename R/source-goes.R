@@ -181,9 +181,6 @@ download_goes <- function(
     rate_limit = rate_limit
   )
   # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(
@@ -191,6 +188,9 @@ download_goes <- function(
       df_download$destfile
     )))
   }
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

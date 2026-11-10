@@ -140,13 +140,13 @@ download_aqs <- function(
     int_years
   )
   # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
-  # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(
