@@ -797,7 +797,6 @@ extent_to_modis_tiles <- function(extent) {
     "xmin must be < xmax" = extent[1] < extent[3],
     "ymin must be < ymax" = extent[2] < extent[4]
   )
-
   # ----------------------------------------------------------------------------
   # Locate the bundled MODIS tile bounds table.
   bounds_file <- system.file(
@@ -808,7 +807,6 @@ extent_to_modis_tiles <- function(extent) {
   stopifnot(
     "sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file)
   )
-
   # ----------------------------------------------------------------------------
   # Read the tile coordinates and geographic bounds.
   lines <- readLines(bounds_file, warn = FALSE)
@@ -817,18 +815,15 @@ extent_to_modis_tiles <- function(extent) {
     text = paste(data_lines, collapse = "\n"),
     col.names = c("iv", "ih", "lon_min", "lon_max", "lat_min", "lat_max")
   )
-
   # ----------------------------------------------------------------------------
   # Drop fill tiles with invalid longitude bounds.
   tiles_df <- tiles_df[tiles_df$lon_min > -900, ]
-
   # ----------------------------------------------------------------------------
   # Extract the requested longitude and latitude limits.
   xmin <- extent[1]
   ymin <- extent[2]
   xmax <- extent[3]
   ymax <- extent[4]
-
   # ----------------------------------------------------------------------------
   # Retain tiles whose geographic bounds overlap the requested extent.
   hits <- tiles_df[
@@ -837,7 +832,6 @@ extent_to_modis_tiles <- function(extent) {
       tiles_df$lat_max >= ymin &
       tiles_df$lat_min <= ymax,
   ]
-
   # ----------------------------------------------------------------------------
   # Format the matching horizontal and vertical tile indices.
   sprintf("h%02dv%02d", hits$ih, hits$iv)

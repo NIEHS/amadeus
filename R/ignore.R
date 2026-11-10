@@ -133,9 +133,7 @@ download_olm <- function(
   #### 2. directory setup
   amadeus:::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus:::download_sanitize_path(directory_to_save)
-
   #### 3. define measurement data paths
-
   download_urls <-
     list_stac_files(
       which = product,
@@ -144,7 +142,6 @@ download_olm <- function(
     )
   url_filenames <- strsplit(download_urls, "/", fixed = TRUE)[[1]]
   url_filenames <- sapply(url_filenames, \(x) x[length(x)])
-
   download_names <- paste0(directory_to_save, url_filenames)
   #### 4. build download command
   download_commands <-
@@ -155,7 +152,6 @@ download_olm <- function(
       download_names,
       "\n"
     )
-
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
