@@ -181,9 +181,6 @@ download_geos <- function(
     )))
   }
   # ----------------------------------------------------------------------------
-  # Create missing directories.
-  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
-  # ----------------------------------------------------------------------------
   # Check first URL for validity.
   amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------

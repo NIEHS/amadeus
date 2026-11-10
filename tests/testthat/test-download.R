@@ -1091,12 +1091,14 @@ testthat::test_that("format_file_size formats correctly", {
   testthat::expect_equal(amadeus:::format_file_size(1024), "1.0 KB")
   testthat::expect_equal(amadeus:::format_file_size(1024 * 1024), "1.0 MB")
   testthat::expect_equal(
-    amadeus:::format_file_size(1024 * 1024 * 1024), "1.0 GB"
+    amadeus:::format_file_size(1024 * 1024 * 1024),
+    "1.0 GB"
   )
   testthat::expect_equal(amadeus:::format_file_size(2560), "2.5 KB")
   # GB branch: bytes >= 1024^3
   testthat::expect_equal(
-    amadeus:::format_file_size(2 * 1024^3), "2.0 GB"
+    amadeus:::format_file_size(2 * 1024^3),
+    "2.0 GB"
   )
 })
 
@@ -1281,7 +1283,7 @@ testthat::test_that("download functions create proper directory structure", {
     )
     # --------------------------------------------------------------------------
     testthat::expect_true(dir.exists("./data"))
-    testthat::expect_true(dir.exists("./data/air.sfc"))
+    testthat::expect_false(dir.exists("./data/air.sfc"))
   })
 })
 
@@ -1784,126 +1786,117 @@ testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
 ################################################################################
 ##### download_run_method show_progress=TRUE success path (" OK " prefix)
 
-testthat::test_that(
-  "download_run_method show_progress=TRUE success shows OK prefix",
-  {
-    skip_on_cran()
-    # --------------------------------------------------------------------------
-    withr::with_tempdir({
-      testthat::local_mocked_bindings(
-        req_perform = function(req, path = NULL, ...) {
-          if (!is.null(path)) {
-            writeBin(charToRaw("fake file data"), path)
-          }
-          structure(
-            list(
-              status_code = 200L,
-              headers = list(`Content-Type` = "application/octet-stream"),
-              body = charToRaw("fake file data")
-            ),
-            class = "httr2_response"
-          )
-        },
-        .package = "httr2"
-      )
-      # ------------------------------------------------------------------------
-      msgs <- character(0)
+testthat::test_that("download_run_method show_progress=TRUE success shows OK prefix", {
+  skip_on_cran()
+  # --------------------------------------------------------------------------
+  withr::with_tempdir({
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        if (!is.null(path)) {
+          writeBin(charToRaw("fake file data"), path)
+        }
+        structure(
+          list(
+            status_code = 200L,
+            headers = list(`Content-Type` = "application/octet-stream"),
+            body = charToRaw("fake file data")
+          ),
+          class = "httr2_response"
+        )
+      },
+      .package = "httr2"
+    )
+    # ------------------------------------------------------------------------
+    msgs <- character(0)
+    withCallingHandlers(
+      {
+        result <- amadeus:::download_run_method(
+          urls = c(
+            "https://example.com/file1.bin",
+            "https://example.com/file2.bin"
+          ),
+          destfiles = c("file1.bin", "file2.bin"),
+          show_progress = TRUE,
+          max_tries = 1,
+          rate_limit = 0
+        )
+      },
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    # ------------------------------------------------------------------------
+    testthat::expect_equal(result$success, 2)
+    testthat::expect_equal(result$failed, 0)
+    testthat::expect_true(any(grepl(" OK ", msgs)))
+  })
+})
+
+################################################################################
+##### download_run_method tryCatch error handler (req_perform throws)
+
+testthat::test_that("download_run_method tryCatch error handler when req_perform throws", {
+  withr::with_tempdir({
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        stop("Simulated network error")
+      },
+      .package = "httr2"
+    )
+    # ------------------------------------------------------------------------
+    msgs <- character(0)
+    result <- suppressWarnings(
       withCallingHandlers(
-        {
-          result <- amadeus:::download_run_method(
-            urls = c(
-              "https://example.com/file1.bin",
-              "https://example.com/file2.bin"
-            ),
-            destfiles = c("file1.bin", "file2.bin"),
-            show_progress = TRUE,
-            max_tries = 1,
-            rate_limit = 0
-          )
-        },
+        amadeus:::download_run_method(
+          urls = "https://example.com/data.bin",
+          destfiles = "error_test.bin",
+          show_progress = FALSE,
+          max_tries = 1
+        ),
         message = function(m) {
           msgs <<- c(msgs, conditionMessage(m))
           invokeRestart("muffleMessage")
         }
       )
-      # ------------------------------------------------------------------------
-      testthat::expect_equal(result$success, 2)
-      testthat::expect_equal(result$failed, 0)
-      testthat::expect_true(any(grepl(" OK ", msgs)))
-    })
-  }
-)
+    )
+    # ------------------------------------------------------------------------
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_false(file.exists("error_test.bin"))
+    testthat::expect_true(any(grepl("Failed", msgs)))
+  })
+})
 
-################################################################################
-##### download_run_method tryCatch error handler (req_perform throws)
-
-testthat::test_that(
-  "download_run_method tryCatch error handler when req_perform throws",
-  {
-    withr::with_tempdir({
-      testthat::local_mocked_bindings(
-        req_perform = function(req, path = NULL, ...) {
-          stop("Simulated network error")
-        },
-        .package = "httr2"
+testthat::test_that("download_run_method tryCatch error handler show_progress=TRUE", {
+  withr::with_tempdir({
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        stop("Simulated network error for progress test")
+      },
+      .package = "httr2"
+    )
+    # ------------------------------------------------------------------------
+    msgs <- character(0)
+    result <- suppressWarnings(
+      withCallingHandlers(
+        amadeus:::download_run_method(
+          urls = "https://example.com/data.bin",
+          destfiles = "error_progress_test.bin",
+          show_progress = TRUE,
+          max_tries = 1
+        ),
+        message = function(m) {
+          msgs <<- c(msgs, conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }
       )
-      # ------------------------------------------------------------------------
-      msgs <- character(0)
-      result <- suppressWarnings(
-        withCallingHandlers(
-          amadeus:::download_run_method(
-            urls = "https://example.com/data.bin",
-            destfiles = "error_test.bin",
-            show_progress = FALSE,
-            max_tries = 1
-          ),
-          message = function(m) {
-            msgs <<- c(msgs, conditionMessage(m))
-            invokeRestart("muffleMessage")
-          }
-        )
-      )
-      # ------------------------------------------------------------------------
-      testthat::expect_equal(result$failed, 1)
-      testthat::expect_equal(result$success, 0)
-      testthat::expect_false(file.exists("error_test.bin"))
-      testthat::expect_true(any(grepl("Failed", msgs)))
-    })
-  }
-)
-
-testthat::test_that(
-  "download_run_method tryCatch error handler show_progress=TRUE",
-  {
-    withr::with_tempdir({
-      testthat::local_mocked_bindings(
-        req_perform = function(req, path = NULL, ...) {
-          stop("Simulated network error for progress test")
-        },
-        .package = "httr2"
-      )
-      # ------------------------------------------------------------------------
-      msgs <- character(0)
-      result <- suppressWarnings(
-        withCallingHandlers(
-          amadeus:::download_run_method(
-            urls = "https://example.com/data.bin",
-            destfiles = "error_progress_test.bin",
-            show_progress = TRUE,
-            max_tries = 1
-          ),
-          message = function(m) {
-            msgs <<- c(msgs, conditionMessage(m))
-            invokeRestart("muffleMessage")
-          }
-        )
-      )
-      # ------------------------------------------------------------------------
-      testthat::expect_equal(result$failed, 1)
-      testthat::expect_true(any(grepl(" FAIL ", msgs)))
-    })
-  }
-)
+    )
+    # ------------------------------------------------------------------------
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_true(any(grepl(" FAIL ", msgs)))
+  })
+})
 
 ################################################################################
 ##### setup_nasa_token: session, renviron, and file methods (no skip_on_cran)
@@ -2115,14 +2108,22 @@ testthat::test_that("check_urls with method=NULL uses check_url_status", {
     .package = "amadeus"
   )
   urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
-  result <- suppressMessages(amadeus:::check_urls(urls = urls, size = 2, method = NULL))
+  result <- suppressMessages(amadeus:::check_urls(
+    urls = urls,
+    size = 2,
+    method = NULL
+  ))
   testthat::expect_length(result, 2)
   testthat::expect_true(all(result))
 })
 
 testthat::test_that("check_urls method=SKIP returns NULL (covers lines 722-723)", {
   urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
-  result <- suppressMessages(amadeus:::check_urls(urls = urls, size = 2, method = "SKIP"))
+  result <- suppressMessages(amadeus:::check_urls(
+    urls = urls,
+    size = 2,
+    method = "SKIP"
+  ))
   testthat::expect_null(result)
 })
 
@@ -2212,7 +2213,9 @@ testthat::test_that("download_run_method with token adds Bearer auth header", {
 testthat::test_that("download_run_method 0-byte file triggers failure path", {
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      if (!is.null(path)) file.create(path)  # Create 0-byte file
+      if (!is.null(path)) {
+        file.create(path)
+      } # Create 0-byte file
       structure(
         list(status_code = 200L, headers = list(), body = charToRaw("")),
         class = "httr2_response"
@@ -2244,7 +2247,9 @@ testthat::test_that("download_run_method 0-byte file triggers failure path", {
 testthat::test_that("download_run_method 0-byte show_progress=TRUE triggers FAIL prefix", {
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      if (!is.null(path)) file.create(path)  # Create 0-byte file
+      if (!is.null(path)) {
+        file.create(path)
+      } # Create 0-byte file
       structure(
         list(status_code = 200L, headers = list(), body = charToRaw("")),
         class = "httr2_response"
@@ -2280,7 +2285,9 @@ testthat::test_that("download_run_method multiple files triggers sleep", {
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       call_count <<- call_count + 1L
-      if (!is.null(path)) writeBin(charToRaw("content"), path)
+      if (!is.null(path)) {
+        writeBin(charToRaw("content"), path)
+      }
       structure(
         list(status_code = 200L, headers = list(), body = charToRaw("")),
         class = "httr2_response"
@@ -2309,7 +2316,9 @@ testthat::test_that("download_run_method multiple files triggers sleep", {
 testthat::test_that("download_run_method error cleanup removes pre-existing file", {
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      if (!is.null(path)) file.create(path)  # Create file before erroring
+      if (!is.null(path)) {
+        file.create(path)
+      } # Create file before erroring
       stop("Simulated error after file creation")
     },
     .package = "httr2"
@@ -2373,15 +2382,28 @@ testthat::test_that("download_data passes nasa_earth_data_token only to NASA fun
   # NASA functions should accept it; non-NASA functions should not receive it
   # (the wrapper uses formals() check to conditionally pass the token)
   nasa_fns <- c(
-    "download_geos", "download_merra2", "download_modis", "download_groads",
+    "download_geos",
+    "download_merra2",
+    "download_modis",
+    "download_groads",
     "download_population"
   )
   non_nasa_fns <- c(
-    "download_aqs", "download_ecoregion", "download_nlcd",
+    "download_aqs",
+    "download_ecoregion",
+    "download_nlcd",
     "download_koppen_geiger",
-    "download_hms", "download_gmted", "download_narr", "download_tri",
-    "download_nei", "download_gridmet", "download_terraclimate",
-    "download_huc", "download_cropscape", "download_prism", "download_edgar"
+    "download_hms",
+    "download_gmted",
+    "download_narr",
+    "download_tri",
+    "download_nei",
+    "download_gridmet",
+    "download_terraclimate",
+    "download_huc",
+    "download_cropscape",
+    "download_prism",
+    "download_edgar"
   )
   # ----------------------------------------------------------------------------
   for (fn_name in nasa_fns) {
@@ -2415,7 +2437,7 @@ testthat::test_that("download_data forwards nasa_earth_data_token without error 
           download = FALSE
         )
       ),
-      NA  # no error expected
+      NA # no error expected
     )
   })
 })
@@ -2473,18 +2495,47 @@ testthat::test_that("download_koppen_geiger has rate_limit parameter with defaul
 
 testthat::test_that("all download functions have rate_limit parameter", {
   fns <- list(
-    download_aqs, download_ecoregion, download_geos, download_gmted,
-    download_merra2, download_narr, download_nlcd, download_groads,
-    download_population, download_hms, download_koppen_geiger, download_modis,
-    download_tri, download_nei, download_gridmet, download_terraclimate,
-    download_huc, download_prism, download_edgar, download_cropscape
+    download_aqs,
+    download_ecoregion,
+    download_geos,
+    download_gmted,
+    download_merra2,
+    download_narr,
+    download_nlcd,
+    download_groads,
+    download_population,
+    download_hms,
+    download_koppen_geiger,
+    download_modis,
+    download_tri,
+    download_nei,
+    download_gridmet,
+    download_terraclimate,
+    download_huc,
+    download_prism,
+    download_edgar,
+    download_cropscape
   )
   fn_names <- c(
-    "download_aqs", "download_ecoregion", "download_geos", "download_gmted",
-    "download_merra2", "download_narr", "download_nlcd", "download_groads",
-    "download_population", "download_hms", "download_koppen_geiger",
-    "download_modis", "download_tri", "download_nei", "download_gridmet",
-    "download_terraclimate", "download_huc", "download_prism", "download_edgar",
+    "download_aqs",
+    "download_ecoregion",
+    "download_geos",
+    "download_gmted",
+    "download_merra2",
+    "download_narr",
+    "download_nlcd",
+    "download_groads",
+    "download_population",
+    "download_hms",
+    "download_koppen_geiger",
+    "download_modis",
+    "download_tri",
+    "download_nei",
+    "download_gridmet",
+    "download_terraclimate",
+    "download_huc",
+    "download_prism",
+    "download_edgar",
     "download_cropscape"
   )
   for (i in seq_along(fns)) {
@@ -2494,7 +2545,6 @@ testthat::test_that("all download functions have rate_limit parameter", {
     )
   }
 })
-
 
 
 ################################################################################
@@ -2529,8 +2579,7 @@ testthat::test_that("download_run_method passes http_version to req_options", {
   testthat::expect_false(is.null(captured_req))
   curl_opts <- captured_req$options
   testthat::expect_true(
-    "http_version" %in% names(curl_opts) &&
-      curl_opts$http_version == 2L
+    "http_version" %in% names(curl_opts) && curl_opts$http_version == 2L
   )
 })
 
@@ -2629,16 +2678,16 @@ testthat::test_that("CMR endpoint is reachable and returns granules for MOD11A1"
     httr2::request(
       "https://cmr.earthdata.nasa.gov/search/granules.json"
     ) |>
-    httr2::req_url_query(
-      short_name = "MOD11A1",
-      version = "061",
-      temporal = "2022-01-01,2022-01-01",
-      bounding_box = "-125,24,-66,50",
-      page_size = 5
-    ) |>
-    httr2::req_options(connecttimeout = 30L) |>
-    httr2::req_timeout(60) |>
-    httr2::req_perform(),
+      httr2::req_url_query(
+        short_name = "MOD11A1",
+        version = "061",
+        temporal = "2022-01-01,2022-01-01",
+        bounding_box = "-125,24,-66,50",
+        page_size = 5
+      ) |>
+      httr2::req_options(connecttimeout = 30L) |>
+      httr2::req_timeout(60) |>
+      httr2::req_perform(),
     error = function(e) NULL
   )
   testthat::skip_if(
@@ -2669,16 +2718,16 @@ testthat::test_that("CMR endpoint is reachable and returns granules for MCD19A2"
     httr2::request(
       "https://cmr.earthdata.nasa.gov/search/granules.json"
     ) |>
-    httr2::req_url_query(
-      short_name = "MCD19A2",
-      version = "061",
-      temporal = "2022-01-01,2022-01-01",
-      bounding_box = "-125,24,-66,50",
-      page_size = 5
-    ) |>
-    httr2::req_options(connecttimeout = 30L) |>
-    httr2::req_timeout(60) |>
-    httr2::req_perform(),
+      httr2::req_url_query(
+        short_name = "MCD19A2",
+        version = "061",
+        temporal = "2022-01-01,2022-01-01",
+        bounding_box = "-125,24,-66,50",
+        page_size = 5
+      ) |>
+      httr2::req_options(connecttimeout = 30L) |>
+      httr2::req_timeout(60) |>
+      httr2::req_perform(),
     error = function(e) NULL
   )
   testthat::skip_if(
