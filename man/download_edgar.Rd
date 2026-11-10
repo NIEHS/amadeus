@@ -2,7 +2,7 @@
 % Please edit documentation in R/edgar.R
 \name{download_edgar}
 \alias{download_edgar}
-\title{Download EDGAR Emissions Data}
+\title{Download EDGAR emissions data}
 \usage{
 download_edgar(
   species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
@@ -28,127 +28,173 @@ download_edgar(
 )
 }
 \arguments{
-\item{species}{Character vector. One or more species to download.
-Supported values: "BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10",
-"PM2.5", "SO2". Input is case-insensitive and supports "pm2.5" or "pm25".}
+\item{species}{character vector. Air pollutants to download for version
+\code{"8.1"}: \code{"BC"}, \code{"CO"}, \code{"NH3"}, \code{"NMVOC"}, \code{"NOx"}, \code{"OC"},
+\code{"PM10"}, \code{"PM2.5"}, or \code{"SO2"}. Defaults to all listed species.
+Input is case-insensitive; \code{"PM25"} is also accepted. Ignored for VOC
+speciation, which uses \code{voc} instead.}
 
-\item{version}{Character. EDGAR data version. Supported values: "8.1" for
-most recent version data or "8.1_voc" for VOC speciation data.}
+\item{version}{character(1). \code{"8.1"} (default) for air pollutants or
+\code{"8.1_voc"} for VOC speciation.}
 
-\item{temp_res}{Character. Temporal resolution for specification with
-version 8.1. One of "yearly", "monthly", or "timeseries". temp_res is not
-needed for version=8.1_voc and will be ignored if specified.}
+\item{temp_res}{character(1) or NULL. Required for version \code{"8.1"}:
+\code{"yearly"}, \code{"monthly"}, or \code{"timeseries"}. Timeseries archives can
+contain tabular data; see Details for processing limitations.
+For version \code{"8.1_voc"}, this does not affect URL selection; if supplied,
+it is retained in the local archive-name prefix instead of \code{"voc"}.}
 
-\item{sector_yearly}{Character vector or NULL. Emission sectors for yearly
-data. If NULL, totals will be used. Possible values include:
-"AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO",
-"REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
-"TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other",
-"TNR_Ship", "TRO", "WWT"}
+\item{sector_yearly}{character vector or NULL. Yearly sectors: \code{"AGS"},
+\code{"AWB"}, \code{"CHE"}, \code{"ENE"}, \code{"IND"}, \code{"MNM"}, \code{"NMM"}, \code{"PRU_SOL"},
+\code{"RCO"}, \code{"REF_TRF"}, \code{"SWD_INC"}, \code{"SWD_LDF"}, \code{"TNR_Aviation_CDS"},
+\code{"TNR_Aviation_CRS"}, \code{"TNR_Aviation_LTO"}, \code{"TNR_Aviation_SPS"},
+\code{"TNR_Other"}, \code{"TNR_Ship"}, \code{"TRO"}, \code{"WWT"}, or \code{"TOTALS"}.
+\code{NULL} selects totals. Used only for yearly version \code{"8.1"} data.}
 
-\item{sector_monthly}{Character vector or NULL. Emission sectors for monthly
-data. If NULL, the function will use full-species files
-(not sector-specific).
-Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
-"IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".}
+\item{sector_monthly}{character vector or NULL. Monthly sectors:
+\code{"AGRICULTURE"}, \code{"BUILDINGS"}, \code{"FUEL_EXPLOITATION"},
+\code{"IND_COMBUSTION"}, \code{"IND_PROCESSES"}, \code{"POWER_INDUSTRY"},
+\code{"TRANSPORT"}, or \code{"WASTE"}. \code{NULL} selects full-species archives.
+Used only for monthly version \code{"8.1"} data.}
 
-\item{sector_voc}{Character vector or NULL. Emission sectors for VOC
-speciation
-data. If NULL, the function will use full-species files
-(not sector-specific).
-Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
-"IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".}
+\item{sector_voc}{character vector or NULL. VOC sectors, using the same
+choices as \code{sector_monthly}. \code{NULL} selects full VOC-group archives.
+Used only for version \code{"8.1_voc"}.}
 
-\item{format}{Character. File format to download. Typically "nc" (NetCDF)
-or "txt". Flux output and monthly outputs are only supported in .nc format}
+\item{format}{character(1). \code{"nc"} (default) or \code{"txt"}. Flux output and
+monthly version \code{"8.1"} data require \code{"nc"}. Selects an archive template
+where supported; it does not convert the downloaded files.}
 
-\item{output}{Character. Output type. Supported values include "emi" for
-emissions and "flx" for fluxes.}
+\item{output}{character(1). \code{"emi"} (default) for emissions or \code{"flx"}
+for fluxes. Full-species monthly, timeseries, and full VOC-group archives
+use fixed provider filenames that do not vary with \code{output} or \code{format}.}
 
-\item{year_range}{Numeric vector of length 1, 2 or NULL. Year range, e.g.,
-2021, or c(2021, 2022). If NULL, uses all available years (1970-2022 for
-yearly data, 2000-2022 for monthly and VOC speciation data)}
+\item{year_range}{integer(1 or more) or NULL. One year, two endpoints, or
+a non-empty vector of years. Every year from the minimum through the
+maximum is selected, including gaps: \code{c(2018, 2023)} and
+\code{c(2018, 2020, 2023)} both select \code{2018:2023}. Years must be non-missing
+integer values from 1900 through the current calendar year. For yearly
+version \code{"8.1"} data or sector-specific VOC data, \code{NULL} (default)
+selects bundled archives instead of individual yearly archives.
+Monthly, timeseries, and full VOC-group archives always contain the
+provider's bundled years; \code{year_range} is validated when supplied but
+does not change their URLs or subset their contents.}
 
-\item{voc}{Integer vector or NULL. Used for VOC speciation in version
-"8.1_voc". Accepts integers from 1 to 25. See:
-https://edgar.jrc.ec.europa.eu/dataset_ap81_VOC_spec#p3  for reference on
-speciation groups and VOC numbers.}
+\item{voc}{integer vector, character vector, or NULL. VOC group numbers
+from 1 to 25, required for version \code{"8.1_voc"}. Numeric strings such as
+\code{"1"} are accepted. Ignored for version \code{"8.1"}.}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped data files ("/data_files").}
+\item{directory_to_save}{character(1). Non-empty parent directory.
+Archives are saved in \verb{zip_files/} and extracted into \verb{data_files/}.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed. Archives and
+extracted data can require substantial storage.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
-
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands. Default is FALSE.}
-
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
-Default is \code{FALSE}.}
-
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
-
-\item{show_progress}{logical(1). Show download progress.
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
+after directory creation, before preflight checks or file downloads.
 Default is \code{TRUE}.}
 
-\item{max_tries}{integer(1). Maximum download retry attempts.
-Default is \code{20}.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+Default is \code{FALSE}.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between requests.
-Default is \code{2}.}
+\item{unzip}{logical(1). Extract downloaded or existing archives into
+\verb{data_files/}. Default is \code{TRUE}. When \code{FALSE}, archives remain in
+\verb{zip_files/} without extraction.}
+
+\item{remove_zip}{logical(1). Remove archives and their parent \verb{zip_files/}
+directory recursively after extraction, including any other files in
+that directory. Requires \code{unzip = TRUE}. Default is \code{FALSE}.}
+
+\item{hash}{logical(1). Return the combined MD5 hash of \verb{data_files/}
+when \code{TRUE}, including previously extracted files. With \code{unzip = FALSE},
+this still hashes \verb{data_files/}, not the downloaded archives.
+Default is \code{FALSE}; ignored when \code{download = FALSE}.}
+
+\item{show_progress}{logical(1). Show per-file download progress. Default
+is \code{TRUE}; summary messages may still be printed when \code{FALSE}.}
+
+\item{max_tries}{integer(1). Maximum attempts per file request, including
+the initial attempt. Must be at least 1. Default is 20.}
+
+\item{rate_limit}{numeric(1). Non-negative request-throttling interval in
+seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 }
 \value{
-A list of download URLs (character). Optionally downloads available
-files and warns about missing ones.
-
 \itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Zip and/or data files will be downloaded and stored in
-\code{directory_to_save}.
+\item With \code{download = FALSE}, an invisible list containing \code{urls},
+\code{destfiles}, and \code{n_files}, the number of planned archive downloads.
+\item With \code{download = TRUE} and \code{hash = FALSE}, the invisible summary from
+\code{\link[=download_run_method]{download_run_method()}} with \code{success}, \code{failed}, and \code{skipped} counts.
+If any downloads are attempted, it also contains \code{failed_urls} and
+\code{failed_files}. These counts describe archives, not extracted files.
+\item With \code{download = TRUE} and \code{hash = TRUE}, a visible character(1) combined
+MD5 hash of all files under \verb{data_files/}, including existing files.
 }
 }
 \description{
-Constructs and optionally downloads EDGAR emissions data URLs based on
-user-specified inputs including species, temporal resolution, emission
-sectors, and file formats.
+Construct EDGAR v8.1 air-pollutant or VOC-speciation archive URLs and
+download them using the shared validation, preview, and download helpers.
+}
+\details{
+Scalar selectors \code{version}, \code{format}, and \code{output} use \code{\link[base:match.arg]{base::match.arg()}},
+allowing unambiguous partial matches. This also applies to \code{temp_res} for
+version \code{"8.1"}; for VOC speciation, a supplied \code{temp_res} is used as-is
+in the local archive-name prefix. Sector names require exact,
+case-sensitive matches. Only the sector argument for the selected version
+and temporal resolution is used; timeseries downloads use no sector argument.
+
+URL construction retains the v8.1 FT2022 archive templates, including
+the PM2.5 folder/filename conventions and the SO2 \verb{_v2} suffix on full
+monthly and timeseries archives. Monthly full-species filenames cover
+2000--2022; timeseries and full VOC-group filenames cover 1970--2022.
+Available remote files are not discovered by querying directory listings.
+Year validation checks the input range, not whether EDGAR provides an
+archive for each requested year or combination of arguments.
+
+Timeseries archives are not necessarily raster products. For example,
+the NOx timeseries archive contains an Excel workbook (\code{.xlsx}) and a
+readme, even when \code{format = "nc"}. \code{\link[=process_edgar]{process_edgar()}} currently accepts
+raster files only, so this workbook cannot be passed through the
+\code{process_edgar()} and \code{calculate_edgar()} workflow.
+
+Local archive names retain the \verb{edgar_<temp_res>_} prefix, or \code{edgar_voc_}
+when VOC speciation is requested with \code{temp_res = NULL}. Preview results
+include all constructed URLs and destination paths, including existing
+files. A preview creates the output directories but makes no network
+requests and does not verify remote availability. No shell-command file
+is created.
+
+Full downloads check the first URL with the shared preflight helper.
+A failed preflight emits a warning and downloading is still attempted.
+\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty destination files and
+records individual download failures in its summary. The preflight check
+uses its own retry settings; file downloads use the shared default timeout.
+Extraction and cleanup occur before returning, and extraction errors can
+prevent a normal return. Summary counts describe downloads, not extraction.
 }
 \examples{
 \dontrun{
 download_edgar(
-species = "CO",
-acknowledgement = TRUE,
-temp_res = "yearly",
-sector_yearly = "ENE",
-year_range = c(2021, 2022)
+  species = "CO",
+  temp_res = "yearly",
+  sector_yearly = "ENE",
+  year_range = c(2021, 2022),
+  directory_to_save = file.path(tempdir(), "edgar"),
+  acknowledgement = TRUE,
+  download = FALSE
 )
-}
-\dontrun{
 download_edgar(
-species = "PM2.5",
-acknowledgement = TRUE,
-temp_res = "monthly",
-sector_monthly = c("TRANSPORT", "WASTE")
+  version = "8.1_voc",
+  voc = 1:3,
+  sector_voc = "AGRICULTURE",
+  year_range = 2021,
+  directory_to_save = file.path(tempdir(), "edgar_voc"),
+  acknowledgement = TRUE,
+  download = FALSE
 )
 }
-\dontrun{
-download_edgar(
-species = "SO2",
-acknowledgement = TRUE,
-temp_res = "timeseries"
-)
 }
+\seealso{
+\code{\link[=download_data]{download_data()}}, \code{\link[=download_run_method]{download_run_method()}}, \code{\link[=process_edgar]{process_edgar()}}
 }
 \author{
 Mariana Alifa Kassien

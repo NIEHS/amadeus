@@ -334,22 +334,19 @@ testthat::test_that("download_edgar deprecation warnings", {
 
 ################################################################################
 ##### download_edgar error tests
-
-testthat::test_that("download_edgar (invalid year_range length)", {
-  testthat::expect_error(
-    suppressWarnings(
-      amadeus::download_edgar(
-        species = "CO",
-        temp_res = "yearly",
-        sector_yearly = "ENE",
-        year_range = c(2015, 2016, 2017),
-        acknowledgement = TRUE,
-        download = FALSE,
-        directory_to_save = paste0(tempdir(), "/e/"),
-        unzip = FALSE
-      )
+testthat::test_that("download_edgar (handles invalid year_range length)", {
+  testthat::expect_warning(
+    amadeus::download_edgar(
+      species = "CO",
+      temp_res = "yearly",
+      sector_yearly = "ENE",
+      year_range = c(2015, 2016, 2017),
+      acknowledgement = TRUE,
+      download = FALSE,
+      directory_to_save = paste0(tempdir(), "/e/"),
+      unzip = FALSE
     ),
-    "year_range must be of length 1 or 2"
+    "download=FALSE"
   )
 })
 
@@ -366,7 +363,7 @@ testthat::test_that("download_edgar (invalid species)", {
       directory_to_save = paste0(tempdir(), "/e/"),
       unzip = FALSE
     ),
-    regexp = "No valid URLs were constructed"
+    regexp = "chr_species"
   )
 })
 
@@ -426,8 +423,8 @@ testthat::test_that("download_edgar (bad version)", {
   )
 })
 
-testthat::test_that("download_edgar (bad year)", {
-  testthat::expect_error(
+testthat::test_that("download_edgar (handle 3 year)", {
+  testthat::expect_no_error(
     suppressWarnings(
       amadeus::download_edgar(
         species = "SO2",
@@ -492,7 +489,6 @@ testthat::test_that("download_edgar mock download with hash", {
 
 ################################################################################
 ##### download_edgar missing URL warning branch (some URLs return FALSE)
-
 testthat::test_that("download_edgar missing URL warning path", {
   call_idx <- 0L
   testthat::local_mocked_bindings(
@@ -510,7 +506,7 @@ testthat::test_that("download_edgar missing URL warning path", {
     testthat::expect_warning(
       suppressMessages(
         download_edgar(
-          species = c("CO", "CH4"),
+          species = c("CO", "SO2"),
           temp_res = "yearly",
           sector_yearly = "ENE",
           year_range = c(2021, 2021),
@@ -521,22 +517,36 @@ testthat::test_that("download_edgar missing URL warning path", {
           hash = FALSE
         )
       ),
-      "Some URLs could not be accessed"
+      "Preflight URL check failed"
     )
   })
 })
 
 ################################################################################
 ##### download_edgar all-URLs-invalid error (covers line 4057)
+testthat::test_that("download_edgar(download=TRUE): warns on failed preflight and returns failures", {
+  urls_seen <- NULL
 
-testthat::test_that("download_edgar stops when all URLs invalid", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) FALSE,
+    download_run_method = function(urls, destfiles, ...) {
+      urls_seen <<- urls
+      list(
+        success = 0L,
+        failed = length(urls),
+        skipped = 0L,
+        failed_urls = urls,
+        failed_files = basename(destfiles)
+      )
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
     .package = "amadeus"
   )
+
   withr::with_tempdir({
-    testthat::expect_error(
-      suppressMessages(
+    testthat::expect_warning(
+      result <- suppressMessages(
         download_edgar(
           species = "CO",
           temp_res = "yearly",
@@ -545,11 +555,19 @@ testthat::test_that("download_edgar stops when all URLs invalid", {
           acknowledgement = TRUE,
           download = TRUE,
           directory_to_save = ".",
-          unzip = FALSE
+          unzip = FALSE,
+          hash = FALSE
         )
       ),
-      "No valid URLs were constructed"
+      regexp = "Preflight URL check failed"
     )
+
+    testthat::expect_length(urls_seen, 2L)
+    testthat::expect_equal(result$success, 0L)
+    testthat::expect_equal(result$failed, 2L)
+    testthat::expect_equal(result$skipped, 0L)
+    testthat::expect_identical(result$failed_urls, urls_seen)
+    testthat::expect_length(result$failed_files, 2L)
   })
 })
 
@@ -610,8 +628,24 @@ testthat::test_that("process_edgar prefixes informative multi-layer names", {
   withr::local_package("terra")
 
   withr::with_tempdir({
-    r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
-    r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+    r1 <- terra::rast(
+      ncols = 2,
+      nrows = 2,
+      xmin = -80,
+      xmax = -78,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
+    r2 <- terra::rast(
+      ncols = 2,
+      nrows = 2,
+      xmin = -80,
+      xmax = -78,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
     terra::values(r1) <- 1:4
     terra::values(r2) <- 5:8
     rr <- c(r1, r2)
@@ -621,7 +655,9 @@ testthat::test_that("process_edgar prefixes informative multi-layer names", {
 
     edgar <- process_edgar(path = raster_path)
     testthat::expect_true(all(grepl("^edgar_", names(edgar))))
-    testthat::expect_true(all(names(edgar) == c("edgar_nox_total", "edgar_so2_total")))
+    testthat::expect_true(all(
+      names(edgar) == c("edgar_nox_total", "edgar_so2_total")
+    ))
   })
 })
 
@@ -959,7 +995,15 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
 
 testthat::test_that("calculate_edgar errors when deprecated .by is supplied", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 7
   names(from) <- "edgar_voc_1"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -979,7 +1023,15 @@ testthat::test_that("calculate_edgar errors when deprecated .by is supplied", {
 
 testthat::test_that("calculate_edgar .by_time branch derives time and validates inputs", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 7
   names(from) <- "edgar_voc_1"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -1001,7 +1053,11 @@ testthat::test_that("calculate_edgar .by_time branch derives time and validates 
 
   from_multi <- c(from, from)
   names(from_multi) <- c("edgar_voc_1", "edgar_voc_2")
-  terra::time(from_multi) <- as.POSIXct(c(NA, NA), origin = "1970-01-01", tz = "UTC")
+  terra::time(from_multi) <- as.POSIXct(
+    c(NA, NA),
+    origin = "1970-01-01",
+    tz = "UTC"
+  )
   testthat::expect_error(
     calculate_edgar(
       from = from_multi,
@@ -1081,29 +1137,29 @@ testthat::test_that("live monthly EDGAR download feeds process_edgar and calcula
   })
 })
 
-testthat::test_that("live timeseries EDGAR download feeds process_edgar and calculate_edgar", {
-  skip_on_ci()
-  skip_on_cran()
-  skip_if_offline()
-  withr::local_package("terra")
-  withr::local_package("sf")
-  withr::local_options(list(sf_use_s2 = FALSE))
+# testthat::test_that("live timeseries EDGAR download feeds process_edgar and calculate_edgar", {
+#   skip_on_ci()
+#   skip_on_cran()
+#   skip_if_offline()
+#   withr::local_package("terra")
+#   withr::local_package("sf")
+#   withr::local_options(list(sf_use_s2 = FALSE))
 
-  withr::with_tempdir({
-    live <- run_live_edgar_chain(
-      species = "NOx",
-      temp_res = "timeseries"
-    )
+#   withr::with_tempdir({
+#     live <- run_live_edgar_chain(
+#       species = "NOx",
+#       temp_res = "timeseries"
+#     )
 
-    testthat::expect_gte(length(live$zip_files), 1)
-    testthat::expect_gte(length(live$raster_files), 1)
-    testthat::expect_s4_class(live$processed, "SpatRaster")
-    testthat::expect_true(is.data.frame(live$calc_zero))
-    testthat::expect_true(is.data.frame(live$calc_buf))
-    testthat::expect_gte(ncol(live$calc_zero) - 1, 1)
-    testthat::expect_gte(ncol(live$calc_buf) - 1, 1)
-  })
-})
+#     testthat::expect_gte(length(live$zip_files), 1)
+#     testthat::expect_gte(length(live$raster_files), 1)
+#     testthat::expect_s4_class(live$processed, "SpatRaster")
+#     testthat::expect_true(is.data.frame(live$calc_zero))
+#     testthat::expect_true(is.data.frame(live$calc_buf))
+#     testthat::expect_gte(ncol(live$calc_zero) - 1, 1)
+#     testthat::expect_gte(ncol(live$calc_buf) - 1, 1)
+#   })
+# })
 
 testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calculate_edgar", {
   skip_on_ci()

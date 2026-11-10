@@ -6,108 +6,147 @@
 ################################################################################
 # {download} tier
 ################################################################################
-# 2. Emissions Database for Global Atmospheric Research (EDGAR)
-# nolint start
-#' Download EDGAR Emissions Data
+#' Download EDGAR emissions data
+#' @description
+#' Construct EDGAR v8.1 air-pollutant or VOC-speciation archive URLs and
+#' download them using the shared validation, preview, and download helpers.
+#' @param species character vector. Air pollutants to download for version
+#'   `"8.1"`: `"BC"`, `"CO"`, `"NH3"`, `"NMVOC"`, `"NOx"`, `"OC"`,
+#'   `"PM10"`, `"PM2.5"`, or `"SO2"`. Defaults to all listed species.
+#'   Input is case-insensitive; `"PM25"` is also accepted. Ignored for VOC
+#'   speciation, which uses `voc` instead.
+#' @param version character(1). `"8.1"` (default) for air pollutants or
+#'   `"8.1_voc"` for VOC speciation.
+#' @param temp_res character(1) or NULL. Required for version `"8.1"`:
+#'   `"yearly"`, `"monthly"`, or `"timeseries"`. Timeseries archives can
+#'   contain tabular data; see Details for processing limitations.
+#'   For version `"8.1_voc"`, this does not affect URL selection; if supplied,
+#'   it is retained in the local archive-name prefix instead of `"voc"`.
+#' @param sector_yearly character vector or NULL. Yearly sectors: `"AGS"`,
+#'   `"AWB"`, `"CHE"`, `"ENE"`, `"IND"`, `"MNM"`, `"NMM"`, `"PRU_SOL"`,
+#'   `"RCO"`, `"REF_TRF"`, `"SWD_INC"`, `"SWD_LDF"`, `"TNR_Aviation_CDS"`,
+#'   `"TNR_Aviation_CRS"`, `"TNR_Aviation_LTO"`, `"TNR_Aviation_SPS"`,
+#'   `"TNR_Other"`, `"TNR_Ship"`, `"TRO"`, `"WWT"`, or `"TOTALS"`.
+#'   `NULL` selects totals. Used only for yearly version `"8.1"` data.
+#' @param sector_monthly character vector or NULL. Monthly sectors:
+#'   `"AGRICULTURE"`, `"BUILDINGS"`, `"FUEL_EXPLOITATION"`,
+#'   `"IND_COMBUSTION"`, `"IND_PROCESSES"`, `"POWER_INDUSTRY"`,
+#'   `"TRANSPORT"`, or `"WASTE"`. `NULL` selects full-species archives.
+#'   Used only for monthly version `"8.1"` data.
+#' @param sector_voc character vector or NULL. VOC sectors, using the same
+#'   choices as `sector_monthly`. `NULL` selects full VOC-group archives.
+#'   Used only for version `"8.1_voc"`.
+#' @param format character(1). `"nc"` (default) or `"txt"`. Flux output and
+#'   monthly version `"8.1"` data require `"nc"`. Selects an archive template
+#'   where supported; it does not convert the downloaded files.
+#' @param output character(1). `"emi"` (default) for emissions or `"flx"`
+#'   for fluxes. Full-species monthly, timeseries, and full VOC-group archives
+#'   use fixed provider filenames that do not vary with `output` or `format`.
+#' @param year_range integer(1 or more) or NULL. One year, two endpoints, or
+#'   a non-empty vector of years. Every year from the minimum through the
+#'   maximum is selected, including gaps: `c(2018, 2023)` and
+#'   `c(2018, 2020, 2023)` both select `2018:2023`. Years must be non-missing
+#'   integer values from 1900 through the current calendar year. For yearly
+#'   version `"8.1"` data or sector-specific VOC data, `NULL` (default)
+#'   selects bundled archives instead of individual yearly archives.
+#'   Monthly, timeseries, and full VOC-group archives always contain the
+#'   provider's bundled years; `year_range` is validated when supplied but
+#'   does not change their URLs or subset their contents.
+#' @param voc integer vector, character vector, or NULL. VOC group numbers
+#'   from 1 to 25, required for version `"8.1_voc"`. Numeric strings such as
+#'   `"1"` are accepted. Ignored for version `"8.1"`.
+#' @param directory_to_save character(1). Non-empty parent directory.
+#'   Archives are saved in `zip_files/` and extracted into `data_files/`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed. Archives and
+#'   extracted data can require substantial storage.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
+#'   after directory creation, before preflight checks or file downloads.
+#'   Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   Default is `FALSE`.
+#' @param unzip logical(1). Extract downloaded or existing archives into
+#'   `data_files/`. Default is `TRUE`. When `FALSE`, archives remain in
+#'   `zip_files/` without extraction.
+#' @param remove_zip logical(1). Remove archives and their parent `zip_files/`
+#'   directory recursively after extraction, including any other files in
+#'   that directory. Requires `unzip = TRUE`. Default is `FALSE`.
+#' @param hash logical(1). Return the combined MD5 hash of `data_files/`
+#'   when `TRUE`, including previously extracted files. With `unzip = FALSE`,
+#'   this still hashes `data_files/`, not the downloaded archives.
+#'   Default is `FALSE`; ignored when `download = FALSE`.
+#' @param show_progress logical(1). Show per-file download progress. Default
+#'   is `TRUE`; summary messages may still be printed when `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file request, including
+#'   the initial attempt. Must be at least 1. Default is 20.
+#' @param rate_limit numeric(1). Non-negative request-throttling interval in
+#'   seconds, passed to [download_run_method()]. Default is 2.
+#' @details
+#' Scalar selectors `version`, `format`, and `output` use [base::match.arg()],
+#' allowing unambiguous partial matches. This also applies to `temp_res` for
+#' version `"8.1"`; for VOC speciation, a supplied `temp_res` is used as-is
+#' in the local archive-name prefix. Sector names require exact,
+#' case-sensitive matches. Only the sector argument for the selected version
+#' and temporal resolution is used; timeseries downloads use no sector argument.
 #'
-#' Constructs and optionally downloads EDGAR emissions data URLs based on
-#' user-specified inputs including species, temporal resolution, emission
-#' sectors, and file formats.
+#' URL construction retains the v8.1 FT2022 archive templates, including
+#' the PM2.5 folder/filename conventions and the SO2 `_v2` suffix on full
+#' monthly and timeseries archives. Monthly full-species filenames cover
+#' 2000--2022; timeseries and full VOC-group filenames cover 1970--2022.
+#' Available remote files are not discovered by querying directory listings.
+#' Year validation checks the input range, not whether EDGAR provides an
+#' archive for each requested year or combination of arguments.
 #'
-#' @param species Character vector. One or more species to download.
-#'  Supported values: "BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10",
-#'  "PM2.5", "SO2". Input is case-insensitive and supports "pm2.5" or "pm25".
-#' @param version Character. EDGAR data version. Supported values: "8.1" for
-#'  most recent version data or "8.1_voc" for VOC speciation data.
-#' @param temp_res Character. Temporal resolution for specification with
-#'  version 8.1. One of "yearly", "monthly", or "timeseries". temp_res is not
-#'  needed for version=8.1_voc and will be ignored if specified.
-#' @param sector_yearly Character vector or NULL. Emission sectors for yearly
-#'  data. If NULL, totals will be used. Possible values include:
-#'  "AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO",
-#'  "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
-#'  "TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other",
-#'  "TNR_Ship", "TRO", "WWT"
-#' @param sector_monthly Character vector or NULL. Emission sectors for monthly
-#'  data. If NULL, the function will use full-species files
-#'  (not sector-specific).
-#'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
-#' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
-#' @param sector_voc Character vector or NULL. Emission sectors for VOC
-#'   speciation
-#'  data. If NULL, the function will use full-species files
-#'  (not sector-specific).
-#'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
-#' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
-#' @param output Character. Output type. Supported values include "emi" for
-#'  emissions and "flx" for fluxes.
-#' @param format Character. File format to download. Typically "nc" (NetCDF)
-#'  or "txt". Flux output and monthly outputs are only supported in .nc format
-#' @param year_range Numeric vector of length 1, 2 or NULL. Year range, e.g.,
-#' 2021, or c(2021, 2022). If NULL, uses all available years (1970-2022 for
-#' yearly data, 2000-2022 for monthly and VOC speciation data)
-#' @param voc Integer vector or NULL. Used for VOC speciation in version
-#'  "8.1_voc". Accepts integers from 1 to 25. See:
-#'  https://edgar.jrc.ec.europa.eu/dataset_ap81_VOC_spec#p3  for reference on
-#'  speciation groups and VOC numbers.
-#' @return A list of download URLs (character). Optionally downloads available
-#'  files and warns about missing ones.
-#' @param directory_to_save character(1). Directory to save data. Two
-#'  sub-directories will be created for the downloaded zip files ("/zip_files")
-#'  and the unzipped data files ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#'  user acknowledges that the data downloaded using this function may be very
-#'  large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#'  containing all download commands. By setting \code{TRUE} the function
-#'  will download all of the requested data files.
-#' @param remove_command logical(1).
-#'  Remove (\code{TRUE}) or keep (\code{FALSE})
-#'  the text file containing download commands. Default is FALSE.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#'  Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#'  an \code{rlang::hash_file()} hash character corresponding to the
-#'  downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress.
-#'   Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts.
-#'   Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests.
-#'   Default is \code{2}.
-#' @author Mariana Alifa Kassien
+#' Timeseries archives are not necessarily raster products. For example,
+#' the NOx timeseries archive contains an Excel workbook (`.xlsx`) and a
+#' readme, even when `format = "nc"`. [process_edgar()] currently accepts
+#' raster files only, so this workbook cannot be passed through the
+#' `process_edgar()` and `calculate_edgar()` workflow.
+#'
+#' Local archive names retain the `edgar_<temp_res>_` prefix, or `edgar_voc_`
+#' when VOC speciation is requested with `temp_res = NULL`. Preview results
+#' include all constructed URLs and destination paths, including existing
+#' files. A preview creates the output directories but makes no network
+#' requests and does not verify remote availability. No shell-command file
+#' is created.
+#'
+#' Full downloads check the first URL with the shared preflight helper.
+#' A failed preflight emits a warning and downloading is still attempted.
+#' [download_run_method()] skips existing non-empty destination files and
+#' records individual download failures in its summary. The preflight check
+#' uses its own retry settings; file downloads use the shared default timeout.
+#' Extraction and cleanup occur before returning, and extraction errors can
+#' prevent a normal return. Summary counts describe downloads, not extraction.
 #' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' \code{directory_to_save}.
+#' * With `download = FALSE`, an invisible list containing `urls`,
+#'   `destfiles`, and `n_files`, the number of planned archive downloads.
+#' * With `download = TRUE` and `hash = FALSE`, the invisible summary from
+#'   [download_run_method()] with `success`, `failed`, and `skipped` counts.
+#'   If any downloads are attempted, it also contains `failed_urls` and
+#'   `failed_files`. These counts describe archives, not extracted files.
+#' * With `download = TRUE` and `hash = TRUE`, a visible character(1) combined
+#'   MD5 hash of all files under `data_files/`, including existing files.
+#' @author Mariana Alifa Kassien
+#' @seealso [download_data()], [download_run_method()], [process_edgar()]
 #' @importFrom Rdpack reprompt
-#'
-# nolint end
 #' @examples
 #' \dontrun{
 #' download_edgar(
-#' species = "CO",
-#' acknowledgement = TRUE,
-#' temp_res = "yearly",
-#' sector_yearly = "ENE",
-#' year_range = c(2021, 2022)
+#'   species = "CO",
+#'   temp_res = "yearly",
+#'   sector_yearly = "ENE",
+#'   year_range = c(2021, 2022),
+#'   directory_to_save = file.path(tempdir(), "edgar"),
+#'   acknowledgement = TRUE,
+#'   download = FALSE
 #' )
-#' }
-#' \dontrun{
 #' download_edgar(
-#' species = "PM2.5",
-#' acknowledgement = TRUE,
-#' temp_res = "monthly",
-#' sector_monthly = c("TRANSPORT", "WASTE")
-#' )
-#' }
-#' \dontrun{
-#' download_edgar(
-#' species = "SO2",
-#' acknowledgement = TRUE,
-#' temp_res = "timeseries"
+#'   version = "8.1_voc",
+#'   voc = 1:3,
+#'   sector_voc = "AGRICULTURE",
+#'   year_range = 2021,
+#'   directory_to_save = file.path(tempdir(), "edgar_voc"),
+#'   acknowledgement = TRUE,
+#'   download = FALSE
 #' )
 #' }
 #' @export
@@ -133,359 +172,336 @@ download_edgar <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  # check for data download acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  # Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus:::download_check(
+    dataset_name = "edgar",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  # ----------------------------------------------------------------------------
+  # Check source-specific scalar arguments.
+  chr_version <- match.arg(version, c("8.1", "8.1_voc"))
+  chr_format <- match.arg(format, c("nc", "txt"))
+  chr_output <- match.arg(output, c("emi", "flx"))
+  checkmate::assert_string(temp_res, null.ok = chr_version == "8.1_voc")
+  chr_temp_res <- if (chr_version == "8.1") {
+    match.arg(temp_res, c("yearly", "monthly", "timeseries"))
+  } else {
+    temp_res
+  }
+  # ----------------------------------------------------------------------------
+  # Normalize and check the selected species or VOC groups.
+  if (chr_version == "8.1") {
+    checkmate::assert_character(species, min.len = 1L, any.missing = FALSE)
+    chr_species <- toupper(species)
+    chr_species[chr_species == "NOX"] <- "NOx"
+    checkmate::assert_subset(
+      chr_species,
+      c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "PM25", "SO2")
     )
-  }
-  if (!isFALSE(remove_command)) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
+  } else {
+    int_voc <- if (is.character(voc)) suppressWarnings(as.numeric(voc)) else voc
+    checkmate::assert_integerish(
+      int_voc,
+      lower = 1L,
+      upper = 25L,
+      min.len = 1L,
+      any.missing = FALSE
     )
+    int_voc <- as.integer(int_voc)
   }
-
-  # directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  durl <- "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/"
-
-  # Normalize species input
-  species <- toupper(species)
-  species <- gsub("NOX", "NOx", species)
-
-  # Check for invalid combinations
-  if (any(output == "flx" & format == "txt")) {
-    stop("Output 'flux' is only supported for format 'nc'.")
+  # ----------------------------------------------------------------------------
+  # Select and check only the sectors used by this request.
+  chr_sectors <- if (chr_version == "8.1_voc") {
+    sector_voc
+  } else {
+    switch(chr_temp_res, yearly = sector_yearly, monthly = sector_monthly)
   }
-  if (any(temp_res == "monthly" & format == "txt")) {
-    stop("Monthly resolution is only supported for format 'nc'.")
-  }
-
-  if (!is.null(year_range)) {
-    if (length(year_range) == 1) {
-      yearsvec <- year_range
-    } else if (length(year_range) == 2) {
-      yearsvec <- seq(year_range[1], year_range[2])
-    } else {
-      stop("year_range must be of length 1 or 2")
-    }
-  }
-
-  urls <- character()
-
-  if (version == "8.1") {
-    vers <- "v81_FT2022_AP_new/"
-    vers_file <- "v8.1_FT2022_AP"
-
-    grid_species <- data.frame(species = species, stringsAsFactors = FALSE)
-    grid_species$folder <- gsub(
-      "(?i)pm2\\.5|pm25",
-      "PM2.5",
-      grid_species$species,
-      perl = TRUE
-    )
-    grid_species$file <- gsub(
-      "(?i)pm2\\.5|pm25",
-      "PM25",
-      grid_species$species,
-      perl = TRUE
-    )
-
-    if (temp_res == "timeseries") {
-      urls <- paste0(durl, vers, "EDGAR_", grid_species$file, "_1970_2022.zip")
-      urls <- ifelse(
-        grid_species$file == "SO2",
-        gsub("2022.zip$", "2022_v2.zip", urls),
-        urls
+  checkmate::assert_character(
+    chr_sectors,
+    min.len = 1L,
+    any.missing = FALSE,
+    null.ok = TRUE
+  )
+  if (!is.null(chr_sectors)) {
+    chr_sector_choices <- if (
+      chr_version == "8.1" && chr_temp_res == "yearly"
+    ) {
+      c(
+        "AGS",
+        "AWB",
+        "CHE",
+        "ENE",
+        "IND",
+        "MNM",
+        "NMM",
+        "PRU_SOL",
+        "RCO",
+        "REF_TRF",
+        "SWD_INC",
+        "SWD_LDF",
+        "TNR_Aviation_CDS",
+        "TNR_Aviation_CRS",
+        "TNR_Aviation_LTO",
+        "TNR_Aviation_SPS",
+        "TNR_Other",
+        "TNR_Ship",
+        "TRO",
+        "WWT",
+        "TOTALS"
       )
-    } else if (temp_res == "yearly") {
-      if (!is.null(sector_yearly)) {
-        grid <- expand.grid(
-          species_idx = seq_len(nrow(grid_species)),
-          sector = sector_yearly,
-          year = if (!is.null(year_range)) yearsvec else NA,
-          stringsAsFactors = FALSE
-        )
-
-        urls <- if (!is.null(year_range)) {
-          paste0(
-            durl,
-            vers,
-            grid_species$folder[grid$species_idx],
-            "/",
-            grid$sector,
-            "/",
-            output,
-            "_",
-            format,
-            "/",
-            vers_file,
-            "_",
-            grid_species$species[grid$species_idx],
-            "_",
-            grid$year,
-            "_",
-            grid$sector,
-            "_",
-            output,
-            "_",
-            format,
-            ".zip"
-          )
-        } else {
-          paste0(
-            durl,
-            vers,
-            grid_species$folder[grid$species_idx],
-            "/",
-            grid$sector,
-            "/",
-            grid$sector,
-            "_",
-            output,
-            "_",
-            format,
-            ".zip"
-          )
-        }
-      } else {
-        grid <- expand.grid(
-          species_idx = seq_len(nrow(grid_species)),
-          year = if (!is.null(year_range)) yearsvec else NA,
-          stringsAsFactors = FALSE
-        )
-
-        urls <- if (!is.null(year_range)) {
-          paste0(
-            durl,
-            vers,
-            grid_species$folder[grid$species_idx],
-            "/TOTALS/",
-            output,
-            "_",
-            format,
-            "/",
-            vers_file,
-            "_",
-            grid_species$species[grid$species_idx],
-            "_",
-            grid$year,
-            "_TOTALS_",
-            output,
-            "_",
-            format,
-            ".zip"
-          )
-        } else {
-          paste0(
-            durl,
-            vers,
-            grid_species$folder,
-            "/TOTALS/TOTALS_",
-            output,
-            "_",
-            format,
-            ".zip"
-          )
-        }
-      }
-    } else if (temp_res == "monthly") {
-      if (!is.null(sector_monthly)) {
-        grid <- expand.grid(
-          species_idx = seq_len(nrow(grid_species)),
-          sector = sector_monthly,
-          stringsAsFactors = FALSE
-        )
-        urls <- paste0(
-          durl,
-          vers,
-          "monthly/",
-          grid_species$folder[grid$species_idx],
-          "/bkl_",
-          grid$sector,
-          "/bkl_",
-          grid$sector,
-          "_",
-          output,
-          "_",
-          format,
-          ".zip"
-        )
-      } else {
-        urls <- paste0(
-          durl,
-          vers,
-          "monthly/EDGAR_",
-          grid_species$file,
-          "_m_2000_2022.zip"
-        )
-        urls <- ifelse(
-          grid_species$file == "SO2",
-          gsub("2022.zip$", "2022_v2.zip", urls),
-          urls
-        )
-      }
     } else {
-      stop("Unsupported temp_res value")
-    }
-  } else if (version == "8.1_voc") {
-    vers <- "v81_FT2022_VOC_spec/"
-    vers_file <- "v8.1_FT2022_VOC_spec"
-
-    if (!is.null(sector_voc)) {
-      grid <- expand.grid(
-        voc = voc,
-        sector = sector_voc,
-        year = if (!is.null(year_range)) yearsvec else NA,
-        stringsAsFactors = FALSE
+      c(
+        "AGRICULTURE",
+        "BUILDINGS",
+        "FUEL_EXPLOITATION",
+        "IND_COMBUSTION",
+        "IND_PROCESSES",
+        "POWER_INDUSTRY",
+        "TRANSPORT",
+        "WASTE"
       )
-
-      urls <- if (!is.null(year_range)) {
-        paste0(
-          durl,
-          vers,
-          "voc",
-          grid$voc,
-          "/bkl_",
-          grid$sector,
-          "/",
-          output,
-          "_",
-          format,
-          "/",
-          vers_file,
-          "_voc",
-          grid$voc,
-          "_",
-          grid$year,
-          "_bkl_",
-          grid$sector,
-          "_",
-          output,
-          "_",
-          format,
-          ".zip"
-        )
-      } else {
-        paste0(
-          durl,
-          vers,
-          "voc",
-          voc,
-          "/bkl_",
-          sector_voc,
-          "/bkl_",
-          sector_voc,
-          "_",
-          output,
-          "_",
-          format,
-          ".zip"
-        )
-      }
+    }
+    checkmate::assert_subset(chr_sectors, chr_sector_choices)
+  }
+  # ----------------------------------------------------------------------------
+  # Reject unsupported output/format combinations.
+  if (chr_output == "flx" && chr_format == "txt") {
+    stop("Output 'flux' is only supported for format 'nc'.", call. = FALSE)
+  }
+  if (
+    chr_version == "8.1" && chr_temp_res == "monthly" && chr_format == "txt"
+  ) {
+    stop("Monthly resolution is only supported for format 'nc'.", call. = FALSE)
+  }
+  # ----------------------------------------------------------------------------
+  # Check years and generate a sequence; NULL retains bundled-archive selection.
+  int_years <- if (is.null(year_range)) {
+    NULL
+  } else {
+    amadeus:::sequence_years(year_range)
+  }
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define provider directories, filename prefixes, and the local archive label.
+  chr_base <- paste0(
+    "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/",
+    if (chr_version == "8.1") "v81_FT2022_AP_new/" else "v81_FT2022_VOC_spec/"
+  )
+  chr_version_file <- if (chr_version == "8.1") {
+    "v8.1_FT2022_AP"
+  } else {
+    "v8.1_FT2022_VOC_spec"
+  }
+  chr_label <- if (is.null(chr_temp_res)) "voc" else chr_temp_res
+  # ----------------------------------------------------------------------------
+  # Expand request combinations and select the matching archive templates.
+  if (chr_version == "8.1" && chr_temp_res == "yearly") {
+    # Yearly totals and individual sectors share the same directory pattern.
+    df_download <- expand.grid(
+      species = chr_species,
+      sector = if (is.null(chr_sectors)) "TOTALS" else chr_sectors,
+      year = if (is.null(int_years)) NA_integer_ else int_years,
+      stringsAsFactors = FALSE
+    )
+    df_download$base <- paste0(
+      chr_base,
+      sub("PM25", "PM2.5", df_download$species, fixed = TRUE),
+      "/",
+      df_download$sector,
+      "/"
+    )
+    if (is.null(int_years)) {
+      df_download$file <- paste0(
+        df_download$sector,
+        "_",
+        chr_output,
+        "_",
+        chr_format,
+        ".zip"
+      )
     } else {
-      urls <- paste0(durl, vers, "EDGAR_voc", voc, "_1970_2022.zip")
+      df_download$base <- paste0(
+        df_download$base,
+        chr_output,
+        "_",
+        chr_format,
+        "/"
+      )
+      df_download$file <- paste0(
+        chr_version_file,
+        "_",
+        df_download$species,
+        "_",
+        df_download$year,
+        "_",
+        df_download$sector,
+        "_",
+        chr_output,
+        "_",
+        chr_format,
+        ".zip"
+      )
+    }
+  } else if (
+    chr_version == "8.1" && chr_temp_res == "monthly" && !is.null(chr_sectors)
+  ) {
+    # Monthly sector archives bundle years; year_range does not change the URLs.
+    df_download <- expand.grid(
+      species = chr_species,
+      sector = chr_sectors,
+      stringsAsFactors = FALSE
+    )
+    df_download$base <- paste0(
+      chr_base,
+      "monthly/",
+      sub("PM25", "PM2.5", df_download$species, fixed = TRUE),
+      "/bkl_",
+      df_download$sector,
+      "/"
+    )
+    df_download$file <- paste0(
+      "bkl_",
+      df_download$sector,
+      "_",
+      chr_output,
+      "_",
+      chr_format,
+      ".zip"
+    )
+  } else if (chr_version == "8.1") {
+    # Full-species monthly and timeseries archives use fixed provider filenames.
+    df_download <- expand.grid(species = chr_species, stringsAsFactors = FALSE)
+    df_download$base <- paste0(
+      chr_base,
+      if (chr_temp_res == "monthly") "monthly/" else ""
+    )
+    df_download$file <- paste0(
+      "EDGAR_",
+      sub("PM2.5", "PM25", df_download$species, fixed = TRUE),
+      if (chr_temp_res == "monthly") "_m_2000_2022" else "_1970_2022",
+      ifelse(df_download$species == "SO2", "_v2", ""),
+      ".zip"
+    )
+  } else if (!is.null(chr_sectors)) {
+    # Expand every VOC/sector/year combination, including bundled sector files.
+    df_download <- expand.grid(
+      voc = int_voc,
+      sector = chr_sectors,
+      year = if (is.null(int_years)) NA_integer_ else int_years,
+      stringsAsFactors = FALSE
+    )
+    df_download$base <- paste0(
+      chr_base,
+      "voc",
+      df_download$voc,
+      "/bkl_",
+      df_download$sector,
+      "/"
+    )
+    if (is.null(int_years)) {
+      df_download$file <- paste0(
+        "bkl_",
+        df_download$sector,
+        "_",
+        chr_output,
+        "_",
+        chr_format,
+        ".zip"
+      )
+    } else {
+      df_download$base <- paste0(
+        df_download$base,
+        chr_output,
+        "_",
+        chr_format,
+        "/"
+      )
+      df_download$file <- paste0(
+        chr_version_file,
+        "_voc",
+        df_download$voc,
+        "_",
+        df_download$year,
+        "_bkl_",
+        df_download$sector,
+        "_",
+        chr_output,
+        "_",
+        chr_format,
+        ".zip"
+      )
     }
   } else {
-    stop("Unsupported version")
+    # Full VOC-group archives already contain the complete provider year range.
+    df_download <- expand.grid(voc = int_voc, stringsAsFactors = FALSE)
+    df_download$base <- chr_base
+    df_download$file <- paste0("EDGAR_voc", df_download$voc, "_1970_2022.zip")
   }
-  # Check constructed urls
-  message("Constructed URL(s): ", paste(urls, collapse = "\n"))
-
-  #### 5. build download file name
-  download_label <- temp_res
-  if (is.null(download_label) || length(download_label) == 0) {
-    download_label <- if (version == "8.1_voc") "voc" else "edgar"
-  }
-  download_names <- paste0(
-    directory_to_download,
+  # ----------------------------------------------------------------------------
+  # Generate download URLs and local archive filenames from the same rows.
+  df_download$url <- paste0(df_download$base, df_download$file)
+  df_download$destfile <- paste0(
+    chr_dir_to_download,
     "edgar_",
-    download_label,
+    chr_label,
     "_",
-    basename(urls)
+    df_download$file
   )
-
-  #### Exit early if download=FALSE (return unvalidated URL list)
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(urls)
-    ))
-    return(invisible(list(
-      urls = urls,
-      destfiles = download_names,
-      n_files = length(urls)
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
     )))
   }
-
-  # Validate and download
-  download_urls <- c()
-  download_names_valid <- c()
-  missing_urls <- c()
-
-  for (i in seq_along(urls)) {
-    u <- urls[i]
-    if (!(amadeus::check_url_status(u))) {
-      missing_urls <- c(missing_urls, u)
-    } else {
-      download_urls <- c(download_urls, u)
-      download_names_valid <- c(download_names_valid, download_names[i])
-    }
-  }
-  # Stop function if no valid urls were created
-  if (is.null(download_urls) || length(download_urls) == 0) {
-    stop("No valid URLs were constructed.")
-  }
-  # Issue warning message for URLs not found
-  if (length(missing_urls)) {
-    warning(
-      "Some URLs could not be accessed:",
-      paste(missing_urls, collapse = "\n")
-    )
-  }
-
-  #### Filter to files that need downloading
-  needs_download <- !file.exists(download_names_valid) |
-    file.size(download_names_valid) == 0
-  download_urls_dl <- download_urls[needs_download]
-  download_names_dl <- download_names_valid[needs_download]
-
-  #### Download using httr2
-  if (length(download_urls_dl) > 0) {
-    amadeus::download_run_method(
-      urls = download_urls_dl,
-      destfiles = download_names_dl,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-  }
-
-  #### Unzip data
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = df_download$url,
+    destfiles = df_download$destfile,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded or existing archives.
   sapply(
-    download_names_valid,
+    df_download$destfile,
     amadeus::download_unzip,
-    directory_to_unzip = directory_to_save,
+    directory_to_unzip = chr_dir_to_save,
     unzip = unzip
   )
+  # ----------------------------------------------------------------------------
+  # Remove zip files after all extractions.
   amadeus::download_remove_zips(
     remove = remove_zip,
-    download_name = download_names_valid
+    download_name = df_download$destfile
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
