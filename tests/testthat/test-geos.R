@@ -10,13 +10,13 @@ testthat::test_that("download_geos", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     # function parameters
     date_start <- "2019-09-09"
     date_end <- "2019-09-09"
     collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-
+    # --------------------------------------------------------------------------
     result <- suppressWarnings(
       download_geos(
         date = c(date_start, date_end),
@@ -27,13 +27,13 @@ testthat::test_that("download_geos", {
         hours = 0
       )
     )
-
+    # --------------------------------------------------------------------------
     # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
     testthat::expect_true(all(
       c("success", "failed", "skipped") %in% names(result)
     ))
-
+    # --------------------------------------------------------------------------
     # Check that some files were processed
     total <- result$success + result$failed + result$skipped
     testthat::expect_gt(total, 0)
@@ -46,12 +46,12 @@ testthat::test_that("download_geos (single date)", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     # function parameters
     date <- "2019-09-09"
     collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-
+    # --------------------------------------------------------------------------
     result <- suppressWarnings(
       download_geos(
         date = date,
@@ -62,13 +62,13 @@ testthat::test_that("download_geos (single date)", {
         hours = 0
       )
     )
-
+    # --------------------------------------------------------------------------
     # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
     testthat::expect_true(all(
       c("success", "failed", "skipped") %in% names(result)
     ))
-
+    # --------------------------------------------------------------------------
     # Check that some files were processed
     total <- result$success + result$failed + result$skipped
     testthat::expect_gt(total, 0)

@@ -6,7 +6,7 @@
 ##### download_hms
 testthat::test_that("download_hms (no errors)", {
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -14,13 +14,13 @@ testthat::test_that("download_hms (no errors)", {
   date_end <- "2022-09-21"
   directory_to_save <- paste0(tempdir(), "/hms/")
   data_formats <- c("Shapefile", "KML")
-
+  # ----------------------------------------------------------------------------
   for (d in seq_along(data_formats)) {
     # Clean directory before test
     if (dir.exists(directory_to_save)) {
       unlink(directory_to_save, recursive = TRUE)
     }
-
+    # --------------------------------------------------------------------------
     # run download function
     testthat::expect_warning(
       download_data(
@@ -36,12 +36,12 @@ testthat::test_that("download_hms (no errors)", {
       ),
       regexp = "deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Check that directory was created
     testthat::expect_true(
       dir.exists(directory_to_save)
     )
-
+    # --------------------------------------------------------------------------
     # remove temporary hms
     unlink(directory_to_save, recursive = TRUE)
   }
@@ -58,7 +58,7 @@ testthat::test_that("download_hms (expected errors)", {
       remove_zip = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   old_date <- "2005-05-01"
   testthat::expect_error(
     download_data(
@@ -70,7 +70,7 @@ testthat::test_that("download_hms (expected errors)", {
       remove_zip = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   future_date <- "2041-05-01"
   testthat::expect_error(
     download_data(
@@ -88,11 +88,11 @@ testthat::test_that("download_hms (expected errors)", {
 testthat::test_that("download_hms (live)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   # function parameters
   date <- "2018-01-01"
   directory <- paste0(tempdir(), "/hms/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   testthat::expect_no_error(
     download_data(
@@ -106,20 +106,20 @@ testthat::test_that("download_hms (live)", {
       remove_command = FALSE
     )
   )
-
+  # ----------------------------------------------------------------------------
   Sys.sleep(1.5)
-
+  # ----------------------------------------------------------------------------
   # Check that directory exists and has files
   testthat::expect_true(
     dir.exists(directory)
   )
-
+  # ----------------------------------------------------------------------------
   all_files <- list.files(directory, recursive = TRUE, include.dirs = TRUE)
   testthat::expect_true(
     length(all_files) > 0,
     info = paste("Expected files in directory, found:", length(all_files))
   )
-
+  # ----------------------------------------------------------------------------
   # Check for command file (may be in subdirectory or root)
   commands <- list.files(
     directory,
@@ -132,7 +132,7 @@ testthat::test_that("download_hms (live)", {
   testthat::expect_true(
     length(all_files) > 0
   )
-
+  # ----------------------------------------------------------------------------
   # remove directory
   unlink(directory, recursive = TRUE)
 })
@@ -140,11 +140,11 @@ testthat::test_that("download_hms (live)", {
 testthat::test_that("download_hms (live + single date)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   # function parameters
   date <- "2018-01-10"
   directory <- paste0(tempdir(), "/hms/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   testthat::expect_no_error(
     download_data(
@@ -158,20 +158,20 @@ testthat::test_that("download_hms (live + single date)", {
       remove_command = FALSE
     )
   )
-
+  # ----------------------------------------------------------------------------
   Sys.sleep(1.5)
-
+  # ----------------------------------------------------------------------------
   # Check that directory exists and has files
   testthat::expect_true(
     dir.exists(directory)
   )
-
+  # ----------------------------------------------------------------------------
   all_files <- list.files(directory, recursive = TRUE, include.dirs = TRUE)
   testthat::expect_true(
     length(all_files) > 0,
     info = paste("Expected files in directory, found:", length(all_files))
   )
-
+  # ----------------------------------------------------------------------------
   # Check for command file (may be in subdirectory or root)
   commands <- list.files(
     directory,
@@ -184,7 +184,7 @@ testthat::test_that("download_hms (live + single date)", {
   testthat::expect_true(
     length(all_files) > 0
   )
-
+  # ----------------------------------------------------------------------------
   # remove directory
   unlink(directory, recursive = TRUE)
 })

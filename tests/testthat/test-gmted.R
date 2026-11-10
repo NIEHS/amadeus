@@ -5,9 +5,9 @@
 ##### download_gmted
 testthat::test_that("download_gmted with download_data function", {
   withr::local_package("httr2")
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/gmted_download_test/")
-
+  # ----------------------------------------------------------------------------
   # Test that download_data creates proper structure with download = FALSE
   testthat::expect_warning(
     download_data(
@@ -22,12 +22,12 @@ testthat::test_that("download_gmted with download_data function", {
     ),
     "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Clean up
   unlink(directory_to_save, recursive = TRUE)
 })

@@ -3,7 +3,7 @@ withr::local_package("sf")
 
 testthat::test_that("targeted download branches are exercised", {
   temp_dir <- withr::local_tempdir()
-
+  # ----------------------------------------------------------------------------
   aqs_normalized <- 0L
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
@@ -24,7 +24,7 @@ testthat::test_that("targeted download branches are exercised", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   aqs_hash <- amadeus::download_aqs(
     resolution_temporal = "daily",
     parameter_code = "88101",
@@ -36,7 +36,7 @@ testthat::test_that("targeted download branches are exercised", {
   )
   testthat::expect_identical(aqs_hash, "hash-ok")
   testthat::expect_equal(aqs_normalized, 1L)
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
     check_url_status = function(...) FALSE,
@@ -51,7 +51,7 @@ testthat::test_that("targeted download branches are exercised", {
     ),
     "Invalid date returns HTTP code 404"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
     .package = "amadeus"
@@ -65,7 +65,7 @@ testthat::test_that("targeted download branches are exercised", {
     ),
     "Requested collection is not recognized"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
     check_url_status = function(...) FALSE,
@@ -80,7 +80,7 @@ testthat::test_that("targeted download branches are exercised", {
     ),
     "Invalid date returns HTTP code 404"
   )
-
+  # ----------------------------------------------------------------------------
   groads_calls <- list(run = 0L, unzip = 0L, remove = 0L)
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
@@ -111,7 +111,7 @@ testthat::test_that("targeted download branches are exercised", {
     "download=FALSE"
   )
   testthat::expect_match(groads_skip$destfiles, "groads_v1_global_gdb\\.zip$")
-
+  # ----------------------------------------------------------------------------
   groads_hash <- amadeus::download_groads(
     data_region = "Africa",
     data_format = "Shapefile",
@@ -123,7 +123,7 @@ testthat::test_that("targeted download branches are exercised", {
   testthat::expect_identical(groads_calls$run, 0L)
   testthat::expect_identical(groads_calls$unzip, 1L)
   testthat::expect_identical(groads_calls$remove, 1L)
-
+  # ----------------------------------------------------------------------------
   population_calls <- list(run = 0L, unzip = 0L, remove = 0L)
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
@@ -143,7 +143,7 @@ testthat::test_that("targeted download branches are exercised", {
     download_hash = function(...) "population-hash",
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     pop_all_tif <- amadeus::download_population(
       data_resolution = "30 second",
@@ -156,7 +156,7 @@ testthat::test_that("targeted download branches are exercised", {
     "download=FALSE"
   )
   testthat::expect_match(pop_all_tif$destfiles, "totpop_2pt5_min_nc\\.zip$")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     pop_all_ascii <- amadeus::download_population(
       data_format = "ASCII",
@@ -168,7 +168,7 @@ testthat::test_that("targeted download branches are exercised", {
     "download=FALSE"
   )
   testthat::expect_match(pop_all_ascii$destfiles, "totpop_1_deg_nc\\.zip$")
-
+  # ----------------------------------------------------------------------------
   pop_hash <- amadeus::download_population(
     data_format = "netCDF",
     year = "2020",
@@ -180,7 +180,7 @@ testthat::test_that("targeted download branches are exercised", {
   testthat::expect_identical(population_calls$run, 0L)
   testthat::expect_identical(population_calls$unzip, 1L)
   testthat::expect_identical(population_calls$remove, 1L)
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "token",
     .package = "amadeus"

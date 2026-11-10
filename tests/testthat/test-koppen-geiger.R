@@ -5,7 +5,7 @@
 ##### download_koppen_geiger
 testthat::test_that("download_koppen_geiger", {
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters

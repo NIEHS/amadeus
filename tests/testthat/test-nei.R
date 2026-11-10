@@ -7,15 +7,15 @@
 testthat::test_that("download_nei", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   year <- c(2017L, 2020L)
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning with download = FALSE
   testthat::expect_warning(
     download_data(
@@ -28,12 +28,12 @@ testthat::test_that("download_nei", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # define file path with commands
   commands_path <- paste0(
     amadeus:::download_sanitize_path(directory_to_save),
@@ -43,7 +43,7 @@ testthat::test_that("download_nei", {
     Sys.Date(),
     "_curl_commands.txt"
   )
-
+  # ----------------------------------------------------------------------------
   # Only proceed if commands file exists
   if (file.exists(commands_path)) {
     # import commands
@@ -63,7 +63,7 @@ testthat::test_that("download_nei", {
     # remove file with commands after test
     file.remove(commands_path)
   }
-
+  # ----------------------------------------------------------------------------
   # remove temporary nei
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -71,12 +71,12 @@ testthat::test_that("download_nei", {
 testthat::test_that("download_nei (live)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   year <- c(2017L, 2020L)
   testthat::expect_no_error(
@@ -91,12 +91,12 @@ testthat::test_that("download_nei (live)", {
       remove_zip = FALSE # NOW THIS PARAMETER EXISTS!
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that files were downloaded
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Check for zip files if they exist
   zip_dir <- paste0(directory_to_save, "/zip_files")
   if (dir.exists(zip_dir)) {
@@ -104,7 +104,7 @@ testthat::test_that("download_nei (live)", {
       length(list.files(zip_dir)) > 0
     )
   }
-
+  # ----------------------------------------------------------------------------
   # Check for data files if they exist
   data_dir <- paste0(directory_to_save, "/data_files")
   if (dir.exists(data_dir)) {
@@ -112,7 +112,7 @@ testthat::test_that("download_nei (live)", {
       length(list.files(data_dir, recursive = TRUE)) > 0
     )
   }
-
+  # ----------------------------------------------------------------------------
   # remove temporary nei
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -120,12 +120,12 @@ testthat::test_that("download_nei (live)", {
 testthat::test_that("download_nei range (live)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   year <- 2017:2020
   testthat::expect_warning(
@@ -141,12 +141,12 @@ testthat::test_that("download_nei range (live)", {
     ),
     regexp = "Proceeding with "
   )
-
+  # ----------------------------------------------------------------------------
   # Check that files were downloaded
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Check for zip files if they exist
   zip_dir <- paste0(directory_to_save, "/zip_files")
   if (dir.exists(zip_dir)) {
@@ -154,7 +154,7 @@ testthat::test_that("download_nei range (live)", {
       length(list.files(zip_dir)) > 0
     )
   }
-
+  # ----------------------------------------------------------------------------
   # Check for data files if they exist
   data_dir <- paste0(directory_to_save, "/data_files")
   if (dir.exists(data_dir)) {
@@ -162,7 +162,7 @@ testthat::test_that("download_nei range (live)", {
       length(list.files(data_dir, recursive = TRUE)) > 0
     )
   }
-
+  # ----------------------------------------------------------------------------
   # remove temporary nei
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -170,13 +170,13 @@ testthat::test_that("download_nei range (live)", {
 testthat::test_that("download_nei (expected errors)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()
   directory_to_save <- paste0(tempdir(), "/epa/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   year <- 2000:2002
   testthat::expect_error(
@@ -192,7 +192,7 @@ testthat::test_that("download_nei (expected errors)", {
     ),
     "No available years to download."
   )
-
+  # ----------------------------------------------------------------------------
   # run download function
   year <- c(2017L)
   testthat::expect_warning(
@@ -206,7 +206,7 @@ testthat::test_that("download_nei (expected errors)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # define file path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -216,12 +216,12 @@ testthat::test_that("download_nei (expected errors)", {
     Sys.Date(),
     "_curl_commands.txt"
   )
-
+  # ----------------------------------------------------------------------------
   # Only remove if file exists
   if (file.exists(commands_path)) {
     file.remove(commands_path)
   }
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 

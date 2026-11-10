@@ -14,16 +14,16 @@ testthat::test_that("download_ecoregion returns proper URL list", {
         download = FALSE
       )
     )
-
+    # --------------------------------------------------------------------------
     # Check return structure
     testthat::expect_type(result, "list")
     testthat::expect_named(result, c("urls", "destfiles", "n_files"))
     testthat::expect_equal(length(result$urls), length(result$destfiles))
     testthat::expect_equal(result$n_files, length(result$urls))
-
+    # --------------------------------------------------------------------------
     # Check single file expected
     testthat::expect_equal(result$n_files, 1)
-
+    # --------------------------------------------------------------------------
     # Check URL is valid format
     testthat::expect_true(grepl("^https?://", result$urls))
     testthat::expect_true(grepl("\\.zip$", result$destfiles))
@@ -39,7 +39,7 @@ testthat::test_that("download_ecoregion creates proper directory structure", {
         download = FALSE
       )
     )
-
+    # --------------------------------------------------------------------------
     # Check directories were created
     testthat::expect_true(dir.exists("zip_files"))
     testthat::expect_true(dir.exists("data_files"))
@@ -53,7 +53,7 @@ testthat::test_that("download_ecoregion skips existing files", {
     zip_path <- "zip_files/us_eco_l3_state_boundaries.zip"
     # Write actual binary content to simulate a real zip file
     writeBin(raw(1000), zip_path)
-
+    # --------------------------------------------------------------------------
     result <- suppressWarnings(
       download_ecoregion(
         directory_to_save = ".",
@@ -61,10 +61,10 @@ testthat::test_that("download_ecoregion skips existing files", {
         download = FALSE
       )
     )
-
+    # --------------------------------------------------------------------------
     # Should skip existing file
     testthat::expect_equal(result$n_files, 1)
-
+    # --------------------------------------------------------------------------
     # Verify original file still exists and has content
     testthat::expect_true(file.exists(zip_path))
     testthat::expect_gt(file.size(zip_path), 0)
@@ -1054,7 +1054,7 @@ testthat::test_that("calculate_ecoregion errors when required field missing from
 
 testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG and calculates indicators", {
   withr::local_package("terra")
-
+  # ----------------------------------------------------------------------------
   fixture <- normalizePath(
     testthat::test_path(
       "..",
@@ -1067,7 +1067,7 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
   download_directory <- withr::local_tempdir()
   downloaded_archive <- NULL
   extracted_gpkg <- NULL
-
+  # ----------------------------------------------------------------------------
   local_download_mocks(
     download_run_method = function(urls, destfiles, ...) {
       testthat::expect_match(
@@ -1104,7 +1104,7 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
     },
     download_remove_zips = function(...) invisible(NULL)
   )
-
+  # ----------------------------------------------------------------------------
   suppressMessages(download_data(
     dataset_name = "ecoregion",
     directory_to_save = download_directory,
@@ -1112,17 +1112,17 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
     show_progress = FALSE,
     rate_limit = 0
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(file.exists(downloaded_archive))
   testthat::expect_gt(file.size(downloaded_archive), 0)
   testthat::expect_true(file.exists(extracted_gpkg))
   testthat::expect_gt(file.size(extracted_gpkg), 0)
-
+  # ----------------------------------------------------------------------------
   processed <- suppressMessages(process_covariates(
     covariate = "ecoregion",
     path = extracted_gpkg
   ))
-
+  # ----------------------------------------------------------------------------
   required_fields <- c(
     "L2_KEY",
     "L3_KEY",
@@ -1137,7 +1137,7 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
   testthat::expect_true(all(required_fields %in% names(processed)))
   testthat::expect_true(nzchar(terra::crs(processed)))
   testthat::expect_false(anyNA(processed$L3_KEY))
-
+  # ----------------------------------------------------------------------------
   n_locations <- min(3L, terra::nrow(processed))
   centers <- terra::centroids(processed[seq_len(n_locations), ])
   coordinates <- terra::crds(centers)
@@ -1150,7 +1150,7 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
     geom = c("x", "y"),
     crs = terra::crs(processed)
   )
-
+  # ----------------------------------------------------------------------------
   result <- suppressMessages(calculate_covariates(
     covariate = "ecoregion",
     from = processed,
@@ -1159,7 +1159,7 @@ testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG 
     frac = FALSE,
     drop = TRUE
   ))
-
+  # ----------------------------------------------------------------------------
   indicator_columns <- grep(
     "^DUM_E[23]",
     names(result),

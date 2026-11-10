@@ -16,7 +16,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 88101,
@@ -25,7 +25,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -45,7 +45,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 44201,
@@ -54,7 +54,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -74,7 +74,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 42101,
@@ -83,7 +83,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -103,7 +103,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 42401,
@@ -112,7 +112,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -132,7 +132,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 42602,
@@ -141,7 +141,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -161,7 +161,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 81102,
@@ -170,7 +170,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -190,7 +190,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "hourly",
       parameter_code = 88101,
@@ -199,7 +199,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",
@@ -219,7 +219,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-
+    # --------------------------------------------------------------------------
     amadeus::download_aqs(
       resolution_temporal = "daily",
       parameter_code = 88101,
@@ -228,7 +228,7 @@ testthat::test_that(
       acknowledgement = TRUE,
       unzip = FALSE
     )
-
+    # --------------------------------------------------------------------------
     zips <- list.files(
       dir,
       pattern = "\\.zip$",

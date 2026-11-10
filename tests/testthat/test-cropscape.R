@@ -7,7 +7,7 @@ testthat::test_that("download_cropscape (no errors - GMU)", {
   withr::local_package("httr2")
   year <- 2010
   directory_to_save <- paste0(tempdir(), "/cps/")
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(
     download_cropscape(
       year = year,
@@ -21,7 +21,7 @@ testthat::test_that("download_cropscape (no errors - GMU)", {
   testthat::expect_equal(result$n_files, 1)
   testthat::expect_true(grepl("^https://", result$urls))
   testthat::expect_true(grepl(as.character(year), result$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -29,7 +29,7 @@ testthat::test_that("download_cropscape (no errors - USDA)", {
   withr::local_package("httr2")
   year <- 2010
   directory_to_save <- paste0(tempdir(), "/cps/")
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(
     download_cropscape(
       year = year,
@@ -43,14 +43,14 @@ testthat::test_that("download_cropscape (no errors - USDA)", {
   testthat::expect_equal(result$n_files, 1)
   testthat::expect_true(grepl("^https://", result$urls))
   testthat::expect_true(grepl(as.character(year), result$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_cropscape deprecation warnings", {
   withr::local_package("httr2")
   directory_to_save <- paste0(tempdir(), "/cps_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_cropscape(
       year = 2010,
@@ -61,7 +61,7 @@ testthat::test_that("download_cropscape deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_cropscape(
       year = 2010,
@@ -73,7 +73,7 @@ testthat::test_that("download_cropscape deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -263,7 +263,7 @@ testthat::test_that("calculate_cropscape", {
 testthat::test_that("CropScape linked mock workflows: GMU and USDA archives produce calculated fractions", {
   withr::local_package("terra")
   withr::local_package("sf")
-
+  # ----------------------------------------------------------------------------
   fixture <- normalizePath(
     testthat::test_path(
       "..",
@@ -276,7 +276,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
   state <- new.env(parent = emptyenv())
   state$downloaded_archives <- character()
   state$extraction_directories <- character()
-
+  # ----------------------------------------------------------------------------
   local_download_mocks(
     download_run_method = function(urls, destfiles, ...) {
       testthat::expect_match(
@@ -311,7 +311,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
       if (!isTRUE(unzip)) {
         return(invisible(NULL))
       }
-
+      # ------------------------------------------------------------------------
       state$extraction_directories <- c(
         state$extraction_directories,
         directory_to_unzip
@@ -327,14 +327,14 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
       invisible(NULL)
     },
   )
-
+  # ----------------------------------------------------------------------------
   for (source in c("GMU", "USDA")) {
     download_directory <- withr::local_tempdir(
       pattern = paste0("cropscape-", tolower(source), "-")
     )
     downloads_before <- length(state$downloaded_archives)
     extractions_before <- length(state$extraction_directories)
-
+    # --------------------------------------------------------------------------
     suppressMessages(download_data(
       dataset_name = "cropscape",
       directory_to_save = download_directory,
@@ -345,7 +345,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
       rate_limit = 0,
       unzip = TRUE
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_equal(
       length(state$downloaded_archives),
       downloads_before + 1L
@@ -367,7 +367,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
     } else {
       "2019_30m_cdls"
     }
-
+    # --------------------------------------------------------------------------
     testthat::expect_identical(basename(archive), expected_archive)
     testthat::expect_true(file.exists(archive))
     testthat::expect_gt(file.size(archive), 0)
@@ -378,13 +378,13 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
     extracted_tiff <- file.path(extraction_directory, basename(fixture))
     testthat::expect_true(file.exists(extracted_tiff))
     testthat::expect_gt(file.size(extracted_tiff), 0)
-
+    # --------------------------------------------------------------------------
     processed <- suppressMessages(process_covariates(
       covariate = "cropscape",
       path = extraction_directory,
       year = 2019
     ))
-
+    # --------------------------------------------------------------------------
     metadata <- terra::metags(processed)
     testthat::expect_s4_class(processed, "SpatRaster")
     testthat::expect_equal(terra::nlyr(processed), 1L)
@@ -396,7 +396,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
       "2019"
     )
     testthat::expect_true(any(!is.na(terra::values(processed, mat = FALSE))))
-
+    # --------------------------------------------------------------------------
     locations <- terra::vect(
       data.frame(site_id = "site_01", lon = -78.90, lat = 35.97),
       geom = c("lon", "lat"),
@@ -409,7 +409,7 @@ testthat::test_that("CropScape linked mock workflows: GMU and USDA archives prod
       locs_id = "site_id",
       radius = 300
     ))
-
+    # --------------------------------------------------------------------------
     fraction_columns <- grep(
       "^cropscape_300_",
       names(result),

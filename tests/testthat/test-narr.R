@@ -6,7 +6,7 @@
 testthat::test_that("download_narr (no errors)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -18,7 +18,7 @@ testthat::test_that("download_narr (no errors)", {
     "soill" # subsurface
   )
   directory_to_save <- paste0(tempdir(), "/narr/")
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning with download = FALSE
   testthat::expect_warning(
     download_data(
@@ -31,12 +31,12 @@ testthat::test_that("download_narr (no errors)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # define path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -46,7 +46,7 @@ testthat::test_that("download_narr (no errors)", {
     year_end,
     "_curl_commands.txt"
   )
-
+  # ----------------------------------------------------------------------------
   # Only proceed if commands file exists
   if (file.exists(commands_path)) {
     # import commands
@@ -64,18 +64,18 @@ testthat::test_that("download_narr (no errors)", {
     # remove file with commands after test
     file.remove(commands_path)
   }
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (single year)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr/")
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning
   testthat::expect_warning(
     download_data(
@@ -88,12 +88,12 @@ testthat::test_that("download_narr (single year)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -119,11 +119,11 @@ testthat::test_that("narr_variable (expected errors)", {
 testthat::test_that("download_narr without download=FALSE", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr_new/")
-
+  # ----------------------------------------------------------------------------
   # Test without download=FALSE (new httr2 method, no deprecation warning)
   testthat::expect_no_error(
     download_data(
@@ -134,12 +134,12 @@ testthat::test_that("download_narr without download=FALSE", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 

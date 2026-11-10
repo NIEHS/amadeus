@@ -9,7 +9,7 @@ testthat::test_that("download_prism (url discovery, no download)", {
   element <- "ppt"
   data_type <- "ts"
   format <- "nc"
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_prism(
     time = time,
     element = element,
@@ -24,7 +24,7 @@ testthat::test_that("download_prism (url discovery, no download)", {
   testthat::expect_true(grepl("/prism/data/get/us/", result$urls))
   testthat::expect_true(grepl("/zip_files/", result$destfiles))
   testthat::expect_equal(result$n_files, 1)
-
+  # ----------------------------------------------------------------------------
   # normals path (format is ignored, message expected)
   suppressWarnings(
     testthat::expect_message(
@@ -40,13 +40,13 @@ testthat::test_that("download_prism (url discovery, no download)", {
     )
   )
   testthat::expect_true(grepl("^https://", result2$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_prism deprecation warnings", {
   directory_to_save <- paste0(tempdir(), "/prism_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_prism(
       time = "201005",
@@ -59,7 +59,7 @@ testthat::test_that("download_prism deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_prism(
       time = "201005",
@@ -73,13 +73,13 @@ testthat::test_that("download_prism deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_prism (expected errors)", {
   directory_to_save <- paste0(tempdir(), "/prism/")
-
+  # ----------------------------------------------------------------------------
   # sol* elements not valid for ts data_type
   testthat::expect_warning(
     testthat::expect_error(
@@ -95,7 +95,7 @@ testthat::test_that("download_prism (expected errors)", {
     ),
     regexp = "download=FALSE"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -186,7 +186,7 @@ testthat::test_that("download_prism errors when downloaded archive is invalid", 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     testthat::expect_error(
       download_prism(

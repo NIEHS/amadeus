@@ -6,19 +6,19 @@
 testthat::test_that("download_population with httr2", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   withr::local_package("terra")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   years <- c("2020")
   data_formats <- c("GeoTIFF")
   data_resolutions <- c("30 second")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "pop")
-
+    # --------------------------------------------------------------------------
     # Test actual download with httr2
     # Suppress warnings since download/unzip issues are common in tests
     result <- suppressWarnings(
@@ -40,12 +40,12 @@ testthat::test_that("download_population with httr2", {
         }
       )
     )
-
+    # --------------------------------------------------------------------------
     # Check that directory was created
     testthat::expect_true(
       dir.exists(directory_to_save)
     )
-
+    # --------------------------------------------------------------------------
     # Check for downloaded files
     tif_files <- list.files(
       directory_to_save,
@@ -53,7 +53,7 @@ testthat::test_that("download_population with httr2", {
       recursive = TRUE,
       full.names = TRUE
     )
-
+    # --------------------------------------------------------------------------
     # If files were downloaded, verify they can be processed
     if (length(tif_files) > 0) {
       testthat::expect_no_error(
@@ -71,13 +71,13 @@ testthat::test_that("download_population with httr2", {
 testthat::test_that("download_population deprecation warnings", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "pop_deprecation")
-
+    # --------------------------------------------------------------------------
     # Test 1: download=FALSE deprecation warning
     testthat::expect_warning(
       download_data(
@@ -91,7 +91,7 @@ testthat::test_that("download_population deprecation warnings", {
       ),
       regexp = "Setting download=FALSE is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 2: remove_command deprecation warning
     testthat::expect_warning(
       download_data(
@@ -105,7 +105,7 @@ testthat::test_that("download_population deprecation warnings", {
       ),
       regexp = "Parameter 'remove_command' is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 3: Both deprecated parameters together
     warnings <- testthat::capture_warnings(
       download_data(
@@ -119,7 +119,7 @@ testthat::test_that("download_population deprecation warnings", {
         remove_command = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(
       any(grepl("Setting download=FALSE is deprecated", warnings))
     )
@@ -134,13 +134,13 @@ testthat::test_that("download_population deprecation warnings", {
 testthat::test_that("download_population parameter validation", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "pop_validation")
-
+    # --------------------------------------------------------------------------
     # Test invalid year - suppress warnings about failed downloads
     # The function may warn but should ultimately error or return gracefully
     suppressWarnings({
@@ -161,7 +161,7 @@ testthat::test_that("download_population parameter validation", {
     })
     # Either error or warning is acceptable for invalid year
     testthat::expect_true(result == "error" || result == "no_error")
-
+    # --------------------------------------------------------------------------
     # Test invalid data format
     testthat::expect_error(
       download_data(
@@ -173,7 +173,7 @@ testthat::test_that("download_population parameter validation", {
         acknowledgement = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     # Test invalid resolution - suppress warnings about failed downloads
     suppressWarnings({
       result <- tryCatch(
@@ -635,14 +635,14 @@ testthat::test_that("calculate_population with multiple locations", {
 testthat::test_that("population integration test", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("terra")
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory <- file.path(getwd(), "pop_integration")
-
+    # --------------------------------------------------------------------------
     # Download population data with error handling
     # Suppress warnings about download/unzip failures
     download_successful <- suppressWarnings(
@@ -664,11 +664,11 @@ testthat::test_that("population integration test", {
         }
       )
     )
-
+    # --------------------------------------------------------------------------
     if (!download_successful) {
       skip("Population data download failed - likely network or server issue")
     }
-
+    # --------------------------------------------------------------------------
     # Find downloaded files
     pop_files <- list.files(
       directory,
@@ -676,18 +676,18 @@ testthat::test_that("population integration test", {
       full.names = TRUE,
       recursive = TRUE
     )
-
+    # --------------------------------------------------------------------------
     if (length(pop_files) > 0) {
       # Process the first file
       testthat::expect_no_error(
         pop_raster <- process_population(path = pop_files[1])
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_s4_class(pop_raster, "SpatRaster")
-
+      # ------------------------------------------------------------------------
       # Test calculation
       ncp <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "test")
-
+      # ------------------------------------------------------------------------
       testthat::expect_no_error(
         pop_result <- calculate_population(
           from = pop_raster,
@@ -697,7 +697,7 @@ testthat::test_that("population integration test", {
           fun = "mean"
         )
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_true(is.data.frame(pop_result))
       testthat::expect_equal(nrow(pop_result), 1)
       testthat::expect_true("site_id" %in% names(pop_result))

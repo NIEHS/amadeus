@@ -5,7 +5,7 @@
 ##### download_tri
 testthat::test_that("download_tri (url discovery)", {
   directory_to_save <- paste0(tempdir(), "/tri/")
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_data(
     dataset_name = "tri",
     directory_to_save = directory_to_save,
@@ -13,21 +13,21 @@ testthat::test_that("download_tri (url discovery)", {
     download = FALSE,
     remove_command = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   # 5 years (2018-2022) → 5 files
   testthat::expect_equal(result$n_files, 5L)
   testthat::expect_true(all(grepl("^https://", result$urls)))
   testthat::expect_true(all(grepl("tri/mv_tri_basic_download", result$urls)))
   testthat::expect_true(all(grepl("_US/csv$", result$urls)))
   testthat::expect_true(all(grepl("tri_raw_[0-9]{4}\\.csv$", result$destfiles)))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_tri (single year, url discovery)", {
   directory_to_save <- paste0(tempdir(), "/tri/")
   year <- 2019L
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_data(
     year = year,
     dataset_name = "tri",
@@ -36,17 +36,17 @@ testthat::test_that("download_tri (single year, url discovery)", {
     download = FALSE,
     remove_command = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(result$n_files, 1L)
   testthat::expect_true(grepl("2019", result$urls))
   testthat::expect_true(grepl("^https://", result$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_tri supports state and tribal jurisdictions", {
   directory_to_save <- paste0(tempdir(), "/tri_jurisdiction/")
-
+  # ----------------------------------------------------------------------------
   state_result <- suppressWarnings(download_data(
     year = 2024L,
     dataset_name = "tri",
@@ -56,14 +56,14 @@ testthat::test_that("download_tri supports state and tribal jurisdictions", {
     download = FALSE,
     remove_command = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(state_result$n_files, 1L)
   testthat::expect_match(state_result$urls, "2024_AZ/csv$")
   testthat::expect_match(
     basename(state_result$destfiles),
     "^tri_raw_2024_AZ\\.csv$"
   )
-
+  # ----------------------------------------------------------------------------
   tribal_result <- suppressWarnings(download_tri(
     year = 2024L,
     directory_to_save = directory_to_save,
@@ -71,14 +71,14 @@ testthat::test_that("download_tri supports state and tribal jurisdictions", {
     jurisdiction = "TBL",
     download = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(tribal_result$n_files, 1L)
   testthat::expect_match(tribal_result$urls, "2024_tbl/csv$")
   testthat::expect_match(
     basename(tribal_result$destfiles),
     "^tri_raw_2024_TBL\\.csv$"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -155,14 +155,12 @@ testthat::test_that("download_tri rejects empty, NA, and non-scalar jurisdiction
 testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips existing files', {
   download_urls_seen <- character()
   destfiles_seen <- character()
-
   # --------------------------------------------------------------------------
   # Prevent the preflight check from accessing the network.
   testthat::local_mocked_bindings(
     check_preflight = function(...) invisible(NULL),
     .package = "amadeus"
   )
-
   # --------------------------------------------------------------------------
   # Mock HTTP transfers; retain real filtering and download-result handling.
   testthat::local_mocked_bindings(
@@ -174,14 +172,13 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     # ------------------------------------------------------------------------
     # Create a nonempty file that the shared runner should skip.
     existing_file <- "tri_raw_2021_NC.csv"
     existing_content <- c("YEAR,STATE", "2021,NC")
     writeLines(existing_content, existing_file)
-
     # ------------------------------------------------------------------------
     # Request both years using whitespace and lowercase jurisdiction input.
     result <- suppressMessages(amadeus::download_tri(
@@ -195,20 +192,18 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
       max_tries = 1L,
       rate_limit = 1
     ))
-
     # ------------------------------------------------------------------------
     # Only the missing year should reach the HTTP request.
     testthat::expect_equal(result$success, 1L)
     testthat::expect_equal(result$failed, 0L)
     testthat::expect_equal(result$skipped, 1L)
-
+    # --------------------------------------------------------------------------
     testthat::expect_length(download_urls_seen, 1L)
     testthat::expect_match(download_urls_seen, "2020_NC/csv$")
     testthat::expect_identical(
       basename(destfiles_seen),
       "tri_raw_2020_NC.csv"
     )
-
     # ------------------------------------------------------------------------
     # Verify the new file was written and the existing file was preserved.
     testthat::expect_identical(
@@ -225,7 +220,7 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
 testthat::test_that("download_tri (LIVE - state and tribal)", {
   testthat::skip_on_cran()
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     state_result <- download_tri(
       year = 2024L,
@@ -245,13 +240,13 @@ testthat::test_that("download_tri (LIVE - state and tribal)", {
       show_progress = FALSE,
       rate_limit = 0
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_type(state_result, "list")
     testthat::expect_type(tribal_result, "list")
-
+    # --------------------------------------------------------------------------
     state_file <- "tri_raw_2024_AZ.csv"
     tribal_file <- "tri_raw_2024_TBL.csv"
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(file.exists(state_file))
     testthat::expect_true(file.exists(tribal_file))
     testthat::expect_gt(file.size(state_file), 1000)
@@ -261,7 +256,7 @@ testthat::test_that("download_tri (LIVE - state and tribal)", {
 
 testthat::test_that("download_tri deprecation warnings", {
   directory_to_save <- paste0(tempdir(), "/tri_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_tri(
       year = c(2020L, 2020L),
@@ -271,7 +266,7 @@ testthat::test_that("download_tri deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_tri(
       year = c(2020L, 2020L),
@@ -282,7 +277,7 @@ testthat::test_that("download_tri deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 

@@ -1767,7 +1767,7 @@ testthat::test_that(
   "SPEI linked mock workflow: creates process-ready NetCDF and calculates values",
   {
     withr::local_package("terra")
-
+    # --------------------------------------------------------------------------
     fixture <- normalizePath(
       testthat::test_path(
         "..",
@@ -1780,7 +1780,7 @@ testthat::test_that(
     )
     download_directory <- withr::local_tempdir()
     downloaded_file <- NULL
-
+    # --------------------------------------------------------------------------
     local_download_mocks(
       download_run_method = function(urls, destfiles, ...) {
         testthat::expect_match(
@@ -1794,7 +1794,7 @@ testthat::test_that(
         list(success = 1L, failed = 0L, skipped = 0L)
       }
     )
-
+    # --------------------------------------------------------------------------
     suppressMessages(download_data(
       dataset_name = "spei",
       directory_to_save = download_directory,
@@ -1804,17 +1804,17 @@ testthat::test_that(
       show_progress = FALSE,
       rate_limit = 0
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(file.exists(downloaded_file))
     testthat::expect_gt(file.size(downloaded_file), 0)
-
+    # --------------------------------------------------------------------------
     processed <- suppressMessages(process_covariates(
       covariate = "spei",
       path = download_directory,
       date = c("2020-01-01", "2020-03-31"),
       timescale = 1L
     ))
-
+    # --------------------------------------------------------------------------
     expected_names <- c(
       "spei_01_2020-01-01",
       "spei_01_2020-02-01",
@@ -1829,7 +1829,7 @@ testthat::test_that(
     )
     testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
     testthat::expect_true(terra::hasValues(processed))
-
+    # --------------------------------------------------------------------------
     valued_cells <- which(!is.na(terra::values(processed[[1L]], mat = FALSE)))
     cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
     coordinates <- terra::xyFromCell(processed, cells)
@@ -1842,7 +1842,7 @@ testthat::test_that(
       geom = c("x", "y"),
       crs = terra::crs(processed)
     )
-
+    # --------------------------------------------------------------------------
     result <- suppressMessages(calculate_covariates(
       covariate = "spei",
       from = processed,
@@ -1850,7 +1850,7 @@ testthat::test_that(
       locs_id = "site_id",
       radius = 0
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_s3_class(result, "data.frame")
     testthat::expect_equal(nrow(result), length(cells) * 3L)
     testthat::expect_identical(unique(result$site_id), locations$site_id)
@@ -1864,7 +1864,7 @@ testthat::test_that(
   "EDDI linked mock workflow: creates dated ASCII raster and calculates values",
   {
     withr::local_package("terra")
-
+    # --------------------------------------------------------------------------
     fixture <- normalizePath(
       testthat::test_path(
         "..",
@@ -1877,7 +1877,7 @@ testthat::test_that(
     )
     download_directory <- withr::local_tempdir()
     downloaded_file <- NULL
-
+    # --------------------------------------------------------------------------
     local_download_mocks(
       download_run_method = function(urls, destfiles, ...) {
         testthat::expect_identical(
@@ -1901,7 +1901,7 @@ testthat::test_that(
         list(success = 1L, failed = 0L, skipped = 0L)
       }
     )
-
+    # --------------------------------------------------------------------------
     suppressMessages(download_data(
       dataset_name = "drought",
       directory_to_save = download_directory,
@@ -1912,17 +1912,17 @@ testthat::test_that(
       show_progress = FALSE,
       rate_limit = 0
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(file.exists(downloaded_file))
     testthat::expect_gt(file.size(downloaded_file), 0)
-
+    # --------------------------------------------------------------------------
     processed <- suppressMessages(process_covariates(
       covariate = "eddi",
       path = download_directory,
       date = "2020-01-07",
       timescale = 1L
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_s4_class(processed, "SpatRaster")
     testthat::expect_equal(terra::nlyr(processed), 1L)
     testthat::expect_identical(names(processed), "eddi_01_2020-01-07")
@@ -1932,7 +1932,7 @@ testthat::test_that(
     )
     testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
     testthat::expect_true(terra::hasValues(processed))
-
+    # --------------------------------------------------------------------------
     valued_cells <- which(!is.na(terra::values(processed, mat = FALSE)))
     cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
     coordinates <- terra::xyFromCell(processed, cells)
@@ -1945,7 +1945,7 @@ testthat::test_that(
       geom = c("x", "y"),
       crs = terra::crs(processed)
     )
-
+    # --------------------------------------------------------------------------
     result <- suppressMessages(calculate_covariates(
       covariate = "eddi",
       from = processed,
@@ -1953,7 +1953,7 @@ testthat::test_that(
       locs_id = "site_id",
       radius = 0
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_s3_class(result, "data.frame")
     testthat::expect_equal(nrow(result), length(cells))
     testthat::expect_identical(result$site_id, locations$site_id)
@@ -1967,7 +1967,7 @@ testthat::test_that(
   "USDM linked mock workflow: extracts complete bundles and calculates proportions",
   {
     withr::local_package("terra")
-
+    # --------------------------------------------------------------------------
     fixture_directory <- normalizePath(
       testthat::test_path("..", "testdata", "drought", "usdm"),
       mustWork = TRUE
@@ -1976,7 +1976,7 @@ testthat::test_that(
     downloaded_archives <- character()
     extracted_files <- character()
     extraction_directory <- NULL
-
+    # --------------------------------------------------------------------------
     local_download_mocks(
       download_run_method = function(urls, destfiles, ...) {
         expected_urls <- paste0(
@@ -2037,7 +2037,7 @@ testthat::test_that(
         invisible(NULL)
       }
     )
-
+    # --------------------------------------------------------------------------
     suppressMessages(download_data(
       dataset_name = "drought",
       directory_to_save = download_directory,
@@ -2049,18 +2049,18 @@ testthat::test_that(
       unzip = TRUE,
       remove_zip = FALSE
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_length(downloaded_archives, 2L)
     testthat::expect_true(all(file.exists(downloaded_archives)))
     testthat::expect_length(extracted_files, 10L)
     testthat::expect_true(all(file.exists(extracted_files)))
-
+    # --------------------------------------------------------------------------
     processed <- suppressMessages(process_covariates(
       covariate = "usdm",
       path = extraction_directory,
       date = c("2020-01-07", "2020-01-14")
     ))
-
+    # --------------------------------------------------------------------------
     testthat::expect_s4_class(processed, "SpatVector")
     testthat::expect_equal(terra::nrow(processed), 2L)
     testthat::expect_true(all(c("DM", "date", "source") %in% names(processed)))
@@ -2070,7 +2070,7 @@ testthat::test_that(
     )
     testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
     testthat::expect_true(all(processed$DM %in% 0:4))
-
+    # --------------------------------------------------------------------------
     center <- terra::centroids(processed[1L, ])
     coordinates <- terra::crds(center)
     locations <- terra::vect(
@@ -2082,7 +2082,7 @@ testthat::test_that(
       geom = c("x", "y"),
       crs = terra::crs(processed)
     )
-
+    # --------------------------------------------------------------------------
     result <- suppressMessages(calculate_covariates(
       covariate = "usdm",
       from = processed,
@@ -2090,7 +2090,7 @@ testthat::test_that(
       locs_id = "site_id",
       radius = 1000
     ))
-
+    # --------------------------------------------------------------------------
     proportion_columns <- paste0("usdm_dm_", 0:4, "_1000")
     proportions <- as.matrix(result[, proportion_columns, drop = FALSE])
     testthat::expect_s3_class(result, "data.frame")

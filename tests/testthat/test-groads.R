@@ -11,7 +11,7 @@ testthat::test_that("download_groads", {
   data_regions <- c("Americas", "Global")
   data_formats <- c("Geodatabase", "Shapefile")
   directory_to_save <- paste0(tempdir(), "/groads/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   for (r in seq_along(data_regions)) {
     data_region <- data_regions[r]
@@ -20,7 +20,7 @@ testthat::test_that("download_groads", {
       if (dir.exists(directory_to_save)) {
         unlink(directory_to_save, recursive = TRUE)
       }
-
+      # ------------------------------------------------------------------------
       testthat::expect_warning(
         download_data(
           dataset_name = "sedac_groads",
@@ -35,23 +35,23 @@ testthat::test_that("download_groads", {
         ),
         "download=FALSE is deprecated"
       )
-
+      # ------------------------------------------------------------------------
       # Check that directory was created
       testthat::expect_true(
         dir.exists(directory_to_save)
       )
-
+      # ------------------------------------------------------------------------
       # Check that subdirectories exist
       subdirs <- list.files(
         directory_to_save,
         include.dirs = TRUE,
         full.names = FALSE
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_true(
         length(subdirs) >= 1
       )
-
+      # ------------------------------------------------------------------------
       # define file path with commands
       commands_path <- paste0(
         amadeus:::download_sanitize_path(directory_to_save),
@@ -61,7 +61,7 @@ testthat::test_that("download_groads", {
         Sys.Date(),
         "_curl_command.txt"
       )
-
+      # ------------------------------------------------------------------------
       # Only proceed with command file tests if it exists
       if (file.exists(commands_path)) {
         # import commands
@@ -81,7 +81,7 @@ testthat::test_that("download_groads", {
       }
     }
   }
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_data(
       dataset_name = "sedac_groads",

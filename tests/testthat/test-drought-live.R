@@ -15,7 +15,7 @@ expect_live_download_files <- function(download_expr, dir) {
       skip_if_transient_live_issue(w)
     }
   )
-
+  # ----------------------------------------------------------------------------
   if (
     is.list(result) &&
       is.numeric(result$success) &&
@@ -28,7 +28,7 @@ expect_live_download_files <- function(download_expr, dir) {
       result$failed
     ))
   }
-
+  # ----------------------------------------------------------------------------
   files <- list.files(dir, recursive = TRUE, full.names = TRUE)
   testthat::expect_gt(length(files), 0)
   testthat::expect_gt(sum(file.info(files)$size > 0), 0)

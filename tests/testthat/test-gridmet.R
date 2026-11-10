@@ -16,7 +16,7 @@ testthat::test_that("download_gridmet (no errors)", {
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   result <- suppressWarnings(
     download_data(
@@ -28,12 +28,12 @@ testthat::test_that("download_gridmet (no errors)", {
       download = FALSE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Assert structured return values from httr2-based download discovery
   testthat::expect_type(result, "list")
   testthat::expect_equal(
@@ -48,7 +48,7 @@ testthat::test_that("download_gridmet (no errors)", {
       )
     )
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -64,7 +64,7 @@ testthat::test_that("download_gridmet (single year)", {
   year <- 2020
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
-
+  # ----------------------------------------------------------------------------
   # run download function
   result <- suppressWarnings(
     download_data(
@@ -76,12 +76,12 @@ testthat::test_that("download_gridmet (single year)", {
       download = FALSE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Assert structured return values from httr2-based download discovery
   testthat::expect_type(result, "list")
   testthat::expect_equal(result$n_files, 1L)
@@ -91,7 +91,7 @@ testthat::test_that("download_gridmet (single year)", {
       result$urls
     )
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -215,7 +215,7 @@ testthat::test_that("download_data(dataset_name='gridmet', year=2020): discovers
   year <- 2020
   variables <- "Precipitation"
   directory_to_save <- file.path(withr::local_tempdir(), "gridmet")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     result <- suppressMessages(
       download_data(
@@ -229,9 +229,9 @@ testthat::test_that("download_data(dataset_name='gridmet', year=2020): discovers
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(dir.exists(directory_to_save))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_type(result, "list")
   testthat::expect_equal(result$n_files, 1L)
   testthat::expect_identical(
@@ -246,7 +246,7 @@ testthat::test_that("download_data(dataset_name='gridmet', year=2020): discovers
 
 testthat::test_that("download_gridmet(acknowledgement=FALSE): stops before creating directories", {
   directory_to_save <- file.path(withr::local_tempdir(), "gridmet")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_error(
     download_gridmet(
       variables = "pr",
@@ -271,7 +271,7 @@ testthat::test_that("download_gridmet(variables=c('pr','tmmx')): forwards exact 
     .package = "amadeus"
   )
   directory_to_save <- withr::local_tempdir()
-
+  # ----------------------------------------------------------------------------
   result <- suppressMessages(
     download_gridmet(
       variables = c("pr", "tmmx"),
@@ -283,7 +283,7 @@ testthat::test_that("download_gridmet(variables=c('pr','tmmx')): forwards exact 
       rate_limit = 0.25
     )
   )
-
+  # ----------------------------------------------------------------------------
   expected_files <- c(
     "pr_2018.nc",
     "tmmx_2018.nc",
@@ -331,7 +331,7 @@ testthat::test_that("download_gridmet(existing destination): sends only missing 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   result <- suppressMessages(
     download_gridmet(
       variables = "pr",
@@ -340,7 +340,7 @@ testthat::test_that("download_gridmet(existing destination): sends only missing 
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_identical(
     captured_urls,
     "https://www.northwestknowledge.net/metdata/data/pr_2019.nc"
@@ -368,7 +368,7 @@ testthat::test_that("download_gridmet(existing files=all): skips downloading and
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   chr_tempdir <- withr::local_tempdir()
   chr_files <- c(
     file.path(chr_tempdir, "pr", sprintf("pr_%d.nc", 2019:2021)),
@@ -379,14 +379,14 @@ testthat::test_that("download_gridmet(existing files=all): skips downloading and
     dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
     writeBin(as.raw(1), path)
   }
-
+  # ----------------------------------------------------------------------------
   result <- (download_gridmet(
     variables = c("pr", "spei30d", "eddi14d"),
     year = c(2019, 2021),
     directory_to_save = chr_tempdir,
     acknowledgement = TRUE
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(result$success, 0)
   testthat::expect_equal(result$failed, 0)
   testthat::expect_equal(result$skipped, 5)

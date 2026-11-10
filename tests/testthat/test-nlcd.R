@@ -6,10 +6,10 @@
 testthat::test_that("download_nlcd", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   years <- sample(1985:2023L, size = 2)
   products <- c(
@@ -28,14 +28,14 @@ testthat::test_that("download_nlcd", {
     "ImpDsc",
     "SpcChg"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "nlcd")
-
+    # --------------------------------------------------------------------------
     # run download function
     for (y in seq_along(years)) {
       p <- sample(seq_along(products), size = 1L)
-
+      # ------------------------------------------------------------------------
       # Expect deprecation warning with download = FALSE
       testthat::expect_warning(
         download_data(
@@ -50,12 +50,12 @@ testthat::test_that("download_nlcd", {
         ),
         "Setting download=FALSE is deprecated"
       )
-
+      # ------------------------------------------------------------------------
       # Check that directory was created
       testthat::expect_true(
         dir.exists(directory_to_save)
       )
-
+      # ------------------------------------------------------------------------
       # define file path with commands
       commands_path <- paste0(
         amadeus:::download_sanitize_path(directory_to_save),
@@ -67,7 +67,7 @@ testthat::test_that("download_nlcd", {
         Sys.Date(),
         "_curl_command.txt"
       )
-
+      # ------------------------------------------------------------------------
       # Only proceed if commands file exists
       if (file.exists(commands_path)) {
         # import commands
@@ -86,7 +86,7 @@ testthat::test_that("download_nlcd", {
         file.remove(commands_path)
       }
     }
-
+    # --------------------------------------------------------------------------
     # Test error case with invalid year
     # This should produce BOTH warnings (download=FALSE and remove_command=TRUE)
     # AND an error. We need to capture the warnings
@@ -117,13 +117,13 @@ testthat::test_that("download_nlcd", {
 testthat::test_that("download_nlcd deprecation warnings", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "nlcd_deprecation")
-
+    # --------------------------------------------------------------------------
     # Test 1: download=FALSE deprecation warning
     testthat::expect_warning(
       download_data(
@@ -136,7 +136,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
       ),
       regexp = "Setting download=FALSE is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 2: remove_command deprecation warning
     testthat::expect_warning(
       download_data(
@@ -149,7 +149,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
       ),
       regexp = "Parameter 'remove_command' is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 3: Both deprecated parameters together (should give both warnings)
     warnings <- testthat::capture_warnings(
       download_data(
@@ -162,7 +162,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
         remove_command = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(
       any(grepl("Setting download=FALSE is deprecated", warnings))
     )

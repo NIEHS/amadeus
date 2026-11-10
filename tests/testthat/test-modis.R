@@ -16,21 +16,21 @@ skip_if_not_local_modis_live <- function() {
 ##### download_modis
 testthat::test_that("download_modis (MODIS-MOD09GA)", {
   skip_if_not_local_modis_live()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringi")
   withr::local_package("jsonlite")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   years <- 2020
   product <- "MOD09GA"
   version <- "061"
   directory_to_save <- paste0(tempdir(), "/mod/")
-
+  # ----------------------------------------------------------------------------
   for (y in seq_along(years)) {
     date_start <- paste0(years[y], "-06-20")
     date_end <- paste0(years[y], "-06-24")
-
+    # --------------------------------------------------------------------------
     # Test with deprecation warning
     testthat::expect_warning(
       download_data(
@@ -46,7 +46,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
       ),
       "Setting download=FALSE is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(dir.exists(directory_to_save))
   }
   unlink(directory_to_save, recursive = TRUE)
@@ -54,16 +54,16 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
 
 testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   skip_if_not_local_modis_live()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   product <- "MOD09GA"
   version <- "061"
   directory_to_save <- paste0(tempdir(), "/mod/")
   date <- "2021-04-12"
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_data(
       dataset_name = "modis",
@@ -78,24 +78,24 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(dir.exists(directory_to_save))
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_modis (MODIS-MOD06L2)", {
   skip_if_not_local_modis_live()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   product <- "MOD06_L2"
   version <- "061"
   date_start <- "2019-02-18"
   date_end <- "2019-02-28"
   directory_to_save <- paste0(tempdir(), "/mod/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_data(
       dataset_name = "modis",
@@ -110,7 +110,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(dir.exists(directory_to_save))
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -118,7 +118,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
 testthat::test_that("download_modis (expected errors)", {
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   years <- 2020
   product <- c("MOD09GA", "MOD11A1", "MOD13A2", "MCD19A2")
@@ -128,7 +128,7 @@ testthat::test_that("download_modis (expected errors)", {
   date_start <- paste0(years, "-06-25")
   date_end <- paste0(years, "-06-30")
   vec_extent <- c(-124, 25, -105, 40)
-
+  # ----------------------------------------------------------------------------
   # with token (if available) - should work
   if (
     Sys.getenv("AMADEUS_LIVE_TESTS") == "true" &&
@@ -150,7 +150,7 @@ testthat::test_that("download_modis (expected errors)", {
       "Setting download=FALSE is deprecated"
     )
   }
-
+  # ----------------------------------------------------------------------------
   # no token - should error
   withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
   testthat::expect_warning(
@@ -170,7 +170,7 @@ testthat::test_that("download_modis (expected errors)", {
     ),
     "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # year difference between date_start and date_end
   testthat::expect_warning(
     testthat::expect_error(
@@ -190,7 +190,7 @@ testthat::test_that("download_modis (expected errors)", {
     ),
     "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # null version
   testthat::expect_warning(
     testthat::expect_error(
@@ -208,16 +208,16 @@ testthat::test_that("download_modis (expected errors)", {
     ),
     "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_modis (MOD + MYD products)", {
   skip_if_not_local_modis_live()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # function parameters
   products <- c(
     "MOD09GA",
@@ -232,10 +232,10 @@ testthat::test_that("download_modis (MOD + MYD products)", {
   date_start <- "2023-12-27"
   date_end <- "2023-12-27"
   vec_extent <- c(-180, -90, 180, 90)
-
+  # ----------------------------------------------------------------------------
   for (p in seq_along(products)) {
     cat("Testing product:", products[p], "\n")
-
+    # --------------------------------------------------------------------------
     testthat::expect_warning(
       download_data(
         dataset_name = "modis",
@@ -256,9 +256,9 @@ testthat::test_that("download_modis (MOD + MYD products)", {
 
 testthat::test_that("download_modis with NASA token", {
   skip_if_not_local_modis_live()
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/mod_token/")
-
+  # ----------------------------------------------------------------------------
   # Test that download works with token
   testthat::expect_no_error(
     download_data(
@@ -271,14 +271,14 @@ testthat::test_that("download_modis with NASA token", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(dir.exists(directory_to_save))
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)", {
   skip_on_cran()
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -287,7 +287,7 @@ testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)"
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -320,7 +320,7 @@ testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)"
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     # Test remove_command=TRUE warning
     testthat::expect_warning(
@@ -336,7 +336,7 @@ testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)"
       ),
       "remove_command.*deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test hash=TRUE return
     result <- suppressWarnings(
       suppressMessages(
@@ -355,7 +355,7 @@ testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)"
 
 testthat::test_that("download_modis(date=<long range>): does not warn", {
   skip_on_cran()
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -366,7 +366,7 @@ testthat::test_that("download_modis(date=<long range>): does not warn", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -399,7 +399,7 @@ testthat::test_that("download_modis(date=<long range>): does not warn", {
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     # date range > 31 days in same year no longer triggers warning
     testthat::expect_no_warning(
@@ -497,7 +497,7 @@ testthat::test_that("download_modis accepts MOD14A1 and MYD14A1 with mocked CMR 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -529,7 +529,7 @@ testthat::test_that("download_modis accepts MOD14A1 and MYD14A1 with mocked CMR 
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     for (mock_product in c("MOD14A1", "MYD14A1")) {
       result <- suppressWarnings(
@@ -544,7 +544,7 @@ testthat::test_that("download_modis accepts MOD14A1 and MYD14A1 with mocked CMR 
           )
         )
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_type(result, "list")
       testthat::expect_equal(result$n_files, 1L)
       testthat::expect_match(result$urls[[1]], mock_product)
@@ -565,7 +565,7 @@ testthat::test_that("download_modis accepts MOD14CM1 and MYD14CM1 monthly files 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -599,12 +599,12 @@ testthat::test_that("download_modis accepts MOD14CM1 and MYD14CM1 monthly files 
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   mock_cases <- list(
     list(product = "MOD14CM1", stamp = "200011", date = "2000-11-15"),
     list(product = "MYD14CM1", stamp = "200207", date = "2002-07-15")
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     for (mock_case in mock_cases) {
       mock_product <- mock_case$product
@@ -621,7 +621,7 @@ testthat::test_that("download_modis accepts MOD14CM1 and MYD14CM1 monthly files 
           )
         )
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_type(result, "list")
       testthat::expect_equal(result$n_files, 1L)
       testthat::expect_match(result$urls[[1]], mock_stamp)
@@ -641,7 +641,7 @@ testthat::test_that("download_modis falls back from CM1 to A2 when CM1 has no gr
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -678,7 +678,7 @@ testthat::test_that("download_modis falls back from CM1 to A2 when CM1 has no gr
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressWarnings(
       suppressMessages(
@@ -691,7 +691,7 @@ testthat::test_that("download_modis falls back from CM1 to A2 when CM1 has no gr
         )
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$n_files, 1L)
     testthat::expect_match(result$urls[[1]], "MOD14A2")
@@ -710,7 +710,7 @@ testthat::test_that("download_modis accepts MCD14ML text files (mock)", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
@@ -741,7 +741,7 @@ testthat::test_that("download_modis accepts MCD14ML text files (mock)", {
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressWarnings(
       suppressMessages(
@@ -754,7 +754,7 @@ testthat::test_that("download_modis accepts MCD14ML text files (mock)", {
         )
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$n_files, 1L)
     testthat::expect_match(result$urls[[1]], "\\.txt$")
@@ -764,7 +764,7 @@ testthat::test_that("download_modis accepts MCD14ML text files (mock)", {
 
 testthat::test_that("download_modis fire products allow cross-year filtering", {
   mock_product <- NULL
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -775,7 +775,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     request = function(url) list(url = url),
     req_url_query = function(req, ...) req,
@@ -832,7 +832,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     mock_product <- "MOD14CM1"
     monthly_result <- suppressWarnings(
@@ -847,7 +847,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
       )
     )
     testthat::expect_equal(monthly_result$n_files, 2L)
-
+    # --------------------------------------------------------------------------
     mock_product <- "MCD64CMQ"
     cmq_result <- suppressWarnings(
       suppressMessages(
@@ -861,7 +861,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
       )
     )
     testthat::expect_equal(cmq_result$n_files, 2L)
-
+    # --------------------------------------------------------------------------
     mock_product <- "MCD64A1"
     burned_result <- suppressWarnings(
       suppressMessages(
@@ -875,7 +875,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
       )
     )
     testthat::expect_equal(burned_result$n_files, 2L)
-
+    # --------------------------------------------------------------------------
     mock_product <- "VNP64A1"
     viirs_burned_result <- suppressWarnings(
       suppressMessages(
@@ -889,7 +889,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
       )
     )
     testthat::expect_equal(viirs_burned_result$n_files, 2L)
-
+    # --------------------------------------------------------------------------
     mock_product <- "MCD14ML"
     txt_result <- suppressWarnings(
       suppressMessages(
@@ -911,7 +911,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
 testthat::test_that("download_modis fire products use product-specific versions and data links", {
   mock_product <- NULL
   mock_query <- NULL
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -922,7 +922,7 @@ testthat::test_that("download_modis fire products use product-specific versions 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
     request = function(url) list(url = url),
     req_url_query = function(req, ...) {
@@ -982,7 +982,7 @@ testthat::test_that("download_modis fire products use product-specific versions 
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   cases <- list(
     list(
       product = "MOD14A1",
@@ -1015,7 +1015,7 @@ testthat::test_that("download_modis fire products use product-specific versions 
       expected_pattern = "\\.h5$"
     )
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     for (i in seq_along(cases)) {
       mock_product <- cases[[i]]$product
@@ -1030,7 +1030,7 @@ testthat::test_that("download_modis fire products use product-specific versions 
           )
         )
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_equal(result$n_files, 1L)
       testthat::expect_match(result$urls[[1]], cases[[i]]$expected_pattern)
       testthat::expect_identical(mock_query$version, cases[[i]]$expected_version)
@@ -3284,7 +3284,7 @@ testthat::test_that("download_modis surfaces CMR query failures", {
     req_perform = function(...) stop("mock cmr outage"),
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     testthat::expect_error(
       download_modis(

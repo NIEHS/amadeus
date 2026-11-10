@@ -102,7 +102,7 @@ testthat::test_that("download_merra2 (no errors)", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     "NASA_EARTHDATA_TOKEN not set"
   )
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -110,7 +110,7 @@ testthat::test_that("download_merra2 (no errors)", {
   date_end <- "2022-02-15"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- paste0(tempdir(), "/merra2/")
-
+  # ----------------------------------------------------------------------------
   # Test that the function runs without error (requires NASA token)
   testthat::expect_no_error(
     download_data(
@@ -121,25 +121,25 @@ testthat::test_that("download_merra2 (no errors)", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
   collections <- c("inst1_2d_asm_Nx")
   directory_to_save <- paste0(tempdir(), "/merra2_deprecated/")
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning when using download = FALSE
   testthat::expect_warning(
     download_data(
@@ -152,7 +152,7 @@ testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -163,14 +163,14 @@ testthat::test_that("download_merra2 (single date)", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     "NASA_EARTHDATA_TOKEN not set"
   )
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- paste0(tempdir(), "/merra2/")
-
+  # ----------------------------------------------------------------------------
   # Test that the function runs without error (requires NASA token)
   testthat::expect_no_error(
     download_data(
@@ -181,32 +181,32 @@ testthat::test_that("download_merra2 (single date)", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 with NASA token", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # Skip if no NASA token is available
   if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
     skip("NASA_EARTHDATA_TOKEN not set")
   }
-
+  # ----------------------------------------------------------------------------
   # function parameters
   date <- "2024-01-02"
   collections <- c("inst1_2d_int_Nx")
   directory_to_save <- paste0(tempdir(), "/merra2_token/")
-
+  # ----------------------------------------------------------------------------
   # Test download with token
   testthat::expect_no_error(
     result <- download_data(
@@ -217,32 +217,32 @@ testthat::test_that("download_merra2 with NASA token", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Check that some files were processed (either downloaded or skipped)
   testthat::expect_true(
     length(list.files(directory_to_save, recursive = TRUE)) > 0
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 fails without NASA token", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # Temporarily unset NASA token
   withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/merra2_notoken/")
-
+  # ----------------------------------------------------------------------------
   # Should error when no token is available
   testthat::expect_error(
     download_data(
@@ -254,7 +254,7 @@ testthat::test_that("download_merra2 fails without NASA token", {
     ),
     "NASA_EARTHDATA_TOKEN"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -362,7 +362,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressMessages(
       download_merra2(
@@ -372,7 +372,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
         acknowledgement = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     expected_files <- c(
       "FWI.MERRA2.CORRECTED.Daily.Default.20240811.nc",
       "FWI.MERRA2.CORRECTED.Daily.Default.20240812.nc"
@@ -382,7 +382,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
       "fwiCalcs.MERRA2/Default/MERRA2.CORRECTED/2024/",
       expected_files
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$success, 2)
     testthat::expect_null(captured$token)
     testthat::expect_equal(captured$urls, expected_urls)
@@ -423,7 +423,7 @@ testthat::test_that("download_merra2 supports mixed FWI and standard requests", 
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressMessages(
       download_merra2(
@@ -434,7 +434,7 @@ testthat::test_that("download_merra2 supports mixed FWI and standard requests", 
         acknowledgement = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(is.character(captured$token))
     testthat::expect_true(nzchar(captured$token))
     testthat::expect_equal(result$success, 3)
