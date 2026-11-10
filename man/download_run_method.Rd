@@ -57,9 +57,8 @@ An invisible list containing:
 basenames.
 }
 
-When every file is skipped, only \code{success}, \code{failed}, and \code{skipped} are
-returned. Otherwise the two failure vectors are present, and are empty
-when no downloads failed.
+All five fields are always present. When no downloads fail, \code{failed_urls}
+and \code{failed_files} are \code{character(0)}, including when every file is skipped.
 }
 \description{
 Download files sequentially with httr2, streaming each response to disk.

@@ -728,7 +728,13 @@ testthat::test_that(
       check_destfile = function(...) TRUE,
       download_run_method = function(urls, ...) {
         captured_urls <<- urls
-        list(success = 1L, failed = 0L, skipped = 0L)
+        list(
+          success = 1L,
+          failed = 0L,
+          skipped = 0L,
+          failed_urls = character(0),
+          failed_files = character(0)
+        )
       },
       download_unzip = function(...) invisible(NULL),
       download_remove_zips = function(...) invisible(NULL),
@@ -746,7 +752,13 @@ testthat::test_that(
       )
       testthat::expect_identical(
         result,
-        list(success = 1L, failed = 0L, skipped = 0L)
+        list(
+          success = 1L,
+          failed = 0L,
+          skipped = 0L,
+          failed_urls = character(0),
+          failed_files = character(0)
+        )
       )
       testthat::expect_identical(
         captured_urls,
@@ -1641,9 +1653,15 @@ testthat::test_that(
     testthat::local_mocked_bindings(
       check_destfile = function(...) TRUE,
       check_url_status = function(url) grepl("spei_database_2_11", url),
-      download_run_method = function(urls, ...) {
+      download_run_method = function(urls, destfiles, ...) {
         captured_urls <<- c(captured_urls, urls)
-        list(success = 0L, failed = 1L, skipped = 0L)
+        list(
+          success = 0L,
+          failed = 1L,
+          skipped = 0L,
+          failed_urls = urls,
+          failed_files = basename(destfiles)
+        )
       },
       .package = "amadeus"
     )
@@ -1659,7 +1677,13 @@ testthat::test_that(
       )
       testthat::expect_identical(
         result,
-        list(success = 0L, failed = 1L, skipped = 0L)
+        list(
+          success = 0L,
+          failed = 1L,
+          skipped = 0L,
+          failed_urls = captured_urls,
+          failed_files = "spei01.nc"
+        )
       )
       testthat::expect_length(captured_urls, 1L)
       testthat::expect_identical(

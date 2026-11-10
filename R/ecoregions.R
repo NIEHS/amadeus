@@ -28,9 +28,9 @@
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
 #' `success`, `failed`, and `skipped` file counts. If the requested archive
 #' already exists and is nonempty, no file is downloaded; the returned list
-#' contains `success = 0`, `failed = 0`, and `skipped = 1`. When a download is
-#' attempted, the list also contains `failed_urls` and `failed_files` character
-#' vectors, empty if the download succeeded.
+#' contains `success = 0`, `failed = 0`, and `skipped = 1`. The list always
+#' contains `failed_urls` and `failed_files` character vectors, both
+#' `character(0)` when no downloads failed, including when the file was skipped.
 #'
 #' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
 #' and `n_files = 1` is returned without downloading, regardless of `hash`.

@@ -41,6 +41,10 @@
 #'   `destfiles`, and `n_files`. Otherwise, an invisible download summary from
 #'   [download_run_method()] when `hash = FALSE`, or a visible character scalar
 #'   containing the output-directory MD5 hash when `hash = TRUE`.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @author Insang Song
 #' @seealso [download_drought()], [process_drought()], [calculate_drought()]
 #' @examples

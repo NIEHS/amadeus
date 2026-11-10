@@ -124,8 +124,9 @@ seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. De
 \code{destfiles}, and \code{n_files}, the number of planned archive downloads.
 \item With \code{download = TRUE} and \code{hash = FALSE}, the invisible summary from
 \code{\link[=download_run_method]{download_run_method()}} with \code{success}, \code{failed}, and \code{skipped} counts.
-If any downloads are attempted, it also contains \code{failed_urls} and
-\code{failed_files}. These counts describe archives, not extracted files.
+It always contains \code{failed_urls} and \code{failed_files} character vectors,
+both \code{character(0)} when no downloads failed, including when every file
+was skipped. These counts describe archives, not extracted files.
 \item With \code{download = TRUE} and \code{hash = TRUE}, a visible character(1) combined
 MD5 hash of all files under \verb{data_files/}, including existing files.
 }

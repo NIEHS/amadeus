@@ -66,8 +66,9 @@ When \code{download = TRUE} and \code{hash = FALSE}, an invisible list containin
 \code{success}, \code{failed}, and \code{skipped} file counts. If all requested archives
 already exist and are nonempty, no files are downloaded; the returned list
 contains \code{success = 0}, \code{failed = 0}, and \code{skipped} equal to the number of
-requested files. When downloads are attempted, the list also contains
-\code{failed_urls} and \code{failed_files} character vectors, empty if none failed.
+requested files. The list always contains \code{failed_urls} and \code{failed_files}
+character vectors, both \code{character(0)} when no downloads failed, including
+when every file was skipped.
 
 When \code{download = FALSE}, an invisible list containing \code{urls}, \code{destfiles},
 and \code{n_files} is returned without downloading, regardless of \code{hash}.

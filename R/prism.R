@@ -87,6 +87,10 @@
 #' optional extraction, `hash = FALSE` returns the download summary from
 #' [download_run_method()] invisibly. With `hash = TRUE`, returns a visible
 #' character scalar containing the combined MD5 hash of `data_files/`.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @seealso [download_setup_dir()], [download_unzip()], [process_prism()]
 #' @importFrom Rdpack reprompt
 #' @references

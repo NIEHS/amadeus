@@ -49,6 +49,10 @@
 #'   and cleanup, an invisible summary from [download_run_method()] when
 #'   `hash = FALSE`, or a visible character scalar containing the combined
 #'   MD5 hash of `data_files/` when `hash = TRUE`.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @author Insang Song
 #' @seealso [download_drought()], [process_drought()], [calculate_drought()]
 #' @examples

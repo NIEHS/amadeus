@@ -58,8 +58,9 @@ The selected downloader's return value, with its visibility preserved:
 \item With \code{download = FALSE}, an invisible preview list containing \code{urls},
 \code{destfiles}, and \code{n_files}.
 \item With downloading enabled and \code{hash = FALSE}, an invisible summary
-containing \code{success}, \code{failed}, and \code{skipped}, with failure details
-when provided by the source function.
+containing \code{success}, \code{failed}, \code{skipped}, \code{failed_urls}, and
+\code{failed_files}. The two failure vectors are \code{character(0)} when no
+downloads failed, including when every file was skipped.
 \item With downloading enabled and \code{hash = TRUE}, a visible character scalar
 containing the combined MD5 hash of the source's output directory.
 }

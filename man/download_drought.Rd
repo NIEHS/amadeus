@@ -90,8 +90,9 @@ The selected source function's result, with visibility preserved:
 \item With \code{download = FALSE}, an invisible list containing \code{urls},
 \code{destfiles}, and \code{n_files}.
 \item With \code{download = TRUE} and \code{hash = FALSE}, an invisible download summary
-containing \code{success}, \code{failed}, and \code{skipped}. When any downloads are
-attempted, it also contains \code{failed_urls} and \code{failed_files}.
+containing \code{success}, \code{failed}, \code{skipped}, \code{failed_urls}, and
+\code{failed_files}. The two failure vectors are \code{character(0)} when no
+downloads failed, including when every file was skipped.
 \item With \code{download = TRUE} and \code{hash = TRUE}, a visible character scalar
 containing the combined MD5 hash of the source's output directory.
 }

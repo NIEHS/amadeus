@@ -71,6 +71,10 @@ With \code{download = FALSE}, an invisible preview list containing \code{urls},
 \code{destfiles}, and \code{n_files}. Otherwise, with \code{hash = FALSE}, the invisible
 download summary from \code{\link[=download_run_method]{download_run_method()}}. With \code{hash = TRUE}, a visible
 combined MD5 hash for all files under \code{directory_to_save}.
+
+The download summary always contains \code{success}, \code{failed}, \code{skipped},
+\code{failed_urls}, and \code{failed_files}. The two failure vectors are
+\code{character(0)} when no files failed, including when every file was skipped.
 }
 \description{
 Query NASA CMR for file URLs, prepare a download table, and download MODIS

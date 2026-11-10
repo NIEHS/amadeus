@@ -121,8 +121,9 @@
 #'   `destfiles`, and `n_files`, the number of planned archive downloads.
 #' * With `download = TRUE` and `hash = FALSE`, the invisible summary from
 #'   [download_run_method()] with `success`, `failed`, and `skipped` counts.
-#'   If any downloads are attempted, it also contains `failed_urls` and
-#'   `failed_files`. These counts describe archives, not extracted files.
+#'   It always contains `failed_urls` and `failed_files` character vectors,
+#'   both `character(0)` when no downloads failed, including when every file
+#'   was skipped. These counts describe archives, not extracted files.
 #' * With `download = TRUE` and `hash = TRUE`, a visible character(1) combined
 #'   MD5 hash of all files under `data_files/`, including existing files.
 #' @author Mariana Alifa Kassien

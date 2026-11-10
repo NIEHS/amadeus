@@ -147,7 +147,13 @@
 #' @param max_tries integer(1). Maximum download retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song, Kyle Messier
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return With `download = FALSE`, an invisible preview list containing
+#' `urls`, `destfiles`, and `n_files`. With `download = TRUE` and
+#' `hash = FALSE`, an invisible summary from [download_run_method()] containing
+#' `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`. The two
+#' failure vectors are `character(0)` when no downloads failed, including when
+#' every file was skipped. With `download = TRUE` and `hash = TRUE`, a visible
+#' character scalar containing the combined MD5 hash of the output directory.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{mesinger_north_2006}{amadeus}

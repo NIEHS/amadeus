@@ -79,8 +79,9 @@
 #' * With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files`.
 #' * With `download = TRUE` and `hash = FALSE`, an invisible download summary
-#'   containing `success`, `failed`, and `skipped`. When any downloads are
-#'   attempted, it also contains `failed_urls` and `failed_files`.
+#'   containing `success`, `failed`, `skipped`, `failed_urls`, and
+#'   `failed_files`. The two failure vectors are `character(0)` when no
+#'   downloads failed, including when every file was skipped.
 #' * With `download = TRUE` and `hash = TRUE`, a visible character scalar
 #'   containing the combined MD5 hash of the source's output directory.
 #'

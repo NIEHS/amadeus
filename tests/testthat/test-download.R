@@ -194,7 +194,7 @@ testthat::test_that("download_run_method has proper parameters", {
   testthat::expect_true("timeout" %in% params)
 })
 
-testthat::test_that("download_run_method skips existing files", {
+testthat::test_that("download_run_method(existing file): returns five fields", {
   withr::with_tempdir({
     # Create existing file with content
     writeLines("existing data", "existing.txt")
@@ -207,6 +207,14 @@ testthat::test_that("download_run_method skips existing files", {
     # --------------------------------------------------------------------------
     testthat::expect_equal(result$skipped, 1)
     testthat::expect_equal(result$success, 0)
+    # --------------------------------------------------------------------------
+    # Keep the summary fields and empty failure-vector types consistent.
+    testthat::expect_named(
+      result,
+      c("success", "failed", "skipped", "failed_urls", "failed_files")
+    )
+    testthat::expect_identical(result$failed_urls, character(0))
+    testthat::expect_identical(result$failed_files, character(0))
   })
 })
 
@@ -1222,10 +1230,7 @@ testthat::test_that("download_run_method respects rate limiting", {
   })
 })
 
-testthat::test_that("download_run_method skips existing files correctly", {
-  skip_on_cran()
-  skip_if_offline()
-  # ----------------------------------------------------------------------------
+testthat::test_that("download_run_method(existing zip): preserves content", {
   withr::with_tempdir({
     # Create an existing file with content
     destfile <- "existing.zip"
@@ -1246,6 +1251,14 @@ testthat::test_that("download_run_method skips existing files correctly", {
     testthat::expect_equal(result$success, 0)
     testthat::expect_equal(result$failed, 0)
     testthat::expect_equal(result$skipped, 1)
+    # --------------------------------------------------------------------------
+    # Skipping every file still returns both empty character vectors.
+    testthat::expect_named(
+      result,
+      c("success", "failed", "skipped", "failed_urls", "failed_files")
+    )
+    testthat::expect_identical(result$failed_urls, character(0))
+    testthat::expect_identical(result$failed_files, character(0))
     # --------------------------------------------------------------------------
     # File should still contain original content
     testthat::expect_true(file.exists(destfile))
@@ -1965,7 +1978,7 @@ testthat::test_that("setup_nasa_token NULL token non-interactive errors", {
 ################################################################################
 ##### download_run_method tests WITHOUT skip_on_cran
 
-testthat::test_that("download_run_method success path (no skip)", {
+testthat::test_that("download_run_method(success): returns empty failures", {
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       if (!is.null(path)) {
@@ -1994,6 +2007,14 @@ testthat::test_that("download_run_method success path (no skip)", {
     )
     testthat::expect_equal(result$success, 1)
     testthat::expect_equal(result$failed, 0)
+    # --------------------------------------------------------------------------
+    # Successful downloads use the same summary fields as all-skipped runs.
+    testthat::expect_named(
+      result,
+      c("success", "failed", "skipped", "failed_urls", "failed_files")
+    )
+    testthat::expect_identical(result$failed_urls, character(0))
+    testthat::expect_identical(result$failed_files, character(0))
   })
 })
 

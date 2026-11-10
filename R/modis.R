@@ -68,6 +68,10 @@
 #' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
 #' download summary from [download_run_method()]. With `hash = TRUE`, a visible
 #' combined MD5 hash for all files under `directory_to_save`.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @author Mitchell Manware, Insang Song
 #' @seealso [download_data()], [download_merra2()], [download_run_method()]
 #' @importFrom Rdpack reprompt

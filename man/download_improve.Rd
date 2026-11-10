@@ -78,6 +78,10 @@ When \code{download = TRUE}, after downloading and optional extraction,
 invisibly, including counts of successful, failed, and skipped files.
 With \code{hash = TRUE}, returns a visible character scalar containing the
 combined MD5 hash of \verb{data_files/}.
+
+The download summary always contains \code{success}, \code{failed}, \code{skipped},
+\code{failed_urls}, and \code{failed_files}. The two failure vectors are
+\code{character(0)} when no files failed, including when every file was skipped.
 }
 \description{
 Download annual IMPROVE (Interagency Monitoring of Protected Visual

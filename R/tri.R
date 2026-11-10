@@ -75,8 +75,9 @@
 #'
 #' When `download = TRUE` and `hash = FALSE`, returns the download summary from
 #' [download_run_method()] invisibly, including `success`, `failed`, and
-#' `skipped` file counts. When downloads are attempted, the summary also
-#' contains `failed_urls` and `failed_files` character vectors.
+#' `skipped` file counts. The summary always contains `failed_urls` and
+#' `failed_files` character vectors, both `character(0)` when no downloads
+#' failed, including when every file was skipped.
 #'
 #' When `download = TRUE` and `hash = TRUE`, returns a visible character scalar
 #' containing the combined MD5 hash of the files under `directory_to_save`.

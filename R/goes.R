@@ -80,6 +80,10 @@
 #' summary from [download_run_method()], including `success`, `failed`, and
 #' `skipped` counts. With `hash = TRUE`, a visible combined MD5 hash for all
 #' files under `directory_to_save`, including previously downloaded files.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @author Mitchell Manware
 #' @seealso [download_data()], [process_goes()], [download_run_method()],
 #'   [download_preview()]

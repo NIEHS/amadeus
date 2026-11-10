@@ -54,7 +54,13 @@ FALSE).}
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-invisible list with download results; or hash character if hash=TRUE
+With \code{download = FALSE}, an invisible preview list containing
+\code{urls}, \code{destfiles}, and \code{n_files}. With \code{download = TRUE} and
+\code{hash = FALSE}, an invisible summary from \code{\link[=download_run_method]{download_run_method()}} containing
+\code{success}, \code{failed}, \code{skipped}, \code{failed_urls}, and \code{failed_files}. The two
+failure vectors are \code{character(0)} when no downloads failed, including when
+every file was skipped. With \code{download = TRUE} and \code{hash = TRUE}, a visible
+character scalar containing the combined MD5 hash of the output directory.
 }
 \description{
 The \code{download_aqs()} function accesses and downloads Air Quality

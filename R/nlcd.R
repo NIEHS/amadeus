@@ -45,8 +45,9 @@
 #' `success`, `failed`, and `skipped` file counts. If all requested archives
 #' already exist and are nonempty, no files are downloaded; the returned list
 #' contains `success = 0`, `failed = 0`, and `skipped` equal to the number of
-#' requested files. When downloads are attempted, the list also contains
-#' `failed_urls` and `failed_files` character vectors, empty if none failed.
+#' requested files. The list always contains `failed_urls` and `failed_files`
+#' character vectors, both `character(0)` when no downloads failed, including
+#' when every file was skipped.
 #'
 #' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
 #' and `n_files` is returned without downloading, regardless of `hash`.

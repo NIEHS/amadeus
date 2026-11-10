@@ -66,8 +66,9 @@ of planned URLs, including files that already exist locally.
 
 When \code{download = TRUE} and \code{hash = FALSE}, returns the download summary from
 \code{\link[=download_run_method]{download_run_method()}} invisibly, including \code{success}, \code{failed}, and
-\code{skipped} file counts. When downloads are attempted, the summary also
-contains \code{failed_urls} and \code{failed_files} character vectors.
+\code{skipped} file counts. The summary always contains \code{failed_urls} and
+\code{failed_files} character vectors, both \code{character(0)} when no downloads
+failed, including when every file was skipped.
 
 When \code{download = TRUE} and \code{hash = TRUE}, returns a visible character scalar
 containing the combined MD5 hash of the files under \code{directory_to_save}.

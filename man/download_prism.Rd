@@ -88,6 +88,10 @@ With \code{download = FALSE}, an invisible preview list containing \code{urls},
 optional extraction, \code{hash = FALSE} returns the download summary from
 \code{\link[=download_run_method]{download_run_method()}} invisibly. With \code{hash = TRUE}, returns a visible
 character scalar containing the combined MD5 hash of \verb{data_files/}.
+
+The download summary always contains \code{success}, \code{failed}, \code{skipped},
+\code{failed_urls}, and \code{failed_files}. The two failure vectors are
+\code{character(0)} when no files failed, including when every file was skipped.
 }
 \description{
 Download one time period and climate element from the PRISM Climate Group

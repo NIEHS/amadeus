@@ -266,7 +266,13 @@ testthat::test_that("download_gridmet(variables=c('pr','tmmx')): forwards exact 
     check_destfile = function(...) TRUE,
     download_run_method = function(...) {
       captured <<- list(...)
-      list(success = 4L, failed = 0L, skipped = 0L)
+      list(
+        success = 4L,
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
     },
     .package = "amadeus"
   )
@@ -308,7 +314,13 @@ testthat::test_that("download_gridmet(variables=c('pr','tmmx')): forwards exact 
   testthat::expect_identical(captured$rate_limit, 0.25)
   testthat::expect_identical(
     result,
-    list(success = 4L, failed = 0L, skipped = 0L)
+    list(
+      success = 4L,
+      failed = 0L,
+      skipped = 0L,
+      failed_urls = character(0),
+      failed_files = character(0)
+    )
   )
 })
 
@@ -363,7 +375,13 @@ testthat::test_that("download_gridmet(existing files=all): skips downloading and
       destfiles_filtered <- destfiles[needs_download]
       if (length(urls_filtered) == 0) {
         message("All files already exist. Nothing to download.\n")
-        return(invisible(list(success = 0, failed = 0, skipped = length(urls))))
+        return(invisible(list(
+          success = 0,
+          failed = 0,
+          skipped = length(urls),
+          failed_urls = character(0),
+          failed_files = character(0)
+        )))
       }
     },
     .package = "amadeus"

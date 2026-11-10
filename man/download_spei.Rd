@@ -66,6 +66,10 @@ With \code{download = FALSE}, an invisible list containing \code{urls},
 \code{destfiles}, and \code{n_files} (one). Otherwise, an invisible download summary
 from \code{\link[=download_run_method]{download_run_method()}} when \code{hash = FALSE}, or a visible character
 scalar containing the output-directory MD5 hash when \code{hash = TRUE}.
+
+The download summary always contains \code{success}, \code{failed}, \code{skipped},
+\code{failed_urls}, and \code{failed_files}. The two failure vectors are
+\code{character(0)} when no files failed, including when every file was skipped.
 }
 \description{
 Download one multi-year SPEI NetCDF file for a selected accumulation

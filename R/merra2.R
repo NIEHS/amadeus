@@ -80,9 +80,9 @@
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return
 #' With `download = TRUE` and `hash = FALSE`, an invisible list containing
-#' `success`, `failed`, and `skipped` file counts. If any downloads were
-#' attempted, it also contains `failed_urls` and `failed_files` character
-#' vectors, which are empty when no files failed. These two fields are absent
+#' `success`, `failed`, and `skipped` file counts, plus `failed_urls` and
+#' `failed_files` character vectors. All five fields are always present; the
+#' two failure vectors are `character(0)` when no downloads failed, including
 #' when every file was skipped. Counts include XML metadata files.
 #'
 #' With `download = TRUE` and `hash = TRUE`, a character scalar containing the

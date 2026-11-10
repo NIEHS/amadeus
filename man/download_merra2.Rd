@@ -79,9 +79,9 @@ throttling behavior is described below.}
 }
 \value{
 With \code{download = TRUE} and \code{hash = FALSE}, an invisible list containing
-\code{success}, \code{failed}, and \code{skipped} file counts. If any downloads were
-attempted, it also contains \code{failed_urls} and \code{failed_files} character
-vectors, which are empty when no files failed. These two fields are absent
+\code{success}, \code{failed}, and \code{skipped} file counts, plus \code{failed_urls} and
+\code{failed_files} character vectors. All five fields are always present; the
+two failure vectors are \code{character(0)} when no downloads failed, including
 when every file was skipped. Counts include XML metadata files.
 
 With \code{download = TRUE} and \code{hash = TRUE}, a character scalar containing the

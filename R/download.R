@@ -82,8 +82,9 @@
 #' * With `download = FALSE`, an invisible preview list containing `urls`,
 #'   `destfiles`, and `n_files`.
 #' * With downloading enabled and `hash = FALSE`, an invisible summary
-#'   containing `success`, `failed`, and `skipped`, with failure details
-#'   when provided by the source function.
+#'   containing `success`, `failed`, `skipped`, `failed_urls`, and
+#'   `failed_files`. The two failure vectors are `character(0)` when no
+#'   downloads failed, including when every file was skipped.
 #' * With downloading enabled and `hash = TRUE`, a visible character scalar
 #'   containing the combined MD5 hash of the source's output directory.
 #' @examples
@@ -907,9 +908,8 @@ download_preview <- function(urls, destfiles) {
 #' * `failed_files`: character vector of the corresponding destination
 #'    basenames.
 #'
-#' When every file is skipped, only `success`, `failed`, and `skipped` are
-#' returned. Otherwise the two failure vectors are present, and are empty
-#' when no downloads failed.
+#' All five fields are always present. When no downloads fail, `failed_urls`
+#' and `failed_files` are `character(0)`, including when every file is skipped.
 #' @seealso [get_token()], [check_destfile()], [download_preview()]
 #' @examples
 #' \dontrun{
@@ -944,48 +944,54 @@ download_run_method <- function(
   }
   # ----------------------------------------------------------------------------
   # Retain destinations that are missing or empty.
-  needs_download <- sapply(destfiles, amadeus:::check_destfile)
-  urls_filtered <- urls[needs_download]
-  destfiles_filtered <- destfiles[needs_download]
+  idx_download <- sapply(destfiles, amadeus:::check_destfile)
+  chr_urls_filtered <- urls[idx_download]
+  chr_destfiles_filtered <- destfiles[idx_download]
   # ----------------------------------------------------------------------------
   # Return early when all destination files already contain data.
-  if (length(urls_filtered) == 0) {
+  if (length(chr_urls_filtered) == 0) {
     message("All files already exist. Nothing to download.\n")
-    return(invisible(list(success = 0, failed = 0, skipped = length(urls))))
+    return(invisible(list(
+      success = 0,
+      failed = 0,
+      skipped = length(urls),
+      failed_urls = character(0),
+      failed_files = character(0)
+    )))
   }
   # ----------------------------------------------------------------------------
   # Report the download count and initialize result tracking.
   message(sprintf(
     "Downloading %d files using httr2 (skipped %d existing files)...\n",
-    length(urls_filtered),
-    sum(!needs_download)
+    length(chr_urls_filtered),
+    sum(!idx_download)
   ))
-  n_files <- length(urls_filtered)
-  n_success <- 0
-  n_failed <- 0
-  failed_urls <- character(0)
-  failed_files <- character(0)
+  int_nfiles <- length(chr_urls_filtered)
+  num_success <- 0
+  num_failed <- 0
+  chr_failed_urls <- character(0)
+  chr_failed_files <- character(0)
   # ----------------------------------------------------------------------------
   # Download each file and record successes and failures.
-  for (i in seq_along(urls_filtered)) {
+  for (int_i in seq_along(chr_urls_filtered)) {
     # --------------------------------------------------------------------------
     # Select the URL and destination for this download.
-    url <- urls_filtered[i]
-    destfile <- destfiles_filtered[i]
+    chr_url <- chr_urls_filtered[int_i]
+    chr_destfile <- chr_destfiles_filtered[int_i]
     # --------------------------------------------------------------------------
     # Create the destination directory if needed.
-    destdir <- dirname(destfile)
-    if (!dir.exists(destdir)) {
-      dir.create(destdir, recursive = TRUE)
+    chr_destdir <- dirname(chr_destfile)
+    if (!dir.exists(chr_destdir)) {
+      dir.create(chr_destdir, recursive = TRUE)
     }
     # --------------------------------------------------------------------------
     # Report the current file number when progress is enabled.
-    progress_prefix <- sprintf("[%d/%d] ", i, n_files)
+    chr_progress_prefix <- sprintf("[%d/%d] ", int_i, int_nfiles)
     if (show_progress) {
       message(sprintf(
         "%sDownloading: %s",
-        progress_prefix,
-        basename(destfile)
+        chr_progress_prefix,
+        basename(chr_destfile)
       ))
     }
     # --------------------------------------------------------------------------
@@ -994,109 +1000,110 @@ download_run_method <- function(
       {
         # ----------------------------------------------------------------------
         # Build the request and add authentication when a token is supplied.
-        req <- httr2::request(url)
+        list_req <- httr2::request(chr_url)
         if (!is.null(token)) {
-          req <- req |>
+          list_req <- list_req |>
             httr2::req_headers(Authorization = paste("Bearer", token))
         }
         # ----------------------------------------------------------------------
         # Configure retries, rate limiting, timeouts, and HTTP error handling.
         # Allow HTTP 500 because some APIs return it with valid response bodies.
         # Retry HTTP 429/502/503/504 and transport failures up to `max_tries`.
-        req <- req |>
+        list_req <- list_req |>
           httr2::req_retry(
             max_tries = max_tries,
-            is_transient = \(resp) {
-              httr2::resp_status(resp) %in% c(429, 502, 503, 504)
+            is_transient = \(list_resp) {
+              httr2::resp_status(list_resp) %in% c(429, 502, 503, 504)
             },
             retry_on_failure = TRUE,
-            backoff = \(i) stats::runif(1) * pmin(i^2, 30)
+            backoff = \(int_i) stats::runif(1) * pmin(int_i^2, 30)
           ) |>
           httr2::req_timeout(timeout) |>
           httr2::req_options(connecttimeout = 30L) |>
           httr2::req_throttle(rate = 1 / rate_limit) |>
-          httr2::req_error(is_error = \(resp) {
-            status <- httr2::resp_status(resp)
-            status >= 400 && !(status %in% c(429, 500, 502, 503, 504))
+          httr2::req_error(is_error = \(list_resp) {
+            int_status <- httr2::resp_status(list_resp)
+            int_status >= 400 && !(int_status %in% c(429, 500, 502, 503, 504))
           })
         # ----------------------------------------------------------------------
         # Apply an HTTP version override when supplied.
         if (!is.null(http_version)) {
-          req <- req |> httr2::req_options(http_version = http_version)
+          list_req <- list_req |>
+            httr2::req_options(http_version = http_version)
         }
         # ----------------------------------------------------------------------
         # Enable the download progress bar when requested.
         if (show_progress) {
-          req <- req |> httr2::req_progress(type = "down")
+          list_req <- list_req |> httr2::req_progress(type = "down")
         }
         # ----------------------------------------------------------------------
         # Stream the response to the destination file.
-        req |> httr2::req_perform(path = destfile)
+        list_req |> httr2::req_perform(path = chr_destfile)
         # ----------------------------------------------------------------------
         # Verify the downloaded file exists and contains data.
-        if (file.exists(destfile) && file.size(destfile) > 0) {
+        if (file.exists(chr_destfile) && file.size(chr_destfile) > 0) {
           # --------------------------------------------------------------------
           # Record the successful download and report its size.
-          n_success <- n_success + 1
-          success_msg <- sprintf(
+          num_success <- num_success + 1
+          chr_success_msg <- sprintf(
             "Success: %s (%s)",
-            basename(destfile),
-            amadeus:::format_file_size(file.size(destfile))
+            basename(chr_destfile),
+            amadeus:::format_file_size(file.size(chr_destfile))
           )
           message(sprintf(
             "%s%s\n",
             if (show_progress) " OK " else "",
-            success_msg
+            chr_success_msg
           ))
         } else {
           # --------------------------------------------------------------------
           # Record the failed validation and remove any empty destination.
-          n_failed <- n_failed + 1
-          failed_urls <- c(failed_urls, url)
-          failed_files <- c(failed_files, basename(destfile))
-          if (file.exists(destfile)) {
-            file.remove(destfile)
+          num_failed <- num_failed + 1
+          chr_failed_urls <- c(chr_failed_urls, chr_url)
+          chr_failed_files <- c(chr_failed_files, basename(chr_destfile))
+          if (file.exists(chr_destfile)) {
+            file.remove(chr_destfile)
           }
           # --------------------------------------------------------------------
           # Report the failed validation using the selected progress format.
-          failure_msg <- sprintf(
+          chr_failure_msg <- sprintf(
             "Failed: %s (0 bytes)",
-            basename(destfile)
+            basename(chr_destfile)
           )
           message(sprintf(
             "%s%s\n",
             if (show_progress) " FAIL " else "",
-            failure_msg
+            chr_failure_msg
           ))
         }
         # ----------------------------------------------------------------------
         # Pause briefly before the next download.
-        if (i < n_files) {
+        if (int_i < int_nfiles) {
           Sys.sleep(runif(1, 0.5, 1.5))
         }
       },
-      error = function(e) {
+      error = function(list_error) {
         # ----------------------------------------------------------------------
         # Record the failed request.
-        n_failed <<- n_failed + 1
-        failed_urls <<- c(failed_urls, url)
-        failed_files <<- c(failed_files, basename(destfile))
+        num_failed <<- num_failed + 1
+        chr_failed_urls <<- c(chr_failed_urls, chr_url)
+        chr_failed_files <<- c(chr_failed_files, basename(chr_destfile))
         # ----------------------------------------------------------------------
         # Report the request error.
-        error_msg <- sprintf(
+        chr_error_msg <- sprintf(
           "Failed: %s - %s",
-          basename(destfile),
-          conditionMessage(e)
+          basename(chr_destfile),
+          conditionMessage(list_error)
         )
         message(sprintf(
           "%s%s\n",
           if (show_progress) " FAIL " else "",
-          error_msg
+          chr_error_msg
         ))
         # ----------------------------------------------------------------------
         # Remove any file left by the failed download.
-        if (file.exists(destfile)) {
-          file.remove(destfile)
+        if (file.exists(chr_destfile)) {
+          file.remove(chr_destfile)
         }
       }
     )
@@ -1105,18 +1112,18 @@ download_run_method <- function(
   # Report the download totals.
   message(sprintf(
     "\n=== Download Summary ===\n%d succeeded, %d failed, %d skipped\n",
-    n_success,
-    n_failed,
-    sum(!needs_download)
+    num_success,
+    num_failed,
+    sum(!idx_download)
   ))
   # ----------------------------------------------------------------------------
   # Warn with the names of files that failed to download.
-  if (n_failed > 0) {
+  if (num_failed > 0) {
     warning(
       sprintf(
         "%d file(s) failed to download:\n  %s\n",
-        n_failed,
-        paste(failed_files, collapse = "\n  ")
+        num_failed,
+        paste(chr_failed_files, collapse = "\n  ")
       ),
       call. = FALSE
     )
@@ -1124,11 +1131,11 @@ download_run_method <- function(
   # ----------------------------------------------------------------------------
   # Return the counts and failed file details invisibly.
   invisible(list(
-    success = n_success,
-    failed = n_failed,
-    skipped = sum(!needs_download),
-    failed_urls = failed_urls,
-    failed_files = failed_files
+    success = num_success,
+    failed = num_failed,
+    skipped = sum(!idx_download),
+    failed_urls = chr_failed_urls,
+    failed_files = chr_failed_files
   ))
 }
 
@@ -1337,7 +1344,9 @@ download_hash <- function(
 #' Return the download summary unchanged, or calculate a combined MD5 hash of
 #' the files in the output directory.
 #' @param results list. Download summary returned by [download_run_method()].
-#'   Used only when `hash = FALSE`.
+#'   Contains `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`.
+#'   The two failure vectors are `character(0)` when no downloads failed,
+#'   including when every file was skipped. Used only when `hash = FALSE`.
 #' @param hash logical(1). Return a directory hash instead of the download
 #'   summary.
 #' @param directory_to_save character(1). Directory containing downloaded or

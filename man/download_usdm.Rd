@@ -71,6 +71,10 @@ archive \code{destfiles}, and \code{n_files}. Otherwise, after optional extracti
 and cleanup, an invisible summary from \code{\link[=download_run_method]{download_run_method()}} when
 \code{hash = FALSE}, or a visible character scalar containing the combined
 MD5 hash of \verb{data_files/} when \code{hash = TRUE}.
+
+The download summary always contains \code{success}, \code{failed}, \code{skipped},
+\code{failed_urls}, and \code{failed_files}. The two failure vectors are
+\code{character(0)} when no files failed, including when every file was skipped.
 }
 \description{
 Download U.S. Drought Monitor ZIP archives for Tuesdays within a date

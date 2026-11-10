@@ -86,6 +86,10 @@
 #' invisibly, including counts of successful, failed, and skipped files.
 #' With `hash = TRUE`, returns a visible character scalar containing the
 #' combined MD5 hash of `data_files/`.
+#'
+#' The download summary always contains `success`, `failed`, `skipped`,
+#' `failed_urls`, and `failed_files`. The two failure vectors are
+#' `character(0)` when no files failed, including when every file was skipped.
 #' @importFrom httr2 request req_retry req_timeout req_perform resp_status
 #' @seealso [download_setup_dir()], [download_unzip()], [process_improve()]
 #' @examples

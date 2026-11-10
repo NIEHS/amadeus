@@ -52,9 +52,9 @@ FALSE).}
 When \code{download = TRUE} and \code{hash = FALSE}, an invisible list containing
 \code{success}, \code{failed}, and \code{skipped} file counts. If the requested archive
 already exists and is nonempty, no file is downloaded; the returned list
-contains \code{success = 0}, \code{failed = 0}, and \code{skipped = 1}. When a download is
-attempted, the list also contains \code{failed_urls} and \code{failed_files} character
-vectors, empty if the download succeeded.
+contains \code{success = 0}, \code{failed = 0}, and \code{skipped = 1}. The list always
+contains \code{failed_urls} and \code{failed_files} character vectors, both
+\code{character(0)} when no downloads failed, including when the file was skipped.
 
 When \code{download = FALSE}, an invisible list containing \code{urls}, \code{destfiles},
 and \code{n_files = 1} is returned without downloading, regardless of \code{hash}.
