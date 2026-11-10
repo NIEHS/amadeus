@@ -8,15 +8,18 @@
 #' meteorological, and environmental data from various open-access data
 #' sources.
 # nolint end
-#' @param dataset_name character(1). Dataset to download.
+#' @param dataset_name character(1). Dataset name or alias from the list below.
+#'   Matching ignores case and accepts unambiguous partial matches. The default
+#'   selects `"aqs"`.
 #' @param directory_to_save character(1). Directory to save / unzip
 #'  (if zip files are downloaded) data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' @param hash logical(1). Return the source function's combined MD5 directory
+#'   hash instead of its download summary. Default is `FALSE`. The directory
+#'   included in the hash depends on the source and can include existing files.
+#'   Ignored when `download = FALSE` is passed through `...`.
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token. Required for NASA EarthData datasets: `"geos"`,
 #' `"merra2"`, `"modis"`, `"sedac_groads"` / `"groads"`, and
@@ -24,9 +27,23 @@
 #' file containing the token, or \code{NULL} to read from the
 #' \code{NASA_EARTHDATA_TOKEN} environment variable. Ignored for datasets that
 #' do not use NASA EarthData authentication.
-#' @param rate_limit numeric(1). Minimum seconds between HTTP requests
-#' (default 2). Passed to the underlying download function.
-#' @param ... Additional arguments passed to each download function.
+#' @param rate_limit numeric(1). Non-negative request-throttling interval in
+#'   seconds, passed to the source function. Default is 2. This controls the
+#'   average request rate rather than a strict minimum gap between requests.
+#' @param ... Source-specific selections and download controls, such as `date`,
+#'   `year`, `timescale`, `version`, `download`, `show_progress`, `max_tries`,
+#'   `unzip`, and `remove_zip`. See the selected source function for its
+#'    arguments.
+#' @details
+#' This wrapper selects a downloader and forwards arguments. The source function
+#' performs validation, directory setup, discovery, downloading, and extraction.
+#' Previews and directory layouts follow that function's behavior.
+#'
+#' The `"drought"` alias calls [download_drought()] with its default SPEI source
+#' unless `source` is supplied. The `"spei"`, `"eddi"`, and `"usdm"` aliases
+#' call [download_spei()], [download_eddi()], and [download_usdm()] directly.
+#' Supply the selected function's required arguments through `...`. The `source`
+#' argument selects a drought source only when `dataset_name = "drought"`.
 #' @note
 #' - All download function names are in \code{download_*} formats
 #' @author Insang Song
@@ -56,13 +73,19 @@
 #' * \code{\link{download_prism}}: `"prism"`
 #' * \code{\link{download_edgar}}: `"edgar"`
 #' * \code{\link{download_improve}}: `"improve"`, `"IMPROVE"`
-#' * \code{\link{download_drought}}: `"drought"`, `"spei"`, `"eddi"`, `"usdm"`
+#' * \code{\link{download_drought}}: `"drought"`
+#' * \code{\link{download_spei}}: `"spei"`
+#' * \code{\link{download_eddi}}: `"eddi"`
+#' * \code{\link{download_usdm}}: `"usdm"`
 #' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Data files will be downloaded and stored in respective
-#' sub-directories within \code{directory_to_save}. File format and
-#' sub-directory names depend on data source and dataset of interest.
+#' The selected downloader's return value, with its visibility preserved:
+#' * With `download = FALSE`, an invisible preview list containing `urls`,
+#'   `destfiles`, and `n_files`.
+#' * With downloading enabled and `hash = FALSE`, an invisible summary
+#'   containing `success`, `failed`, and `skipped`, with failure details
+#'   when provided by the source function.
+#' * With downloading enabled and `hash = TRUE`, a visible character scalar
+#'   containing the combined MD5 hash of the source's output directory.
 #' @examples
 #' \dontrun{
 #' download_data(
@@ -71,137 +94,134 @@
 #'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   download = FALSE # Deprecated; may still contact the source.
 #' )
 #' }
 #' @export
-download_data <-
-  function(
-    dataset_name = c(
-      "aqs",
-      "ecoregion",
-      "ecoregions",
-      "geos",
-      "goes",
-      "goes_adp",
-      "GOES",
-      "gmted",
-      "koppen",
-      "koppengeiger",
-      "merra2",
-      "merra",
-      "modis",
-      "narr",
-      "nlcd",
-      "noaa",
-      "sedac_groads",
-      "sedac_population",
-      "groads",
-      "population",
-      "hms",
-      "smoke",
-      "tri",
-      "nei",
-      "gridmet",
-      "terraclimate",
-      "huc",
-      "cropscape",
-      "cdl",
-      "prism",
-      "edgar",
-      "improve",
-      "IMPROVE",
-      "drought",
-      "spei",
-      "eddi",
-      "usdm"
+download_data <- function(
+  dataset_name = c(
+    "aqs",
+    "ecoregion",
+    "ecoregions",
+    "geos",
+    "goes",
+    "goes_adp",
+    "gmted",
+    "koppen",
+    "koppengeiger",
+    "merra2",
+    "merra",
+    "modis",
+    "narr",
+    "nlcd",
+    "noaa",
+    "sedac_groads",
+    "sedac_population",
+    "groads",
+    "population",
+    "hms",
+    "smoke",
+    "tri",
+    "nei",
+    "gridmet",
+    "terraclimate",
+    "huc",
+    "cropscape",
+    "cdl",
+    "prism",
+    "edgar",
+    "improve",
+    "drought",
+    "spei",
+    "eddi",
+    "usdm"
+  ),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  hash = FALSE,
+  nasa_earth_data_token = NULL,
+  rate_limit = 2,
+  ...
+) {
+  # ----------------------------------------------------------------------------
+  # Normalize the dataset name, select one source or alias.
+  dataset_name <- tolower(dataset_name)
+  chr_dataset <- match.arg(dataset_name)
+  # ----------------------------------------------------------------------------
+  # Select download function based on called source/alias.
+  fun_download <- switch(
+    chr_dataset,
+    aqs = amadeus::download_aqs,
+    ecoregion = amadeus::download_ecoregion,
+    ecoregions = amadeus::download_ecoregion,
+    geos = amadeus::download_geos,
+    goes = amadeus::download_goes,
+    goes_adp = amadeus::download_goes,
+    gmted = amadeus::download_gmted,
+    koppen = amadeus::download_koppen_geiger,
+    koppengeiger = amadeus::download_koppen_geiger,
+    merra2 = amadeus::download_merra2,
+    merra = amadeus::download_merra2,
+    narr = amadeus::download_narr,
+    nlcd = amadeus::download_nlcd,
+    noaa = amadeus::download_hms,
+    smoke = amadeus::download_hms,
+    hms = amadeus::download_hms,
+    sedac_groads = amadeus::download_groads,
+    groads = amadeus::download_groads,
+    sedac_population = amadeus::download_population,
+    population = amadeus::download_population,
+    modis = amadeus::download_modis,
+    tri = amadeus::download_tri,
+    nei = amadeus::download_nei,
+    gridmet = amadeus::download_gridmet,
+    terraclimate = amadeus::download_terraclimate,
+    huc = amadeus::download_huc,
+    cropscape = amadeus::download_cropscape,
+    cdl = amadeus::download_cropscape,
+    prism = amadeus::download_prism,
+    edgar = amadeus::download_edgar,
+    improve = amadeus::download_improve,
+    drought = amadeus::download_drought,
+    spei = amadeus::download_spei,
+    eddi = amadeus::download_eddi,
+    usdm = amadeus::download_usdm
+  )
+  # ----------------------------------------------------------------------------
+  # Forward shared controls together with the source-specific arguments.
+  list_args <- c(
+    list(
+      directory_to_save = directory_to_save,
+      acknowledgement = acknowledgement,
+      hash = hash,
+      rate_limit = rate_limit
     ),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    hash = FALSE,
-    nasa_earth_data_token = NULL,
-    rate_limit = 2,
-    ...
-  ) {
-    dataset_name <- tolower(dataset_name)
-    dataset_name <- match.arg(dataset_name)
-
-    # determine whether the data exist and deter proceeding?
-    what_to_run <- switch(
-      dataset_name,
-      aqs = download_aqs,
-      ecoregion = download_ecoregion,
-      ecoregions = download_ecoregion,
-      geos = download_geos,
-      goes = download_goes,
-      goes_adp = download_goes,
-      gmted = download_gmted,
-      koppen = download_koppen_geiger,
-      koppengeiger = download_koppen_geiger,
-      merra2 = download_merra2,
-      merra = download_merra2,
-      narr = download_narr,
-      nlcd = download_nlcd,
-      noaa = download_hms,
-      smoke = download_hms,
-      hms = download_hms,
-      sedac_groads = download_groads,
-      groads = download_groads,
-      sedac_population = download_population,
-      population = download_population,
-      modis = download_modis,
-      tri = download_tri,
-      nei = download_nei,
-      gridmet = download_gridmet,
-      terraclimate = download_terraclimate,
-      huc = download_huc,
-      cropscape = download_cropscape,
-      cdl = download_cropscape,
-      prism = download_prism,
-      edgar = download_edgar,
-      improve = download_improve,
-      drought = download_drought,
-      spei = function(...) download_drought(source = "spei", ...),
-      eddi = function(...) download_drought(source = "eddi", ...),
-      usdm = function(...) download_drought(source = "usdm", ...)
-    )
-
-    call_args <- c(
-      list(
-        directory_to_save = directory_to_save,
-        acknowledgement = acknowledgement,
-        hash = hash,
-        rate_limit = rate_limit
-      ),
-      list(...)
-    )
-
-    # Only pass nasa_earth_data_token to functions that accept it
-    if ("nasa_earth_data_token" %in% names(formals(what_to_run))) {
-      call_args$nasa_earth_data_token <- nasa_earth_data_token
-    }
-
-    return <- tryCatch(
-      {
-        do.call(what_to_run, call_args)
-      },
-      error = function(e) {
-        stop(
-          paste0(
-            e,
-            "\n",
-            paste0(deparse(args(what_to_run)), collapse = "\n"),
-            "\n",
-            "Please refer to the argument list and ",
-            "the error message above to rectify the error.\n"
-          )
-        )
-      }
-    )
-
-    return(return)
+    list(...)
+  )
+  # ----------------------------------------------------------------------------
+  # Pass authentication only to downloaders that declare the token parameter.
+  if ("nasa_earth_data_token" %in% names(formals(fun_download))) {
+    list_args$nasa_earth_data_token <- nasa_earth_data_token
   }
+  # ----------------------------------------------------------------------------
+  # Preserve source-function result and visibility; argument context on errors.
+  tryCatch(
+    do.call(fun_download, list_args),
+    error = function(e) {
+      stop(
+        paste0(
+          conditionMessage(e),
+          "\n",
+          paste0(deparse(args(fun_download)), collapse = "\n"),
+          "\n",
+          "Please refer to the argument list and ",
+          "the error message above to rectify the error.\n"
+        ),
+        call. = FALSE
+      )
+    }
+  )
+}
 
 ################################################################################
 # Support and internal {download} functions.
@@ -293,7 +313,7 @@ download_setup_dir <-
   function(directory, zip = FALSE) {
     # --------------------------------------------------------------------------
     # Sanitize the download path and create missing parent directories.
-    chr_dir_sanitized <- amadeus::download_sanitize_path(directory)
+    chr_dir_sanitized <- amadeus:::download_sanitize_path(directory)
     if (!dir.exists(chr_dir_sanitized)) {
       dir.create(chr_dir_sanitized, recursive = TRUE)
     }
@@ -302,7 +322,7 @@ download_setup_dir <-
     if (zip) {
       # ------------------------------------------------------------------------
       # Create the archive directory.
-      directory_zip <- amadeus::download_sanitize_path(
+      directory_zip <- amadeus:::download_sanitize_path(
         paste0(
           chr_dir_sanitized,
           "zip_files"
@@ -313,7 +333,7 @@ download_setup_dir <-
       }
       # ------------------------------------------------------------------------
       # Create the extracted data directory.
-      directory_data <- amadeus::download_sanitize_path(
+      directory_data <- amadeus:::download_sanitize_path(
         paste0(
           chr_dir_sanitized,
           "data_files"
@@ -776,7 +796,7 @@ check_urls <- function(
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(
       url_sample,
-      check_url_status
+      amadeus:::check_url_status
     )
     return(url_status)
   }
@@ -800,7 +820,7 @@ check_urls <- function(
 check_preflight <- function(url) {
   # ----------------------------------------------------------------------------
   # Warn if the URL check fails so the caller can continue downloading.
-  if (!amadeus::check_url_status(url)) {
+  if (!amadeus:::check_url_status(url)) {
     warning(
       paste0(
         "Preflight URL check failed; attempting direct download ",
@@ -943,7 +963,7 @@ download_run_method <- function(
 
   # ----------------------------------------------------------------------------
   # Retain destinations that are missing or empty.
-  needs_download <- sapply(destfiles, amadeus::check_destfile)
+  needs_download <- sapply(destfiles, amadeus:::check_destfile)
   urls_filtered <- urls[needs_download]
   destfiles_filtered <- destfiles[needs_download]
 
@@ -1053,7 +1073,7 @@ download_run_method <- function(
           success_msg <- sprintf(
             "Success: %s (%s)",
             basename(destfile),
-            format_file_size(file.size(destfile))
+            amadeus:::format_file_size(file.size(destfile))
           )
           message(sprintf(
             "%s%s\n",
@@ -1284,7 +1304,7 @@ download_unzip <- function(
   ))
   # ----------------------------------------------------------------------------
   # Remove downloaded archives and their parent directories when requested.
-  amadeus::download_remove_zips(
+  amadeus:::download_remove_zips(
     remove = remove,
     download_name = file_name
   )
@@ -1375,7 +1395,7 @@ download_return <- function(
   # ----------------------------------------------------------------------------
   # Return a directory hash or an invisible download summary.
   if (hash) {
-    amadeus::download_hash(hash = hash, directory_to_save)
+    amadeus:::download_hash(hash = hash, directory_to_save)
   } else {
     invisible(results)
   }
