@@ -1,0 +1,1759 @@
+{
+  "schema_version": "0.1.0",
+  "data_sources": [
+    {
+      "id": "amadeus:source/epa_nei_onroad",
+      "name": "epa_nei_onroad",
+      "label": "EPA NEI on-road summaries",
+      "producer_institution": "U.S. Environmental Protection Agency",
+      "homepage": "https://www.epa.gov/air-emissions-inventories",
+      "access_protocol": "https_bulk_file",
+      "requires_authentication": false,
+      "amadeus_function_suffix": "_nei",
+      "description": "On-road county/SCC/pollutant inventory summaries, not the whole NEI and not ambient concentrations. Supported adapter inventory years are 2017 v1 (April summary) and 2020. Native LB is international avoirdupois pound; TON is US short ton, 2000 lb, never metric tonne. Public EPA data; cite inventory year/version and retrieval. Workbook first-release history 1999 and triennial programme cadence do not define annual observations or interpolation. County geometry/GEOID and its CRS are external inputs, not supplied by these CSVs."
+    }
+  ],
+  "products": [
+    {
+      "id": "amadeus:product/nei_onroad_2017",
+      "name": "nei_onroad_2017",
+      "label": "NEI 2017 county on-road emissions by pollutant and SCC",
+      "data_source": "amadeus:source/epa_nei_onroad",
+      "spatial_support_type": "administrative_area",
+      "temporal_resolution": "annual",
+      "description": "Native ZIP contains regional CSV partitions. Preserve five-character county FIPS, SCC, pollutant code/description, pollutant classification, reporting period, operating type and inventory label. Select county records and disjoint SCC detail before any aggregation; national/state/regional totals must not be combined with component counties. Do not add CAP/HAP species, overlapping particulate definitions or different reporting bases together. Current process_nei drops pollutant/SCC identity and sums species into TRF_NEINP_0_00000; that output is not a validated pollutant-specific quantity and is not a binding here. No county-area allocation model is implied. Generic CSV has no accurate NativeFormatEnum member; native_format is intentionally unset, not station CSV.",
+      "data_genre": [
+        "emissions",
+        "air_pollution"
+      ],
+      "product_version": "2017v1 April summary",
+      "temporal_resolution_iso": "P1Y",
+      "temporal_coverage_start": "2017-01-01",
+      "temporal_coverage_end": "2017-12-31",
+      "spatial_extent_descriptor": "US on-road inventory geography; actual county/FIPS rows and supplied geometry determine coverage",
+      "native_spatial_resolution_descriptor": "County inventory records with source classification code detail",
+      "access_url": "https://gaftp.epa.gov/air/nei/2017/data_summaries/2017v1/2017neiApr_onroad_byregions.zip",
+      "amadeus_dataset_name": "nei",
+      "amadeus_process_covariate": "nei",
+      "amadeus_calculate_covariate": "nei"
+    },
+    {
+      "id": "amadeus:product/nei_onroad_2020",
+      "name": "nei_onroad_2020",
+      "label": "NEI 2020 county on-road emissions by pollutant and SCC",
+      "data_source": "amadeus:source/epa_nei_onroad",
+      "spatial_support_type": "administrative_area",
+      "temporal_resolution": "annual",
+      "description": "Native ZIP contains regional CSV partitions. Preserve five-character county FIPS, SCC, pollutant code/description, pollutant classification, reporting period, operating type and inventory label. Select county records and disjoint SCC detail before any aggregation; national/state/regional totals must not be combined with component counties. Do not add CAP/HAP species, overlapping particulate definitions or different reporting bases together. Current process_nei drops pollutant/SCC identity and sums species into TRF_NEINP_0_00000; that output is not a validated pollutant-specific quantity and is not a binding here. No county-area allocation model is implied. Generic CSV has no accurate NativeFormatEnum member; native_format is intentionally unset, not station CSV.",
+      "data_genre": [
+        "emissions",
+        "air_pollution"
+      ],
+      "product_version": "2020 NEI onroad summary",
+      "temporal_resolution_iso": "P1Y",
+      "temporal_coverage_start": "2020-01-01",
+      "temporal_coverage_end": "2020-12-31",
+      "spatial_extent_descriptor": "US on-road inventory geography; actual county/FIPS rows and supplied geometry determine coverage",
+      "native_spatial_resolution_descriptor": "County inventory records with source classification code detail",
+      "access_url": "https://gaftp.epa.gov/air/nei/2020/data_summaries/2020nei_onroad_byregion.zip",
+      "amadeus_dataset_name": "nei",
+      "amadeus_process_covariate": "nei",
+      "amadeus_calculate_covariate": "nei"
+    }
+  ],
+  "grid_definitions": [],
+  "canonical_variables": [
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_100414",
+      "name": "nei_onroad_annual_mass_100414",
+      "label": "Annual on-road inventory mass: Ethyl Benzene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_100414",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 100414; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_100425",
+      "name": "nei_onroad_annual_mass_100425",
+      "label": "Annual on-road inventory mass: Styrene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_100425",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 100425; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_106990",
+      "name": "nei_onroad_annual_mass_106990",
+      "label": "Annual on-road inventory mass: 1,3-Butadiene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_106990",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 106990; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_107028",
+      "name": "nei_onroad_annual_mass_107028",
+      "label": "Annual on-road inventory mass: Acrolein",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_107028",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 107028; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_108883",
+      "name": "nei_onroad_annual_mass_108883",
+      "label": "Annual on-road inventory mass: Toluene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_108883",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 108883; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_110543",
+      "name": "nei_onroad_annual_mass_110543",
+      "label": "Annual on-road inventory mass: Hexane",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_110543",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 110543; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_120127",
+      "name": "nei_onroad_annual_mass_120127",
+      "label": "Annual on-road inventory mass: Anthracene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_120127",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 120127; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_123386",
+      "name": "nei_onroad_annual_mass_123386",
+      "label": "Annual on-road inventory mass: Propionaldehyde",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_123386",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 123386; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_129000",
+      "name": "nei_onroad_annual_mass_129000",
+      "label": "Annual on-road inventory mass: Pyrene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_129000",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 129000; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_1330207",
+      "name": "nei_onroad_annual_mass_1330207",
+      "label": "Annual on-road inventory mass: Xylenes (Mixed Isomers)",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_1330207",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 1330207; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_18540299",
+      "name": "nei_onroad_annual_mass_18540299",
+      "label": "Annual on-road inventory mass: Chromium (VI)",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_18540299",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 18540299; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_191242",
+      "name": "nei_onroad_annual_mass_191242",
+      "label": "Annual on-road inventory mass: Benzo[g,h,i,]Perylene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_191242",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 191242; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_193395",
+      "name": "nei_onroad_annual_mass_193395",
+      "label": "Annual on-road inventory mass: Indeno[1,2,3-c,d]Pyrene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_193395",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 193395; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_205992",
+      "name": "nei_onroad_annual_mass_205992",
+      "label": "Annual on-road inventory mass: Benzo[b]Fluoranthene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_205992",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 205992; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_206440",
+      "name": "nei_onroad_annual_mass_206440",
+      "label": "Annual on-road inventory mass: Fluoranthene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_206440",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 206440; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_207089",
+      "name": "nei_onroad_annual_mass_207089",
+      "label": "Annual on-road inventory mass: Benzo[k]Fluoranthene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_207089",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 207089; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_208968",
+      "name": "nei_onroad_annual_mass_208968",
+      "label": "Annual on-road inventory mass: Acenaphthylene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_208968",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 208968; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_218019",
+      "name": "nei_onroad_annual_mass_218019",
+      "label": "Annual on-road inventory mass: Chrysene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_218019",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 218019; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_50000",
+      "name": "nei_onroad_annual_mass_50000",
+      "label": "Annual on-road inventory mass: Formaldehyde",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_50000",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 50000; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_50328",
+      "name": "nei_onroad_annual_mass_50328",
+      "label": "Annual on-road inventory mass: Benzo[a]Pyrene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_50328",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 50328; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_53703",
+      "name": "nei_onroad_annual_mass_53703",
+      "label": "Annual on-road inventory mass: Dibenzo[a,h]Anthracene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_53703",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 53703; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_540841",
+      "name": "nei_onroad_annual_mass_540841",
+      "label": "Annual on-road inventory mass: 2,2,4-Trimethylpentane",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_540841",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 540841; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_56553",
+      "name": "nei_onroad_annual_mass_56553",
+      "label": "Annual on-road inventory mass: Benz[a]Anthracene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_56553",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 56553; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_71432",
+      "name": "nei_onroad_annual_mass_71432",
+      "label": "Annual on-road inventory mass: Benzene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_71432",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 71432; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7439965",
+      "name": "nei_onroad_annual_mass_7439965",
+      "label": "Annual on-road inventory mass: Manganese",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7439965",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7439965; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7439976",
+      "name": "nei_onroad_annual_mass_7439976",
+      "label": "Annual on-road inventory mass: Mercury",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7439976",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7439976; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7440020",
+      "name": "nei_onroad_annual_mass_7440020",
+      "label": "Annual on-road inventory mass: Nickel",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7440020",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7440020; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7440382",
+      "name": "nei_onroad_annual_mass_7440382",
+      "label": "Annual on-road inventory mass: Arsenic",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7440382",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7440382; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_75070",
+      "name": "nei_onroad_annual_mass_75070",
+      "label": "Annual on-road inventory mass: Acetaldehyde",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_75070",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 75070; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_83329",
+      "name": "nei_onroad_annual_mass_83329",
+      "label": "Annual on-road inventory mass: Acenaphthene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_83329",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 83329; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_85018",
+      "name": "nei_onroad_annual_mass_85018",
+      "label": "Annual on-road inventory mass: Phenanthrene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_85018",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 85018; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_86737",
+      "name": "nei_onroad_annual_mass_86737",
+      "label": "Annual on-road inventory mass: Fluorene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_86737",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 86737; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_91203",
+      "name": "nei_onroad_annual_mass_91203",
+      "label": "Annual on-road inventory mass: Naphthalene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_91203",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 91203; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_ch4",
+      "name": "nei_onroad_annual_mass_ch4",
+      "label": "Annual on-road inventory mass: Methane",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_ch4",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code CH4; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_co2",
+      "name": "nei_onroad_annual_mass_co2",
+      "label": "Annual on-road inventory mass: Carbon Dioxide",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_co2",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code CO2; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_co",
+      "name": "nei_onroad_annual_mass_co",
+      "label": "Annual on-road inventory mass: Carbon Monoxide",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_co",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code CO; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_diesel_pm10",
+      "name": "nei_onroad_annual_mass_diesel_pm10",
+      "label": "Annual on-road inventory mass: PM10-Primary from certain diesel engines",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_diesel_pm10",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code DIESEL-PM10; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_diesel_pm25",
+      "name": "nei_onroad_annual_mass_diesel_pm25",
+      "label": "Annual on-road inventory mass: PM25-Primary from certain diesel engines",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_diesel_pm25",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code DIESEL-PM25; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_ec",
+      "name": "nei_onroad_annual_mass_ec",
+      "label": "Annual on-road inventory mass: Elemental Carbon portion of PM2.5-PRI",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_ec",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code EC; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_n2o",
+      "name": "nei_onroad_annual_mass_n2o",
+      "label": "Annual on-road inventory mass: Nitrous Oxide",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_n2o",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code N2O; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_nh3",
+      "name": "nei_onroad_annual_mass_nh3",
+      "label": "Annual on-road inventory mass: Ammonia",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_nh3",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code NH3; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_no3",
+      "name": "nei_onroad_annual_mass_no3",
+      "label": "Annual on-road inventory mass: Nitrate portion of PM2.5-PRI",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_no3",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code NO3; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_nox",
+      "name": "nei_onroad_annual_mass_nox",
+      "label": "Annual on-road inventory mass: Nitrogen Oxides",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_nox",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code NOX; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_oc",
+      "name": "nei_onroad_annual_mass_oc",
+      "label": "Annual on-road inventory mass: Organic Carbon portion of PM2.5-PRI",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_oc",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code OC; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_pm10_pri",
+      "name": "nei_onroad_annual_mass_pm10_pri",
+      "label": "Annual on-road inventory mass: PM10 Primary (Filt + Cond)",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_pm10_pri",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code PM10-PRI; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_pm25_pri",
+      "name": "nei_onroad_annual_mass_pm25_pri",
+      "label": "Annual on-road inventory mass: PM2.5 Primary (Filt + Cond)",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_pm25_pri",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code PM25-PRI; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_pmfine",
+      "name": "nei_onroad_annual_mass_pmfine",
+      "label": "Annual on-road inventory mass: Remaining PMFINE portion of PM2.5-PRI",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_pmfine",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code PMFINE; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_so2",
+      "name": "nei_onroad_annual_mass_so2",
+      "label": "Annual on-road inventory mass: Sulfur Dioxide",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_so2",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code SO2; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_so4",
+      "name": "nei_onroad_annual_mass_so4",
+      "label": "Annual on-road inventory mass: Sulfate Portion of PM2.5-PRI",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_so4",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code SO4; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_voc",
+      "name": "nei_onroad_annual_mass_voc",
+      "label": "Annual on-road inventory mass: Volatile Organic Compounds",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_voc",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code VOC; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_108383",
+      "name": "nei_onroad_annual_mass_108383",
+      "label": "Annual on-road inventory mass: m-Xylene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_108383",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 108383; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_1634044",
+      "name": "nei_onroad_annual_mass_1634044",
+      "label": "Annual on-road inventory mass: Methyl Tert-Butyl Ether",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_1634044",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 1634044; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_67561",
+      "name": "nei_onroad_annual_mass_67561",
+      "label": "Annual on-road inventory mass: Methanol",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_67561",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 67561; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7440360",
+      "name": "nei_onroad_annual_mass_7440360",
+      "label": "Annual on-road inventory mass: Antimony",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7440360",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7440360; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7440439",
+      "name": "nei_onroad_annual_mass_7440439",
+      "label": "Annual on-road inventory mass: Cadmium",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7440439",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7440439; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7440484",
+      "name": "nei_onroad_annual_mass_7440484",
+      "label": "Annual on-road inventory mass: Cobalt",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7440484",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7440484; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7723140",
+      "name": "nei_onroad_annual_mass_7723140",
+      "label": "Annual on-road inventory mass: Phosphorus",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7723140",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7723140; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_7782492",
+      "name": "nei_onroad_annual_mass_7782492",
+      "label": "Annual on-road inventory mass: Selenium",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_7782492",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 7782492; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_90120",
+      "name": "nei_onroad_annual_mass_90120",
+      "label": "Annual on-road inventory mass: 1-Methylnaphthalene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_90120",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 90120; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_91576",
+      "name": "nei_onroad_annual_mass_91576",
+      "label": "Annual on-road inventory mass: 2-Methylnaphthalene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_91576",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 91576; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_95476",
+      "name": "nei_onroad_annual_mass_95476",
+      "label": "Annual on-road inventory mass: o-Xylene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_95476",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 95476; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    },
+    {
+      "id": "amadeus:var/nei_onroad_annual_mass_98828",
+      "name": "nei_onroad_annual_mass_98828",
+      "label": "Annual on-road inventory mass: Cumene",
+      "standard_name": "https://w3id.org/niehs/amadeus/var/nei_onroad_annual_mass_98828",
+      "standard_name_authority": "AMADEUS project-local semantic identifier; no ontology equivalence asserted",
+      "units_ucum": "kg",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "extensive",
+      "description": "Inventory pollutant code 98828; provider reporting basis retained. County/SCC support; distinct from ambient concentration, toxicity, exposure or emission rate."
+    }
+  ],
+  "product_variables": [
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.100414_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_100414",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"100414\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.100425_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_100425",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"100425\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.106990_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_106990",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"106990\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.107028_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_107028",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"107028\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.108883_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_108883",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"108883\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.110543_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_110543",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"110543\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.120127_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_120127",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"120127\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.123386_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_123386",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"123386\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.129000_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_129000",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"129000\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.1330207_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_1330207",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"1330207\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.18540299_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_18540299",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"18540299\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.191242_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_191242",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"191242\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.193395_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_193395",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"193395\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.205992_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_205992",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"205992\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.206440_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_206440",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"206440\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.207089_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_207089",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"207089\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.208968_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_208968",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"208968\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.218019_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_218019",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"218019\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.50000_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_50000",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"50000\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.50328_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_50328",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"50328\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.53703_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_53703",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"53703\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.540841_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_540841",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"540841\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.56553_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_56553",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"56553\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.71432_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_71432",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"71432\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.7439965_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7439965",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7439965\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.7439976_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7439976",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7439976\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.7440020_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440020",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440020\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.7440382_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440382",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440382\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.75070_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_75070",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"75070\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.83329_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_83329",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"83329\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.85018_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_85018",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"85018\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.86737_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_86737",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"86737\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.91203_lb",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_91203",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"91203\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.ch4_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_ch4",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CH4\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.co2_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_co2",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CO2\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.co_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_co",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CO\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.diesel_pm10_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_diesel_pm10",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"DIESEL-PM10\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.diesel_pm25_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_diesel_pm25",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"DIESEL-PM25\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.ec_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_ec",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"EC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.n2o_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_n2o",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"N2O\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.nh3_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_nh3",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NH3\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.no3_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_no3",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NO3\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.nox_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_nox",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NOX\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.oc_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_oc",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"OC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.pm10_pri_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pm10_pri",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PM10-PRI\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.pm25_pri_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pm25_pri",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PM25-PRI\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.pmfine_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pmfine",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PMFINE\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.so2_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_so2",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"SO2\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.so4_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_so4",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"SO4\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2017.voc_ton",
+      "product": "amadeus:product/nei_onroad_2017",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_voc",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"VOC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.100414_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_100414",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"100414\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.100425_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_100425",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"100425\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.106990_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_106990",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"106990\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.107028_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_107028",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"107028\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.108383_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_108383",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"108383\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.108883_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_108883",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"108883\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.110543_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_110543",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"110543\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.120127_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_120127",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"120127\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.123386_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_123386",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"123386\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.129000_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_129000",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"129000\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.1330207_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_1330207",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"1330207\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.1634044_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_1634044",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"1634044\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.18540299_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_18540299",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"18540299\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.191242_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_191242",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"191242\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.193395_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_193395",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"193395\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.205992_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_205992",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"205992\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.206440_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_206440",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"206440\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.207089_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_207089",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"207089\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.208968_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_208968",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"208968\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.218019_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_218019",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"218019\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.50000_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_50000",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"50000\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.50328_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_50328",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"50328\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.53703_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_53703",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"53703\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.540841_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_540841",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"540841\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.56553_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_56553",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"56553\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.67561_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_67561",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"67561\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.71432_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_71432",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"71432\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7439965_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7439965",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7439965\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7439976_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7439976",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7439976\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7440020_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440020",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440020\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7440360_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440360",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440360\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7440382_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440382",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440382\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7440439_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440439",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440439\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7440484_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7440484",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7440484\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.75070_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_75070",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"75070\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7723140_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7723140",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7723140\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.7782492_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_7782492",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"7782492\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.83329_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_83329",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"83329\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.85018_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_85018",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"85018\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.86737_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_86737",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"86737\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.90120_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_90120",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"90120\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.91203_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_91203",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"91203\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.91576_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_91576",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"91576\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.95476_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_95476",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"95476\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.98828_lb",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_98828",
+      "native_name": "total emissions",
+      "native_units_ucum": "[lb_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"98828\", \"emissions uom\": \"LB\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 0.45359237; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.ch4_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_ch4",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CH4\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.co2_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_co2",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CO2\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.co_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_co",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"CO\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.diesel_pm10_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_diesel_pm10",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"DIESEL-PM10\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.diesel_pm25_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_diesel_pm25",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"DIESEL-PM25\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.ec_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_ec",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"EC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.n2o_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_n2o",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"N2O\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.nh3_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_nh3",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NH3\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.no3_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_no3",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NO3\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.nox_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_nox",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"NOX\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.oc_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_oc",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"OC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.pm10_pri_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pm10_pri",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PM10-PRI\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.pm25_pri_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pm25_pri",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PM25-PRI\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.pmfine_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_pmfine",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"PMFINE\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.so2_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_so2",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"SO2\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.so4_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_so4",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"SO4\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    },
+    {
+      "id": "amadeus:pvar/nei_onroad_2020.voc_ton",
+      "product": "amadeus:product/nei_onroad_2020",
+      "canonical_variable": "amadeus:var/nei_onroad_annual_mass_voc",
+      "native_name": "total emissions",
+      "native_units_ucum": "[ston_av]",
+      "harmonization_note": "Filter exact native rows {\"pollutant code\": \"VOC\", \"emissions uom\": \"TON\", \"reporting period\": \"A\", \"data category\": \"ON\"}. Preserve SCC, geography, operating type and version. Blank is missing; zero remains zero. Convert the stated unit once; unsupported units must fail. No packing factor is present. The R all-pollutant county sum cannot populate this quantity.",
+      "unit_conversion_formula": "canonical = raw_native * 907.18474; mask native missing values first"
+    }
+  ]
+}

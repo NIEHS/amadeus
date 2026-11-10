@@ -1,0 +1,2710 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/noaa_psl_narr
+  name: noaa_psl_narr
+  label: NOAA PSL NARR daily products
+  producer_institution: NOAA NCEP; NOAA Physical Sciences Laboratory
+  homepage: https://psl.noaa.gov/data/gridded/data.narr.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _narr
+  description: Daily derivatives of NCEP NARR. All 87 variables enumerated by the current R narr_variable
+    helper have freshly inspected provider DAS metadata. The workbook claim that the archive ended around
+    2021 is superseded by current PSL documentation. Daily means and daily sums are not native three-hourly
+    instantaneous products; native statistic and vertical support govern each binding.
+  citation_apa: Mesinger et al. (2006). North American Regional Reanalysis. Bulletin of the American Meteorological
+    Society 87, 343–360. https://doi.org/10.1175/BAMS-87-3-343. NCEP NARR data provided by NOAA PSL, Boulder,
+    Colorado, USA.
+products:
+- id: amadeus:product/narr_psl_daily_surface
+  name: narr_psl_daily_surface
+  label: NARR PSL daily surface
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_surface
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_pressure_29
+  name: narr_psl_daily_pressure_29
+  label: NARR PSL daily pressure_29
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_pressure_29
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_soil_4
+  name: narr_psl_daily_soil_4
+  label: NARR PSL daily soil_4
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_soil_4
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_pressure_15
+  name: narr_psl_daily_pressure_15
+  label: NARR PSL daily pressure_15
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_pressure_15
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_soil_5
+  name: narr_psl_daily_soil_5
+  label: NARR PSL daily soil_5
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_soil_5
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+grid_definitions:
+- id: amadeus:grid/narr_psl_daily_surface
+  name: narr_psl_daily_surface
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_pressure_29
+  name: narr_psl_daily_pressure_29
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 875.0
+  - 850.0
+  - 825.0
+  - 800.0
+  - 775.0
+  - 750.0
+  - 725.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 275.0
+  - 250.0
+  - 225.0
+  - 200.0
+  - 175.0
+  - 150.0
+  - 125.0
+  - 100.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_soil_4
+  name: narr_psl_daily_soil_4
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: native_soil_level_cm
+  vertical_level_unit: cm
+  vertical_levels:
+  - 0.0
+  - 10.0
+  - 40.0
+  - 100.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_pressure_15
+  name: narr_psl_daily_pressure_15
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 875.0
+  - 850.0
+  - 825.0
+  - 800.0
+  - 775.0
+  - 750.0
+  - 725.0
+  - 700.0
+  - 650.0
+  - 600.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_soil_5
+  name: narr_psl_daily_soil_5
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: native_soil_level_cm
+  vertical_level_unit: cm
+  vertical_levels:
+  - 0.0
+  - 10.0
+  - 40.0
+  - 100.0
+  - 800.0
+  n_columns: 349
+  n_rows: 277
+canonical_variables:
+- id: amadeus:var/narr_daily_acpcp
+  name: narr_daily_acpcp
+  label: Daily accumulated convective precipitation at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_acpcp
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: convective precipitation accumulation. Native daily sum statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_air
+  name: narr_daily_air
+  label: Daily Air Temperature on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_air
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Air temperature. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_air_2m
+  name: narr_daily_air_2m
+  label: Daily Air Temperature at 2 m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_air_2m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Air temperature. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_air_sfc
+  name: narr_daily_air_sfc
+  label: Daily air temperature at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_air_sfc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: air temperature. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_albedo
+  name: narr_daily_albedo
+  label: Daily albedo at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_albedo
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Albedo. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_apcp
+  name: narr_daily_apcp
+  label: Daily accumulated total precipitation at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_apcp
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Precipitation amount. Native daily sum statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_bgrun
+  name: narr_daily_bgrun
+  label: Daily Subsurface Runoff (baseflow)
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_bgrun
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: subsurface runoff (baseflow). Native daily sum statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_bmixl_hl1
+  name: narr_daily_bmixl_hl1
+  label: Daily Blackadar's Mixing Length Scale
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_bmixl_hl1
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Blackadar's Mixing Length Scale. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cape
+  name: narr_daily_cape
+  label: Daily Convective Available Potential Energy at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cape
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: J/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: convective available potential energy. Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_ccond
+  name: narr_daily_ccond
+  label: Daily Canopy Conductance at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_ccond
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: canopy conductance. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cdcon
+  name: narr_daily_cdcon
+  label: Daily Mean of Convective Cloud Cover at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cdcon
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Convective cloud cover. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cdlyr
+  name: narr_daily_cdlyr
+  label: Daily Mean of Non-Convective Cloud Cover at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cdlyr
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Non-convective cloud cover. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cfrzr
+  name: narr_daily_cfrzr
+  label: Daily Categorical Freezing Rain at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cfrzr
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: proportion
+  extensivity: intensive
+  description: categorical freezing rain. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cicep
+  name: narr_daily_cicep
+  label: Daily Categorical Ice Pellets at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cicep
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: proportion
+  extensivity: intensive
+  description: categorical ice pellets. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cin
+  name: narr_daily_cin
+  label: Daily Convective Inhibition at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cin
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: J/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: convective inhibition. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_cnwat
+  name: narr_daily_cnwat
+  label: Daily Plant Canopy Water at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_cnwat
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: plant canopy surface water. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_crain
+  name: narr_daily_crain
+  label: Daily Categorical Rain at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_crain
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: proportion
+  extensivity: intensive
+  description: categorical rain. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_csnow
+  name: narr_daily_csnow
+  label: Daily Categorical Snow at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_csnow
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: proportion
+  extensivity: intensive
+  description: categorical snow. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_dlwrf
+  name: narr_daily_dlwrf
+  label: Daily Downward Longwave Radiation Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_dlwrf
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: downward longwave radiation flux. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_dpt_2m
+  name: narr_daily_dpt_2m
+  label: Daily Dew Point Temperature at 2m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_dpt_2m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Dew Point Temperature at 2m. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_dswrf
+  name: narr_daily_dswrf
+  label: Daily Downward Shortwave Radiation Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_dswrf
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: downward shortwave radiation flux. Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_evap
+  name: narr_daily_evap
+  label: Daily accumulated total evaporation at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_evap
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Evaporation amount. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_gflux
+  name: narr_daily_gflux
+  label: Daily Ground Heat Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_gflux
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: ground heat flux. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_hcdc
+  name: narr_daily_hcdc
+  label: Daily High Cloud Area Fraction
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_hcdc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: High Cloud Area Fraction. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_hgt
+  name: narr_daily_hgt
+  label: Daily Geopotential Heights on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_hgt
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Geopotential height. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_hgt_tropo
+  name: narr_daily_hgt_tropo
+  label: Daily Geopotential Height
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_hgt_tropo
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Geopotential Height. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_hlcy
+  name: narr_daily_hlcy
+  label: Daily Storm Relative Helicity
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_hlcy
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m2/s2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Storm Relative Helicity. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_hpbl
+  name: narr_daily_hpbl
+  label: Daily Planetary Boundary Layer Height
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_hpbl
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: planetary boundary layer height. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_lcdc
+  name: narr_daily_lcdc
+  label: Daily Low Cloud Area Fraction
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_lcdc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Low Cloud Area Fraction. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_lftx4
+  name: narr_daily_lftx4
+  label: Daily Best (4-layer) Lifted Index
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_lftx4
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Best (4-layer) Lifted Index. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_lhtfl
+  name: narr_daily_lhtfl
+  label: Daily Latent Heat Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_lhtfl
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: latent heat flux. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_mcdc
+  name: narr_daily_mcdc
+  label: Daily Medium Cloud Area Fraction
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_mcdc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Medium Cloud Area Fraction. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_mconv_hl1
+  name: narr_daily_mconv_hl1
+  label: Daily Horizontal Moisture Divergence
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_mconv_hl1
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/kg/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Horizontal Moisture Divergence. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_mslet
+  name: narr_daily_mslet
+  label: Daily Mean Sea Level (ETA model) Pressure
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_mslet
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Mean Sea Level (ETA model) Pressure. Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_mstav
+  name: narr_daily_mstav
+  label: Daily Moisture Availability
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_mstav
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Moisture Availability. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_omega
+  name: narr_daily_omega
+  label: Daily Omega on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_omega
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Omega (dp/dt). Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_pevap
+  name: narr_daily_pevap
+  label: Daily accumulated potential evaporation at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pevap
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Evaporation amount. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_pottmp_hl1
+  name: narr_daily_pottmp_hl1
+  label: Daily Potential Temperature
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pottmp_hl1
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Potential Temperature. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_pottmp_sfc
+  name: narr_daily_pottmp_sfc
+  label: Daily potential temperature at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pottmp_sfc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Potential temperature. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_pr_wtr
+  name: narr_daily_pr_wtr
+  label: Daily Precipitable Water for entire atmosphere
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pr_wtr
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Precipitable Water Content. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_prate
+  name: narr_daily_prate
+  label: Daily precipitation rate at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_prate
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Precipitation rate. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_pres_sfc
+  name: narr_daily_pres_sfc
+  label: Daily pressure at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pres_sfc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Pressure. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_pres_tropo
+  name: narr_daily_pres_tropo
+  label: Daily Tropopause Pressure
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_pres_tropo
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Tropopause Pressure. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_prmsl
+  name: narr_daily_prmsl
+  label: Daily Pressure at Mean Sea Level
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_prmsl
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Mean Sea Level Pressure. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_rcq
+  name: narr_daily_rcq
+  label: Daily Humidity Parameter Canopy Conductance at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_rcq
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: humidity parameter canopy conductance. Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_rcs
+  name: narr_daily_rcs
+  label: Daily Solar Parameter Canopy Conductance at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_rcs
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: solar parameter canopy conductance. Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_rcsol
+  name: narr_daily_rcsol
+  label: Daily Soil Moisture Parameter Canopy Conductance at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_rcsol
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: soil moisture parameter canopy conductance. Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_rct
+  name: narr_daily_rct
+  label: Daily Temperature Parameter Canopy Conductance at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_rct
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: temperature parameter canopy conductance. Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_rhum_2m
+  name: narr_daily_rhum_2m
+  label: Daily Relative Humidity at 2m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_rhum_2m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Relative Humidity. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_shtfl
+  name: narr_daily_shtfl
+  label: Daily Sensible Heat Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_shtfl
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: sensible heat flux. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_shum
+  name: narr_daily_shum
+  label: Daily Specific Humidity on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_shum
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Specific humidity. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_shum_2m
+  name: narr_daily_shum_2m
+  label: Daily Specific Humidity at 2m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_shum_2m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Specific Humidity. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_snod
+  name: narr_daily_snod
+  label: Daily Snow Depth at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_snod
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: snow depth. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_snohf
+  name: narr_daily_snohf
+  label: Daily Snow Phase-change Heat at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_snohf
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: snow phase-change heat. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_snom
+  name: narr_daily_snom
+  label: Daily Snow Melt
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_snom
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: snow melt. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_snowc
+  name: narr_daily_snowc
+  label: Daily Snow Cover at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_snowc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: snow cover. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_soill
+  name: narr_daily_soill
+  label: Daily Liquid Volumetric Soil Moisture (non-frozen) Fraction
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_soill
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Liquid Volumetric Soil Moisture (non-frozen) Fraction. Native daily mean statistic. Fractional
+    daily means of categorical precipitation indicators are occurrence proportions, not nominal class
+    codes or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_soilm
+  name: narr_daily_soilm
+  label: Daily Soil Moisture Content
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_soilm
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Soil Moisture Content. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_soilw
+  name: narr_daily_soilw
+  label: Daily Volumetric Soil Moisture (frozen + liquid) Fraction
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_soilw
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Volumetric Soil Moisture (frozen + liquid) Fraction. Native daily mean statistic. Fractional
+    daily means of categorical precipitation indicators are occurrence proportions, not nominal class
+    codes or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_ssrun
+  name: narr_daily_ssrun
+  label: Daily Surface Runoff (non-infiltrating)
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_ssrun
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: surface runoff (non-infiltrating). Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_tcdc
+  name: narr_daily_tcdc
+  label: Daily Forecast of Total Cloud Cover at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_tcdc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Total cloud cover. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_tke
+  name: narr_daily_tke
+  label: Daily Turbulent Kinetic Energy on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_tke
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: J/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Turbulent Kinetic Energy. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_tke_hl1
+  name: narr_daily_tke_hl1
+  label: Daily Turbulent Kinetic Energy
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_tke_hl1
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: J/kg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Turbulent Kinetic Energy. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_tsoil
+  name: narr_daily_tsoil
+  label: Daily Soil Temperature
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_tsoil
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Soil Temperature. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_ulwrf_ntat
+  name: narr_daily_ulwrf_ntat
+  label: Daily Upward Longwave Radiation Flux
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_ulwrf_ntat
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Upward Longwave Radiation Flux. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_ulwrf_sfc
+  name: narr_daily_ulwrf_sfc
+  label: Daily Upward Longwave Radiation Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_ulwrf_sfc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: upward longwave radiation flux. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_ustm
+  name: narr_daily_ustm
+  label: Daily U-component of Storm Motion
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_ustm
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: U-component of Storm Motion. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_uswrf_ntat
+  name: narr_daily_uswrf_ntat
+  label: Daily Upward Shortwave Radiation Flux
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_uswrf_ntat
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Upward Shortwave Radiation Flux. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_uswrf_sfc
+  name: narr_daily_uswrf_sfc
+  label: Daily Upward Shortwave Radiation Flux at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_uswrf_sfc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: upward shortwave radiation flux. Native daily mean statistic. Fractional daily means of
+    categorical precipitation indicators are occurrence proportions, not nominal class codes or QA words.
+    Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_uwnd
+  name: narr_daily_uwnd
+  label: Daily U-wind on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_uwnd
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: u-wind. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_uwnd_10m
+  name: narr_daily_uwnd_10m
+  label: Daily u-wind at 10 m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_uwnd_10m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: u-wind. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_veg
+  name: narr_daily_veg
+  label: Daily vegetation at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_veg
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: vegetation. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_vis
+  name: narr_daily_vis
+  label: Daily Visibility
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vis
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: visibility. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_vstm
+  name: narr_daily_vstm
+  label: Daily V-component of Storm Motion
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vstm
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: V-component of Storm Motion. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_vvel_hl1
+  name: narr_daily_vvel_hl1
+  label: Daily Pressure Vertical Velocity
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vvel_hl1
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Pa/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Pressure Vertical Velocity. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_vwnd
+  name: narr_daily_vwnd
+  label: Daily V-wind on Pressure Levels
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vwnd
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: v-wind. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_vwnd_10m
+  name: narr_daily_vwnd_10m
+  label: Daily v-wind at 10 m
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vwnd_10m
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: v-wind. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_vwsh_tropo
+  name: narr_daily_vwsh_tropo
+  label: Daily Vertical Speed Shear
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_vwsh_tropo
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: 1/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Vertical Wind Shear. Native daily mean statistic. Fractional daily means of categorical
+    precipitation indicators are occurrence proportions, not nominal class codes or QA words. Per-area
+    water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wcconv
+  name: narr_daily_wcconv
+  label: Daily Water Condensate Flux Convergence Accumulation at Entire Atmosphere Considered as a Single
+    Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wcconv
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water condensate flux convergence (vertical int.). Native daily mean statistic. Fractional
+    daily means of categorical precipitation indicators are occurrence proportions, not nominal class
+    codes or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wcinc
+  name: narr_daily_wcinc
+  label: Daily Water Condensate Added by Precip. Assimilation Accumulation at Entire Atmosphere Considered
+    as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wcinc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water condensate added by precip. assimilation. Native daily mean statistic. Fractional
+    daily means of categorical precipitation indicators are occurrence proportions, not nominal class
+    codes or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wcuflx
+  name: narr_daily_wcuflx
+  label: Daily Water Condensate Zonal Flux Accumulation at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wcuflx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water condensate zonal flux (vertical int.). Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wcvflx
+  name: narr_daily_wcvflx
+  label: Daily Water Condensate Meridional Flux Accumulation at Entire Atmosphere Considered as a Single
+    Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wcvflx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water condensate meridional flux (vertical int.). Native daily mean statistic. Fractional
+    daily means of categorical precipitation indicators are occurrence proportions, not nominal class
+    codes or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_weasd
+  name: narr_daily_weasd
+  label: Daily Accumulated Snow at Surface
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_weasd
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: accumulated snow. Native daily mean statistic. Fractional daily means of categorical precipitation
+    indicators are occurrence proportions, not nominal class codes or QA words. Per-area water amounts
+    remain spatially intensive.
+- id: amadeus:var/narr_daily_wvconv
+  name: narr_daily_wvconv
+  label: Daily Water Vapor Flux Convergence Accumulation at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wvconv
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water vapor flux convergence (vertical int.). Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wvinc
+  name: narr_daily_wvinc
+  label: Daily Water Vapor Added by Precip. Assimilation Accumulation at Entire Atmosphere Considered
+    as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wvinc
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water vapor added by precip. assimilation. Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wvuflx
+  name: narr_daily_wvuflx
+  label: Daily Water Vapor Zonal Flux Accumulation at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wvuflx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water vapor zonal flux (vertical int.). Native daily mean statistic. Fractional daily means
+    of categorical precipitation indicators are occurrence proportions, not nominal class codes or QA
+    words. Per-area water amounts remain spatially intensive.
+- id: amadeus:var/narr_daily_wvvflx
+  name: narr_daily_wvvflx
+  label: Daily Water Vapor Meridional Flux Accumulation at Entire Atmosphere Considered as a Single Layer
+  standard_name: https://w3id.org/niehs/amadeus/var/narr_daily_wvvflx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: water vapor meridional flux (vertical int.). Native daily mean statistic. Fractional daily
+    means of categorical precipitation indicators are occurrence proportions, not nominal class codes
+    or QA words. Per-area water amounts remain spatially intensive.
+product_variables:
+- id: amadeus:pvar/narr_psl_daily_surface.acpcp
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_acpcp
+  native_name: acpcp
+  native_units_ucum: kg/m2
+  harmonization_note: File selector acpcp; field acpcp. Preserve source statistic Sum. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: acpcp
+  missing_value_sentinel: '9.969209968386869e+36'
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  cf_standard_name: convective_precipitation_amount
+- id: amadeus:pvar/narr_psl_daily_pressure_29.air
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_air
+  native_name: air
+  native_units_ucum: K
+  harmonization_note: File selector air; field air. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: air
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.air.2m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_air_2m
+  native_name: air
+  native_units_ucum: K
+  harmonization_note: File selector air.2m; field air. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: air.2m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.air.sfc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_air_sfc
+  native_name: air
+  native_units_ucum: K
+  harmonization_note: File selector air.sfc; field air. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: air.sfc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.albedo
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_albedo
+  native_name: albedo
+  native_units_ucum: '%'
+  harmonization_note: File selector albedo; field albedo. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: albedo
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_albedo
+- id: amadeus:pvar/narr_psl_daily_surface.apcp
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_apcp
+  native_name: apcp
+  native_units_ucum: kg/m2
+  harmonization_note: File selector apcp; field apcp. Preserve source statistic Sum. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: apcp
+  missing_value_sentinel: '9.969209968386869e+36'
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  cf_standard_name: precipitation_amount
+- id: amadeus:pvar/narr_psl_daily_surface.bgrun
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_bgrun
+  native_name: bgrun
+  native_units_ucum: kg/m2
+  harmonization_note: File selector bgrun; field bgrun. Preserve source statistic Sum. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: bgrun
+  missing_value_sentinel: '9.969209968386869e+36'
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+- id: amadeus:pvar/narr_psl_daily_surface.bmixl.hl1
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_bmixl_hl1
+  native_name: bmixl
+  native_units_ucum: m
+  harmonization_note: File selector bmixl.hl1; field bmixl. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: bmixl.hl1
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.cape
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cape
+  native_name: cape
+  native_units_ucum: J/kg
+  harmonization_note: File selector cape; field cape. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cape
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.ccond
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_ccond
+  native_name: ccond
+  native_units_ucum: m/s
+  harmonization_note: File selector ccond; field ccond. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: ccond
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.cdcon
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cdcon
+  native_name: cdcon
+  native_units_ucum: '%'
+  harmonization_note: File selector cdcon; field cdcon. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cdcon
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: convective_cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_surface.cdlyr
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cdlyr
+  native_name: cdlyr
+  native_units_ucum: '%'
+  harmonization_note: File selector cdlyr; field cdlyr. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cdlyr
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: non-convective_cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_surface.cfrzr
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cfrzr
+  native_name: cfrzr
+  native_units_ucum: '1'
+  harmonization_note: File selector cfrzr; field cfrzr. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cfrzr
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.cicep
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cicep
+  native_name: cicep
+  native_units_ucum: '1'
+  harmonization_note: File selector cicep; field cicep. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cicep
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.cin
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cin
+  native_name: cin
+  native_units_ucum: J/kg
+  harmonization_note: File selector cin; field cin. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cin
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.cnwat
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_cnwat
+  native_name: cnwat
+  native_units_ucum: kg/m2
+  harmonization_note: File selector cnwat; field cnwat. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: cnwat
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.crain
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_crain
+  native_name: crain
+  native_units_ucum: '1'
+  harmonization_note: File selector crain; field crain. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: crain
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.csnow
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_csnow
+  native_name: csnow
+  native_units_ucum: '1'
+  harmonization_note: File selector csnow; field csnow. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: csnow
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.dlwrf
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_dlwrf
+  native_name: dlwrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector dlwrf; field dlwrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: dlwrf
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.dpt.2m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_dpt_2m
+  native_name: dpt
+  native_units_ucum: K
+  harmonization_note: File selector dpt.2m; field dpt. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: dpt.2m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: dew_point_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.dswrf
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_dswrf
+  native_name: dswrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector dswrf; field dswrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: dswrf
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.evap
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_evap
+  native_name: evap
+  native_units_ucum: kg/m2
+  harmonization_note: File selector evap; field evap. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: evap
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: water_evaporation_amount
+- id: amadeus:pvar/narr_psl_daily_surface.gflux
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_gflux
+  native_name: gflux
+  native_units_ucum: W/m2
+  harmonization_note: File selector gflux; field gflux. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: gflux
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.hcdc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_hcdc
+  native_name: hcdc
+  native_units_ucum: '%'
+  harmonization_note: File selector hcdc; field hcdc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: hcdc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: high_cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_pressure_29.hgt
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_hgt
+  native_name: hgt
+  native_units_ucum: m
+  harmonization_note: File selector hgt; field hgt. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: hgt
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: geopotential_height
+- id: amadeus:pvar/narr_psl_daily_surface.hgt.tropo
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_hgt_tropo
+  native_name: hgt
+  native_units_ucum: m
+  harmonization_note: File selector hgt.tropo; field hgt. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: hgt.tropo
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: geopotential_height
+- id: amadeus:pvar/narr_psl_daily_surface.hlcy
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_hlcy
+  native_name: hlcy
+  native_units_ucum: m2/s2
+  harmonization_note: File selector hlcy; field hlcy. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: hlcy
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.hpbl
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_hpbl
+  native_name: hpbl
+  native_units_ucum: m
+  harmonization_note: File selector hpbl; field hpbl. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: hpbl
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.lcdc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_lcdc
+  native_name: lcdc
+  native_units_ucum: '%'
+  harmonization_note: File selector lcdc; field lcdc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: lcdc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: low_cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_surface.lftx4
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_lftx4
+  native_name: lftx4
+  native_units_ucum: K
+  harmonization_note: File selector lftx4; field lftx4. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: lftx4
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.lhtfl
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_lhtfl
+  native_name: lhtfl
+  native_units_ucum: W/m2
+  harmonization_note: File selector lhtfl; field lhtfl. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: lhtfl
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_upward_latent_heat_flux
+- id: amadeus:pvar/narr_psl_daily_surface.mcdc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_mcdc
+  native_name: mcdc
+  native_units_ucum: '%'
+  harmonization_note: File selector mcdc; field mcdc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: mcdc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: medium_cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_surface.mconv.hl1
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_mconv_hl1
+  native_name: mconv
+  native_units_ucum: kg/kg/s
+  harmonization_note: File selector mconv.hl1; field mconv. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: mconv.hl1
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.mslet
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_mslet
+  native_name: mslet
+  native_units_ucum: Pa
+  harmonization_note: File selector mslet; field mslet. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: mslet
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.mstav
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_mstav
+  native_name: mstav
+  native_units_ucum: '%'
+  harmonization_note: File selector mstav; field mstav. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: mstav
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_pressure_29.omega
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_omega
+  native_name: omega
+  native_units_ucum: Pa/s
+  harmonization_note: File selector omega; field omega. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: omega
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: omega
+- id: amadeus:pvar/narr_psl_daily_surface.pevap
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pevap
+  native_name: pevap
+  native_units_ucum: kg/m2
+  harmonization_note: File selector pevap; field pevap. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pevap
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.pottmp.hl1
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pottmp_hl1
+  native_name: pottmp
+  native_units_ucum: K
+  harmonization_note: File selector pottmp.hl1; field pottmp. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pottmp.hl1
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_potential_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.pottmp.sfc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pottmp_sfc
+  native_name: pottmp
+  native_units_ucum: K
+  harmonization_note: File selector pottmp.sfc; field pottmp. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pottmp.sfc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_potential_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.pr_wtr
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pr_wtr
+  native_name: pr_wtr
+  native_units_ucum: kg/m2
+  harmonization_note: File selector pr_wtr; field pr_wtr. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pr_wtr
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: atmosphere_water_vapour_content
+- id: amadeus:pvar/narr_psl_daily_surface.prate
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_prate
+  native_name: prate
+  native_units_ucum: kg/m2/s
+  harmonization_note: File selector prate; field prate. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: prate
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: precipitation_flux
+- id: amadeus:pvar/narr_psl_daily_surface.pres.sfc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pres_sfc
+  native_name: pres
+  native_units_ucum: Pa
+  harmonization_note: File selector pres.sfc; field pres. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pres.sfc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_pressure
+- id: amadeus:pvar/narr_psl_daily_surface.pres.tropo
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_pres_tropo
+  native_name: pres
+  native_units_ucum: Pa
+  harmonization_note: File selector pres.tropo; field pres. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: pres.tropo
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_pressure
+- id: amadeus:pvar/narr_psl_daily_surface.prmsl
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_prmsl
+  native_name: prmsl
+  native_units_ucum: Pa
+  harmonization_note: File selector prmsl; field prmsl. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: prmsl
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: air_pressure_at_sea_level
+- id: amadeus:pvar/narr_psl_daily_surface.rcq
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_rcq
+  native_name: rcq
+  native_units_ucum: '1'
+  harmonization_note: File selector rcq; field rcq. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: rcq
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.rcs
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_rcs
+  native_name: rcs
+  native_units_ucum: '1'
+  harmonization_note: File selector rcs; field rcs. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: rcs
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.rcsol
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_rcsol
+  native_name: rcsol
+  native_units_ucum: '1'
+  harmonization_note: File selector rcsol; field rcsol. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: rcsol
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.rct
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_rct
+  native_name: rct
+  native_units_ucum: '1'
+  harmonization_note: File selector rct; field rct. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: rct
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.rhum.2m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_rhum_2m
+  native_name: rhum
+  native_units_ucum: '%'
+  harmonization_note: File selector rhum.2m; field rhum. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: rhum.2m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: relative_humidity
+- id: amadeus:pvar/narr_psl_daily_surface.shtfl
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_shtfl
+  native_name: shtfl
+  native_units_ucum: W/m2
+  harmonization_note: File selector shtfl; field shtfl. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: shtfl
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_upward_sensible_heat_flux
+- id: amadeus:pvar/narr_psl_daily_pressure_29.shum
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_shum
+  native_name: shum
+  native_units_ucum: kg/kg
+  harmonization_note: File selector shum; field shum. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: shum
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: specific_humidity
+- id: amadeus:pvar/narr_psl_daily_surface.shum.2m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_shum_2m
+  native_name: shum
+  native_units_ucum: kg/kg
+  harmonization_note: File selector shum.2m; field shum. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: shum.2m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: specific_humidity
+- id: amadeus:pvar/narr_psl_daily_surface.snod
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_snod
+  native_name: snod
+  native_units_ucum: m
+  harmonization_note: File selector snod; field snod. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: snod
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_snow_thickness
+- id: amadeus:pvar/narr_psl_daily_surface.snohf
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_snohf
+  native_name: snohf
+  native_units_ucum: W/m2
+  harmonization_note: File selector snohf; field snohf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: snohf
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.snom
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_snom
+  native_name: snom
+  native_units_ucum: kg/m2
+  harmonization_note: File selector snom; field snom. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: snom
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_snow_melt_amount
+- id: amadeus:pvar/narr_psl_daily_surface.snowc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_snowc
+  native_name: snowc
+  native_units_ucum: '1'
+  harmonization_note: File selector snowc; field snowc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: snowc
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_soil_4.soill
+  product: amadeus:product/narr_psl_daily_soil_4
+  canonical_variable: amadeus:var/narr_daily_soill
+  native_name: soill
+  native_units_ucum: '1'
+  harmonization_note: File selector soill; field soill. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: native_soil_level_cm
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: soill
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.soilm
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_soilm
+  native_name: soilm
+  native_units_ucum: kg/m2
+  harmonization_note: File selector soilm; field soilm. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: soilm
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: soil_moisture_content
+- id: amadeus:pvar/narr_psl_daily_soil_4.soilw
+  product: amadeus:product/narr_psl_daily_soil_4
+  canonical_variable: amadeus:var/narr_daily_soilw
+  native_name: soilw
+  native_units_ucum: '1'
+  harmonization_note: File selector soilw; field soilw. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: native_soil_level_cm
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: soilw
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.ssrun
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_ssrun
+  native_name: ssrun
+  native_units_ucum: kg/m2
+  harmonization_note: File selector ssrun; field ssrun. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: ssrun
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.tcdc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_tcdc
+  native_name: tcdc
+  native_units_ucum: '%'
+  harmonization_note: File selector tcdc; field tcdc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: tcdc
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: cloud_area_fraction
+- id: amadeus:pvar/narr_psl_daily_pressure_15.tke
+  product: amadeus:product/narr_psl_daily_pressure_15
+  canonical_variable: amadeus:var/narr_daily_tke
+  native_name: tke
+  native_units_ucum: J/kg
+  harmonization_note: File selector tke; field tke. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: tke
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.tke.hl1
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_tke_hl1
+  native_name: tke
+  native_units_ucum: J/kg
+  harmonization_note: File selector tke.hl1; field tke. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: tke.hl1
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_soil_5.tsoil
+  product: amadeus:product/narr_psl_daily_soil_5
+  canonical_variable: amadeus:var/narr_daily_tsoil
+  native_name: tsoil
+  native_units_ucum: K
+  harmonization_note: File selector tsoil; field tsoil. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: native_soil_level_cm
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: tsoil
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: soil_temperature
+- id: amadeus:pvar/narr_psl_daily_surface.ulwrf.ntat
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_ulwrf_ntat
+  native_name: ulwrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector ulwrf.ntat; field ulwrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: ulwrf.ntat
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.ulwrf.sfc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_ulwrf_sfc
+  native_name: ulwrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector ulwrf.sfc; field ulwrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: ulwrf.sfc
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.ustm
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_ustm
+  native_name: ustm
+  native_units_ucum: m/s
+  harmonization_note: File selector ustm; field ustm. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: ustm
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.uswrf.ntat
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_uswrf_ntat
+  native_name: uswrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector uswrf.ntat; field uswrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: uswrf.ntat
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.uswrf.sfc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_uswrf_sfc
+  native_name: uswrf
+  native_units_ucum: W/m2
+  harmonization_note: File selector uswrf.sfc; field uswrf. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: uswrf.sfc
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_pressure_29.uwnd
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_uwnd
+  native_name: uwnd
+  native_units_ucum: m/s
+  harmonization_note: File selector uwnd; field uwnd. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: uwnd
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: eastward_wind
+- id: amadeus:pvar/narr_psl_daily_surface.uwnd.10m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_uwnd_10m
+  native_name: uwnd
+  native_units_ucum: m/s
+  harmonization_note: File selector uwnd.10m; field uwnd. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: uwnd.10m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: eastward_wind
+- id: amadeus:pvar/narr_psl_daily_surface.veg
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_veg
+  native_name: veg
+  native_units_ucum: '%'
+  harmonization_note: File selector veg; field veg. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: veg
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: vegetation_area_fraction
+- id: amadeus:pvar/narr_psl_daily_surface.vis
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_vis
+  native_name: vis
+  native_units_ucum: m
+  harmonization_note: File selector vis; field vis. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: vis
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: visibility_in_air
+- id: amadeus:pvar/narr_psl_daily_surface.vstm
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_vstm
+  native_name: vstm
+  native_units_ucum: m/s
+  harmonization_note: File selector vstm; field vstm. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: vstm
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.vvel.hl1
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_vvel_hl1
+  native_name: vvel
+  native_units_ucum: Pa/s
+  harmonization_note: File selector vvel.hl1; field vvel. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: vvel.hl1
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: vertical_air_velocity_expressed_as_tendancy_of_pressure
+- id: amadeus:pvar/narr_psl_daily_pressure_29.vwnd
+  product: amadeus:product/narr_psl_daily_pressure_29
+  canonical_variable: amadeus:var/narr_daily_vwnd
+  native_name: vwnd
+  native_units_ucum: m/s
+  harmonization_note: File selector vwnd; field vwnd. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  vertical_level_type: isobaric_pressure_hPa
+  layer_name_template: '{native_name}_{level}_{YYYYMMDD}'
+  amadeus_variable_code: vwnd
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: northward_wind
+- id: amadeus:pvar/narr_psl_daily_surface.vwnd.10m
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_vwnd_10m
+  native_name: vwnd
+  native_units_ucum: m/s
+  harmonization_note: File selector vwnd.10m; field vwnd. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: vwnd.10m
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: northward_wind
+- id: amadeus:pvar/narr_psl_daily_surface.vwsh.tropo
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_vwsh_tropo
+  native_name: vwsh
+  native_units_ucum: 1/s
+  harmonization_note: File selector vwsh.tropo; field vwsh. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: vwsh.tropo
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: wind_speed_shear
+- id: amadeus:pvar/narr_psl_daily_surface.wcconv
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wcconv
+  native_name: wcconv
+  native_units_ucum: kg/m2
+  harmonization_note: File selector wcconv; field wcconv. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wcconv
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wcinc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wcinc
+  native_name: wcinc
+  native_units_ucum: kg/m2
+  harmonization_note: File selector wcinc; field wcinc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wcinc
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wcuflx
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wcuflx
+  native_name: wcuflx
+  native_units_ucum: kg/m
+  harmonization_note: File selector wcuflx; field wcuflx. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wcuflx
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wcvflx
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wcvflx
+  native_name: wcvflx
+  native_units_ucum: kg/m
+  harmonization_note: File selector wcvflx; field wcvflx. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wcvflx
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.weasd
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_weasd
+  native_name: weasd
+  native_units_ucum: kg/m2
+  harmonization_note: File selector weasd; field weasd. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: weasd
+  missing_value_sentinel: '9.969209968386869e+36'
+  cf_standard_name: surface_snow_amount
+- id: amadeus:pvar/narr_psl_daily_surface.wvconv
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wvconv
+  native_name: wvconv
+  native_units_ucum: kg/m2
+  harmonization_note: File selector wvconv; field wvconv. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wvconv
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wvinc
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wvinc
+  native_name: wvinc
+  native_units_ucum: kg/m2
+  harmonization_note: File selector wvinc; field wvinc. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wvinc
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wvuflx
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wvuflx
+  native_name: wvuflx
+  native_units_ucum: kg/m
+  harmonization_note: File selector wvuflx; field wvuflx. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wvuflx
+  missing_value_sentinel: '9.969209968386869e+36'
+- id: amadeus:pvar/narr_psl_daily_surface.wvvflx
+  product: amadeus:product/narr_psl_daily_surface
+  canonical_variable: amadeus:var/narr_daily_wvvflx
+  native_name: wvvflx
+  native_units_ucum: kg/m
+  harmonization_note: File selector wvvflx; field wvvflx. Preserve source statistic Mean. Native _FillValue=9.969209968386869e+36;
+    missing_value=-9.969209968386869e+36; mask BOTH before decoding. No scale/offset is invented, and
+    no raw valid_range becomes a canonical physical bound. Daily sums of kg/m2 are temporal accumulation,
+    not spatial sums. Mean wind components remain components; derive speed/direction with an explicit
+    vector policy.
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: start
+  layer_name_template: '{native_name}_{YYYYMMDD}'
+  amadeus_variable_code: wvvflx
+  missing_value_sentinel: '9.969209968386869e+36'
