@@ -10,8 +10,8 @@
 #' Construct EDDI ASCII-grid URLs for Tuesdays within a date interval and
 #' download the selected accumulation timescale using the shared workflow.
 #' @param date character(1 or 2). Required date or inclusive range endpoints
-#'   in `"YYYY-MM-DD"` format, in either order. Dates must be between
-#'   1950-01-01 and today. A single Tuesday selects one file; an interval
+#'   in `"YYYY-MM-DD"` format, in either order.
+#'   A single Tuesday selects one file; an interval
 #'   containing no Tuesdays raises an error before directory creation.
 #' @param timescale integer(1). Required positive accumulation timescale in
 #'   months. Validation does not establish provider availability. The value

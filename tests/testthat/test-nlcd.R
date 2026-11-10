@@ -917,7 +917,7 @@ testthat::test_that("download_nlcd stops with invalid year", {
         download = FALSE
       )
     ),
-    "not recognized"
+    "Assertion on 'year' failed"
   )
 })
 

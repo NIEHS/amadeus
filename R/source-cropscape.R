@@ -16,7 +16,10 @@
 #' @param year integer(1 or more). One year, two endpoints, or a non-empty
 #'   vector of years. Every year from the minimum through the maximum is
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
-#'   Default is `1997:2023`. Missing, fractional, and future years are rejected.
+#'   Default is `1997:2023`. Valid years run from 1997 for GMU or 2008 for USDA
+#'   through the current calendar year, inclusive. Missing, fractional, or
+#'   out-of-range years cause the entire request to raise an error before
+#'   directory creation; years are not filtered or truncated.
 #' @param source character(1). Data source, either `"GMU"` (default) or
 #'   `"USDA"`. GMU requests use `YYYY_cdls.tar.gz` with a minimum year of
 #'   1997. USDA requests use `YYYY_30m_cdls.zip` with a minimum year of 2008;
@@ -28,7 +31,7 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. CropScape
 #'   archives and extracted rasters can require substantial storage.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation and a preflight check of the first URL. No
+#'   after directory creation, before the preflight check of the first URL. No
 #'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
@@ -59,9 +62,9 @@
 #' or an extracted TIFF path to [process_cropscape()].
 #'
 #' Preview destinations refer to the archive files in `zip_files/`.
-#' The preflight check contacts the first URL even in preview mode; a failed
-#' check emits a warning. Its request settings are separate from those used
-#' for file downloads.
+#' For actual downloads, the preflight check contacts the first URL; a failed
+#' check emits a warning. Preview mode skips this check. Its request settings
+#' are separate from those used for file downloads.
 #'
 #' Hashing covers all files under `data_files/`, including existing files,
 #' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
@@ -123,14 +126,13 @@ download_cropscape <- function(
   chr_source <- match.arg(source)
   checkmate::assert_choice(chr_source, c("GMU", "USDA"))
   # ----------------------------------------------------------------------------
-  # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
-  # ----------------------------------------------------------------------------
-  # Check year and source combinations.
+  # Check source-specific year bounds and generate sequence.
   int_minyear <- switch(chr_source, USDA = 2008, GMU = 1997)
-  if (min(int_years) < int_minyear) {
-    stop(sprintf("Year should be equal to or greater than %d.", int_minyear))
-  }
+  int_years <- amadeus:::sequence_years(
+    year,
+    min = int_minyear,
+    max = as.integer(format(Sys.Date(), "%Y"))
+  )
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)

@@ -21,8 +21,8 @@ download_usdm(
 }
 \arguments{
 \item{date}{character(1 or 2). Required date or inclusive range endpoints
-in \code{"YYYY-MM-DD"} format, in either order. Dates must be between
-1950-01-01 and today. A single Tuesday selects one archive; an interval
+in \code{"YYYY-MM-DD"} format, in either order.
+A single Tuesday selects one archive; an interval
 containing no Tuesdays raises an error before directory creation.}
 
 \item{directory_to_save}{character(1). Non-empty parent directory.

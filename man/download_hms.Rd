@@ -22,7 +22,11 @@ download_hms(
 \arguments{
 \item{data_format}{character(1). "Shapefile" or "KML".}
 
-\item{date}{character(1 or 2). Date range "YYYY-MM-DD" format}
+\item{date}{character(1 or 2). A single date or inclusive range endpoints
+in \code{"YYYY-MM-DD"} format, in either order. All dates must be between
+\code{"2005-08-05"} and today, inclusive. Any date outside this range causes
+the entire request to fail before directory creation or network requests;
+the range is not filtered or truncated.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 

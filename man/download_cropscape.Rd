@@ -23,7 +23,10 @@ download_cropscape(
 \item{year}{integer(1 or more). One year, two endpoints, or a non-empty
 vector of years. Every year from the minimum through the maximum is
 requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
-Default is \code{1997:2023}. Missing, fractional, and future years are rejected.}
+Default is \code{1997:2023}. Valid years run from 1997 for GMU or 2008 for USDA
+through the current calendar year, inclusive. Missing, fractional, or
+out-of-range years cause the entire request to raise an error before
+directory creation; years are not filtered or truncated.}
 
 \item{source}{character(1). Data source, either \code{"GMU"} (default) or
 \code{"USDA"}. GMU requests use \code{YYYY_cdls.tar.gz} with a minimum year of
@@ -39,7 +42,7 @@ extracted into separate per-archive directories under \verb{data_files/}.}
 archives and extracted rasters can require substantial storage.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation and a preflight check of the first URL. No
+after directory creation, before the preflight check of the first URL. No
 archives are downloaded or extracted in preview mode. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -96,9 +99,9 @@ each archive are preserved. Pass the corresponding per-archive directory
 or an extracted TIFF path to \code{\link[=process_cropscape]{process_cropscape()}}.
 
 Preview destinations refer to the archive files in \verb{zip_files/}.
-The preflight check contacts the first URL even in preview mode; a failed
-check emits a warning. Its request settings are separate from those used
-for file downloads.
+For actual downloads, the preflight check contacts the first URL; a failed
+check emits a warning. Preview mode skips this check. Its request settings
+are separate from those used for file downloads.
 
 Hashing covers all files under \verb{data_files/}, including existing files,
 and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still

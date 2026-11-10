@@ -106,14 +106,16 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         collection = "aqc_tavg_1hr_g1440x721_v1",
         acknowledgement = TRUE,
         directory_to_save = "."
-      )
+      ),
+      regexp = "Date must be >="
     )
     testthat::expect_error(
       download_aqs(
         year = c(1900, 2022),
         acknowledgement = TRUE,
         directory_to_save = "."
-      )
+      ),
+      regexp = "year"
     )
     testthat::expect_error(
       download_narr(
@@ -121,7 +123,8 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         variables = "air.sfc",
         acknowledgement = TRUE,
         directory_to_save = "."
-      )
+      ),
+      regexp = "year"
     )
     testthat::expect_error(
       download_merra2(
@@ -129,14 +132,16 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         collection = "inst1_2d_asm_Nx",
         directory_to_save = ".",
         acknowledgement = TRUE
-      )
+      ),
+      regexp = "Date must be >="
     )
     testthat::expect_error(
       download_hms(
         date = c("1900-01-01", "2018-01-01"),
         directory_to_save = ".",
         acknowledgement = TRUE
-      )
+      ),
+      regexp = "Date must be >="
     )
     testthat::expect_error(
       download_gridmet(
@@ -144,7 +149,8 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         variables = "Precipitation",
         acknowledgement = TRUE,
         directory_to_save = "."
-      )
+      ),
+      regexp = "year"
     )
     testthat::expect_error(
       download_terraclimate(
@@ -152,7 +158,8 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         variables = "Wind Speed",
         acknowledgement = TRUE,
         directory_to_save = ".",
-      )
+      ),
+      regexp = "year"
     )
   })
 })

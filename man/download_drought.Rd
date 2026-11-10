@@ -28,8 +28,8 @@ Uses \code{\link[base:match.arg]{base::match.arg()}}, allowing unambiguous parti
 
 \item{date}{character(1 or 2). One date or inclusive range endpoints in
 \code{"YYYY-MM-DD"} format, in either order. EDDI and USDM select Tuesdays
-within the interval and stop if none occur. Dates must be between
-1950-01-01 and today. Default is \code{c("2020-01-01", "2020-12-31")}.
+within the interval and stop if none occur.
+Default is \code{c("2020-01-01", "2020-12-31")}.
 Ignored for SPEI, which downloads a complete multi-year file.}
 
 \item{timescale}{integer(1). Positive accumulation timescale in months,

@@ -79,14 +79,34 @@ testthat::test_that("download_cropscape deprecation warnings", {
 
 testthat::test_that("download_cropscape (expected errors)", {
   # invalid source
-  testthat::expect_error(download_cropscape(year = 2020, source = "CMU"))
+  testthat::expect_error(
+    download_cropscape(
+      acknowledgement = TRUE,
+      directory_to_save = tempdir(),
+      year = 2020,
+      source = "CMU"
+    ),
+    regexp = "GMU|USDA"
+  )
   # GMU year too early
   testthat::expect_error(
-    download_cropscape(year = 1996, source = "GMU")
+    download_cropscape(
+      acknowledgement = TRUE,
+      directory_to_save = tempdir(),
+      year = 1996,
+      source = "GMU"
+    ),
+    regexp = "year"
   )
   # USDA year too early
   testthat::expect_error(
-    download_cropscape(year = 2000, source = "USDA")
+    download_cropscape(
+      acknowledgement = TRUE,
+      directory_to_save = tempdir(),
+      year = 2000,
+      source = "USDA"
+    ),
+    regexp = "year"
   )
 })
 

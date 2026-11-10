@@ -12,7 +12,11 @@
 #' and Smoke Product.
 #' @note HMS data does not require authentication.
 #' @param data_format character(1). "Shapefile" or "KML".
-#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param date character(1 or 2). A single date or inclusive range endpoints
+#'   in `"YYYY-MM-DD"` format, in either order. All dates must be between
+#'   `"2005-08-05"` and today, inclusive. Any date outside this range causes
+#'   the entire request to fail before directory creation or network requests;
+#'   the range is not filtered or truncated.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -81,10 +85,11 @@ download_hms <- function(
   checkmate::assert_choice(chr_format, c("shapefile", "kml"))
   # ----------------------------------------------------------------------------
   # Check `date` and generate sequence.
-  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
-  if (as.Date(chr_dates[1], format = "%Y%m%d") < as.Date("2005-08-05")) {
-    stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")
-  }
+  chr_dates <- amadeus:::sequence_dates(
+    date,
+    hyphen = FALSE,
+    min = "2005-08-05"
+  )
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)

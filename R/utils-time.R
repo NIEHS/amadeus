@@ -5,27 +5,39 @@
 ################################################################################
 #' Generate an inclusive sequence of years
 #' @description
-#' Validate all supplied years and generate every year from the minimum
-#' through the maximum, including both endpoints.
+#' Validate all supplied years against configurable lower and upper bounds,
+#' then generate every year from the smallest requested year through the
+#' largest, including both endpoints.
 #' @param year numeric(1 or more). A non-empty vector of non-missing,
-#'   integer-valued years between 1900 and the current calendar year.
+#'   integer-valued years between `min` and `max`, inclusive.
 #'   A single year, two endpoints, or a longer vector may be supplied in
 #'   any order; repeated years are accepted.
+#' @param min numeric(1). Inclusive lower bound for year validation.
+#'   Default is 1900.
+#' @param max numeric(1). Inclusive upper bound for year validation.
+#'   Defaults to the current calendar year when the function is called.
 #' @details Gaps are filled automatically: `c(2018, 2023)` and
 #'   `c(2018, 2020, 2023)` both return `2018:2023`.
-#'   Source-specific data availability limits are checked by the caller.
+#'   If any requested year is below `min` or above `max`,
+#'   the entire request raises an error; years are not filtered or truncated.
+#'   The default bounds are generic validation limits and do not establish
+#'   dataset coverage. Remote file availability is not checked.
 #' @return Numeric vector of consecutive years in ascending order, including
 #'   both endpoints. A single input year returns one value.
 #' @keywords internal
 #' @noRd
-sequence_years <- function(year) {
+sequence_years <- function(
+  year,
+  min = 1950,
+  max = as.integer(format(Sys.Date(), "%Y"))
+) {
   # ----------------------------------------------------------------------------
   # Validate every supplied year before selecting the range.
   checkmate::assert_integerish(
     year,
     min.len = 1L,
-    lower = 1900,
-    upper = as.integer(format(Sys.Date(), "%Y")),
+    lower = min,
+    upper = max,
     any.missing = FALSE
   )
   # ----------------------------------------------------------------------------
@@ -40,12 +52,25 @@ sequence_years <- function(year) {
 #' Generate an inclusive sequence of dates
 #' @description
 #' Generate consecutive daily dates from a single date or two range endpoints.
-#' Range endpoints are ordered before generating the sequence.
+#' Range endpoints are ordered, and requests outside the permitted range
+#' raise an error.
 #' @param date character(1 or 2). A single date or two range endpoints in
-#' `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
+#'   `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
+#'   Dates must be between `min` and `max`, inclusive.
+#' @param min Date(1) or character(1). Inclusive lower bound for date
+#'   validation. Character values use `"YYYY-MM-DD"` format. Default is
+#'   `"1900-01-01"`.
+#' @param max Date(1) or character(1). Inclusive upper bound for date
+#'   validation. Character values use `"YYYY-MM-DD"` format. Defaults to
+#'   `Sys.Date()` when the function is called.
 #' @param hyphen logical(1). Include hyphens in the returned date strings.
 #' If `FALSE` (the default), return `"YYYYMMDD"`; if `TRUE`, return
 #' `"YYYY-MM-DD"`.
+#' @details Bounds are checked before generating the sequence. Any requested
+#'   date outside the permitted range causes the entire request to raise an
+#'   error; dates are not filtered or truncated. The default bounds are
+#'   generic validation limits and do not establish dataset coverage.
+#'   Remote file availability is not checked.
 #' @return A character vector of daily dates in ascending order, including
 #' both endpoints. A single input date returns one date string. The output
 #' format is controlled by `hyphen`.
@@ -57,7 +82,12 @@ sequence_years <- function(year) {
 #' sequence_dates(c("2020-05-05", "2020-05-07"), hyphen = TRUE)
 #' @keywords internal auxiliary
 #' @export
-sequence_dates <- function(date, hyphen = FALSE) {
+sequence_dates <- function(
+  date,
+  min = "1950-01-01",
+  max = Sys.Date(),
+  hyphen = FALSE
+) {
   # ----------------------------------------------------------------------------
   # Ensure `hyphen` is TRUE/FALSE.
   checkmate::assert_flag(hyphen)
@@ -74,8 +104,8 @@ sequence_dates <- function(date, hyphen = FALSE) {
   # Ensure valid date range.
   checkmate::assert_date(
     as.Date(chr_dates, "%Y-%m-%d"),
-    lower = as.Date("1950-01-01"),
-    upper = Sys.Date()
+    lower = as.Date(min, "%Y-%m-%d"),
+    upper = as.Date(max, "%Y-%m-%d")
   )
   # ----------------------------------------------------------------------------
   # Generate sequence.

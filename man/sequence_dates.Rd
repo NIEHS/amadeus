@@ -4,11 +4,20 @@
 \alias{sequence_dates}
 \title{Generate an inclusive sequence of dates}
 \usage{
-sequence_dates(date, hyphen = FALSE)
+sequence_dates(date, min = "1950-01-01", max = Sys.Date(), hyphen = FALSE)
 }
 \arguments{
 \item{date}{character(1 or 2). A single date or two range endpoints in
-\code{"YYYY-MM-DD"} format. Endpoints may be supplied in either order.}
+\code{"YYYY-MM-DD"} format. Endpoints may be supplied in either order.
+Dates must be between \code{min} and \code{max}, inclusive.}
+
+\item{min}{Date(1) or character(1). Inclusive lower bound for date
+validation. Character values use \code{"YYYY-MM-DD"} format. Default is
+\code{"1900-01-01"}.}
+
+\item{max}{Date(1) or character(1). Inclusive upper bound for date
+validation. Character values use \code{"YYYY-MM-DD"} format. Defaults to
+\code{Sys.Date()} when the function is called.}
 
 \item{hyphen}{logical(1). Include hyphens in the returned date strings.
 If \code{FALSE} (the default), return \code{"YYYYMMDD"}; if \code{TRUE}, return
@@ -21,7 +30,15 @@ format is controlled by \code{hyphen}.
 }
 \description{
 Generate consecutive daily dates from a single date or two range endpoints.
-Range endpoints are ordered before generating the sequence.
+Range endpoints are ordered, and requests outside the permitted range
+raise an error.
+}
+\details{
+Bounds are checked before generating the sequence. Any requested
+date outside the permitted range causes the entire request to raise an
+error; dates are not filtered or truncated. The default bounds are
+generic validation limits and do not establish dataset coverage.
+Remote file availability is not checked.
 }
 \examples{
 sequence_dates("2020-05-05")

@@ -10,8 +10,8 @@
 #' Download U.S. Drought Monitor ZIP archives for Tuesdays within a date
 #' interval, with optional extraction of drought-class shapefiles.
 #' @param date character(1 or 2). Required date or inclusive range endpoints
-#'   in `"YYYY-MM-DD"` format, in either order. Dates must be between
-#'   1950-01-01 and today. A single Tuesday selects one archive; an interval
+#'   in `"YYYY-MM-DD"` format, in either order.
+#'   A single Tuesday selects one archive; an interval
 #'   containing no Tuesdays raises an error before directory creation.
 #' @param directory_to_save character(1). Non-empty parent directory.
 #'   Archives are saved in `zip_files/` and extracted into `data_files/`.

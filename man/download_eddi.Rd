@@ -20,8 +20,8 @@ download_eddi(
 }
 \arguments{
 \item{date}{character(1 or 2). Required date or inclusive range endpoints
-in \code{"YYYY-MM-DD"} format, in either order. Dates must be between
-1950-01-01 and today. A single Tuesday selects one file; an interval
+in \code{"YYYY-MM-DD"} format, in either order.
+A single Tuesday selects one file; an interval
 containing no Tuesdays raises an error before directory creation.}
 
 \item{timescale}{integer(1). Required positive accumulation timescale in

@@ -132,10 +132,7 @@ download_nlcd <- function(
   )
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
-  if (!all(int_years %in% 1985:2024L)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  }
+  int_years <- amadeus:::sequence_years(year, min = 1985, max = 2024)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
