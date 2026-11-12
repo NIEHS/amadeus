@@ -55,11 +55,9 @@
 #' and `tri_raw_2020_TBL.csv` for `"tbl"`. Tribal download URLs use lowercase
 #' `tbl`, while local file names use uppercase `TBL`.
 #'
-#' The output directory is created and the first planned URL is checked before
-#' returning a preview or downloading. A failed preflight check emits a warning
-#' and allows execution to continue; it does not verify availability for every
-#' requested year. Preview mode therefore still makes network requests and may
-#' create directories.
+#' The output directory is created before returning a preview or downloading.
+#' Preview mode makes no network requests. Individual download failures are
+#' recorded by [download_run_method()] during file transfers.
 #'
 #' Previews include all planned files, including those already present locally.
 #' During downloading, [download_run_method()] skips existing non-empty files;
@@ -160,9 +158,6 @@ download_tri <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

@@ -163,22 +163,36 @@ testthat::test_that("download_gridmet mock download with hash", {
   })
 })
 
-testthat::test_that("download_gridmet continues when preflight check fails transiently", {
+testthat::test_that("download_gridmet(download=TRUE): reports HTTP failures", {
+  urls_seen <- character()
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path, ...) {
+      urls_seen <<- c(urls_seen, req$url)
+      stop("HTTP 404")
+    },
+    .package = "httr2"
+  )
   withr::with_tempdir({
     testthat::expect_warning(
       result <- suppressMessages(
         download_gridmet(
           variables = "Precipitation",
-          year = c(1918, 1919),
+          year = c(2018, 2019),
           directory_to_save = ".",
-          acknowledgement = TRUE
+          acknowledgement = TRUE,
+          show_progress = FALSE,
+          max_tries = 1L,
+          rate_limit = 1
         )
       ),
-      regexp = "Preflight URL check failed"
+      regexp = "2 file\\(s\\) failed to download"
     )
   })
   testthat::expect_type(result, "list")
   testthat::expect_length(result$failed_urls, 2)
+  testthat::expect_length(urls_seen, 2L)
+  testthat::expect_identical(result$failed_urls, urls_seen)
+  testthat::expect_equal(result$failed, 2L)
 })
 
 testthat::test_that("download_gridmet mock download hash=FALSE", {

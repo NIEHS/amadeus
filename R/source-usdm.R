@@ -35,8 +35,7 @@
 #'
 #' Both `zip_files/` and `data_files/` are created before a preview returns,
 #' including when extraction is disabled. Preview results include existing
-#' archive paths and require no network requests. Actual downloads check the
-#' first URL; a failed preflight warns and downloading is still attempted.
+#' archive paths and require no network requests.
 #'
 #' [download_run_method()] skips existing non-empty archives and records
 #' individual download failures. All planned archives are subsequently passed
@@ -129,9 +128,6 @@ download_usdm <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

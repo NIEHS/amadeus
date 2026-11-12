@@ -31,7 +31,7 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. CropScape
 #'   archives and extracted rasters can require substantial storage.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation, before the preflight check of the first URL. No
+#'   after directory creation, without contacting the provider. No
 #'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
@@ -63,9 +63,9 @@
 #' or an extracted TIFF path to [process_cropscape()].
 #'
 #' Preview destinations refer to the archive files in `zip_files/`.
-#' For actual downloads, the preflight check contacts the first URL; a failed
-#' check emits a warning. Preview mode skips this check. Its request settings
-#' are separate from those used for file downloads.
+#' Actual downloads use [download_run_method()], which skips existing
+#' non-empty archives and records individual download failures. Existing
+#' archives are still passed to extraction when `unzip = TRUE`.
 #'
 #' Hashing covers all files recursively under `data_files/`, including the
 #' per-archive subdirectories and existing files, and excludes archives in
@@ -169,9 +169,6 @@ download_cropscape <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

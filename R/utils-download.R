@@ -223,35 +223,6 @@ check_urls <- function(
 }
 
 ################################################################################
-#' Check a download URL before downloading
-#' @description
-#' Check a single download URL with [check_url_status()] and warn if the check
-#' fails, allowing the calling download function to continue.
-#' @param url character(1). Download URL to check.
-#' @details
-#' HTTP status codes 200 and 206 are treated as successful by
-#' [check_url_status()], which tries a HEAD request followed by a ranged GET
-#' when necessary. A failed check emits a warning; the caller handles any
-#' subsequent download attempt.
-#' @return NULL, invisibly. Called for its warning side effect.
-#' @seealso [check_url_status()]
-#' @keywords internal
-#' @noRd
-check_preflight <- function(url) {
-  # ----------------------------------------------------------------------------
-  # Warn if the URL check fails so the caller can continue downloading.
-  if (!amadeus:::check_url_status(url)) {
-    warning(
-      paste0(
-        "Preflight URL check failed; attempting direct download ",
-        "for year validation.\n"
-      ),
-      call. = FALSE
-    )
-  }
-}
-
-################################################################################
 #' Preview planned downloads
 #' @description
 #' Print a message reporting the number of planned downloads and return their

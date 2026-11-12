@@ -129,11 +129,10 @@ testthat::test_that("download_terraclimate mock download with hash", {
 })
 
 testthat::test_that(
-  "download_terraclimate continues when preflight check fails transiently",
+  "download_terraclimate(download=TRUE): returns the runner's result",
   {
     run_called <- FALSE
     testthat::local_mocked_bindings(
-      check_url_status = function(...) FALSE,
       check_destfile = function(...) TRUE,
       download_run_method = function(...) {
         run_called <<- TRUE
@@ -151,7 +150,7 @@ testthat::test_that(
             acknowledgement = TRUE
           )
         ),
-        regexp = "Preflight URL check failed"
+        regexp = NA
       )
       testthat::expect_true(run_called)
       testthat::expect_equal(result$success, 1L)

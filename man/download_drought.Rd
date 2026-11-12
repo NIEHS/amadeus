@@ -54,8 +54,7 @@ ignored when \code{download = FALSE}.}
 \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
-the initial attempt. Must be at least 1. Default is \code{3L}. Preflight
-checks use their own request settings.}
+the initial attempt. Must be at least 1. Default is \code{3L}.}
 
 \item{rate_limit}{numeric(1). Finite, non-negative request-throttling
 interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
@@ -69,7 +68,7 @@ Requires \code{unzip = TRUE} for USDM. Default is \code{FALSE}. Ignored for SPEI
 and EDDI.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a
-preview after directory creation, before preflight checks or downloading.
+preview after directory creation, without making network requests.
 Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -111,10 +110,9 @@ validation occurs once in the source function; this wrapper does not
 repeat validation, directory creation, or download execution.
 
 Previews create the output directories but make no network requests.
-They include existing destination files. Actual downloads check the first
-URL before calling \code{\link[=download_run_method]{download_run_method()}}, which skips existing non-empty
-files and reports individual failures. A failed preflight warns and allows
-downloading to proceed. See the source functions for endpoint limitations
+They include existing destination files. Actual downloads use
+\code{\link[=download_run_method]{download_run_method()}}, which skips existing non-empty files and reports
+individual failures. See the source functions for endpoint limitations
 and extraction behavior.
 
 SPEI retains the flat \code{speiNN.nc} filename across versions for compatibility

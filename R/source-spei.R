@@ -39,9 +39,9 @@
 #'
 #' A preview creates the output directory and returns the URL and destination
 #' without contacting the server. Existing files remain in the preview.
-#' Actual downloads perform a preflight check, which warns on failure, then
-#' call [download_run_method()]. The runner skips existing non-empty files
-#' and reports failures without selecting another database version.
+#' Actual downloads use [download_run_method()], which skips existing
+#' non-empty files and reports failures without selecting another database
+#' version.
 #' @return With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files` (one). Otherwise, an invisible download summary
 #'   from [download_run_method()] when `hash = FALSE`, or a visible character
@@ -120,9 +120,6 @@ download_spei <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_url, chr_filename)))
   }
-  # ----------------------------------------------------------------------------
-  # Check the selected URL; downloads do not fall back to another version.
-  amadeus:::check_preflight(chr_url)
   # ----------------------------------------------------------------------------
   # Run download, including existing-file checks and failure reporting.
   download_result <- amadeus:::download_run_method(

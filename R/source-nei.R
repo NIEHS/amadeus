@@ -25,7 +25,7 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
 #'   archives and extracted CSV files can require substantial storage.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation, before the preflight check of the first URL. No
+#'   after directory creation, without contacting the provider. No
 #'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
@@ -61,9 +61,8 @@
 #' files that already exist locally. For actual downloads,
 #' [download_run_method()] skips existing non-empty archives; they are still
 #' passed to extraction when `unzip = TRUE`.
-#' For actual downloads, the preflight check contacts the first URL; a failed
-#' check emits a warning. Preview mode skips this check. Its request settings
-#' are separate from those used for file downloads.
+#' Preview mode makes no network requests. Individual download failures are
+#' recorded by the shared runner during file transfers.
 #'
 #' Hashing covers all files recursively under `data_files/`, including the
 #' per-archive subdirectories and existing files, and excludes archives in
@@ -206,9 +205,6 @@ download_nei <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

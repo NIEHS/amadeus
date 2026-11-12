@@ -34,8 +34,7 @@
 #'   `TRUE`. Other status and summary messages may still be printed when
 #'   `FALSE`.
 #' @param max_tries integer(1). Maximum attempts per file request, including
-#'   the initial attempt. Must be at least 1. Default is `3L`. Preflight
-#'   checks use their own request settings.
+#'   the initial attempt. Must be at least 1. Default is `3L`.
 #' @param rate_limit numeric(1). Finite, non-negative request-throttling
 #'   interval in seconds, passed to [download_run_method()]. Default is 2.
 #' @param unzip logical(1). Extract USDM archives into `data_files/`.
@@ -45,7 +44,7 @@
 #'   Requires `unzip = TRUE` for USDM. Default is `FALSE`. Ignored for SPEI
 #'   and EDDI.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a
-#'   preview after directory creation, before preflight checks or downloading.
+#'   preview after directory creation, without making network requests.
 #'   Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
@@ -62,10 +61,9 @@
 #' repeat validation, directory creation, or download execution.
 #'
 #' Previews create the output directories but make no network requests.
-#' They include existing destination files. Actual downloads check the first
-#' URL before calling [download_run_method()], which skips existing non-empty
-#' files and reports individual failures. A failed preflight warns and allows
-#' downloading to proceed. See the source functions for endpoint limitations
+#' They include existing destination files. Actual downloads use
+#' [download_run_method()], which skips existing non-empty files and reports
+#' individual failures. See the source functions for endpoint limitations
 #' and extraction behavior.
 #'
 #' SPEI retains the flat `speiNN.nc` filename across versions for compatibility

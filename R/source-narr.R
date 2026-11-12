@@ -253,9 +253,6 @@ download_narr <- function(
     )))
   }
   # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
-  # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(
     urls = df_download$url,

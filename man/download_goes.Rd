@@ -36,8 +36,8 @@ see Details.}
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation, discovery, and the preflight check, without
-downloading data files. Default is \code{TRUE}.}
+after directory creation and discovery, without downloading data files.
+Discovery still queries S3 listings in preview mode. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
 Default is \code{FALSE}.}
@@ -93,14 +93,12 @@ be incomplete when a daily listing spans multiple pages.
 A successfully retrieved listing with no matching files emits a message
 and contributes no rows. Errors while requesting, parsing, or processing
 any listing stop discovery before downloading. Files are not required for
-every requested date. If all listings are empty, the preflight check warns;
-\code{download = TRUE} then errors with \code{"No URLs provided for download."},
-whereas \code{download = FALSE} returns an empty preview.
+every requested date. If all listings are empty, \code{download = TRUE} errors
+with \code{"No URLs provided for download."}, whereas \code{download = FALSE} returns
+an empty preview.
 
 Discovery uses a 60-second timeout per request attempt. File downloads use
-\code{\link[=download_run_method]{download_run_method()}}'s default timeout of 3600 seconds. The preflight
-check probes the first discovered URL using its own request settings; a
-failed check warns and allows the download or preview to proceed.
+\code{\link[=download_run_method]{download_run_method()}}'s default timeout of 3600 seconds.
 }
 \note{
 \itemize{

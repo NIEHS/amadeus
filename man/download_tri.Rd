@@ -89,11 +89,9 @@ File names depend on the selected jurisdiction. For example, requests for
 and \code{tri_raw_2020_TBL.csv} for \code{"tbl"}. Tribal download URLs use lowercase
 \code{tbl}, while local file names use uppercase \code{TBL}.
 
-The output directory is created and the first planned URL is checked before
-returning a preview or downloading. A failed preflight check emits a warning
-and allows execution to continue; it does not verify availability for every
-requested year. Preview mode therefore still makes network requests and may
-create directories.
+The output directory is created before returning a preview or downloading.
+Preview mode makes no network requests. Individual download failures are
+recorded by \code{\link[=download_run_method]{download_run_method()}} during file transfers.
 
 Previews include all planned files, including those already present locally.
 During downloading, \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty files;

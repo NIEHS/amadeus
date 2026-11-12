@@ -40,8 +40,9 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed, acknowledging
 #'   that the downloads may require substantial storage and memory.
 #' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
-#'   a download preview. Authentication checks, file discovery, directory
-#'   creation, and the preflight URL check still run before returning.
+#'   a download preview. Required token lookup, directory creation, and file
+#'   discovery still run before returning. Standard collections require remote
+#'   listing requests in preview mode; FWI URLs are constructed locally.
 #' @param remove_command logical(1). Deprecated and ignored. `TRUE` emits a
 #'   warning.
 #' @param hash logical(1). If `TRUE`, return the combined MD5 hash calculated
@@ -73,10 +74,9 @@
 #'
 #' Listing requests to the same host are spaced by at least `rate_limit`
 #' seconds; 0 disables listing throttling. File downloads use the host-based
-#' token bucket described in [download_run_method()]. The preflight URL check
-#' uses its own request settings. Discovery and file downloads use their
-#' default per-attempt timeout of 3600 seconds; this function does not expose
-#' a `timeout` argument.
+#' token bucket described in [download_run_method()]. Discovery and file
+#' downloads use their default per-attempt timeout of 3600 seconds; this
+#' function does not expose a `timeout` argument.
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return
 #' With `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -282,9 +282,6 @@ download_merra2 <- function(
       df_download$destfile
     )))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

@@ -60,7 +60,7 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. Archives and
 #'   extracted data can require substantial storage.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation, before preflight checks or file downloads.
+#'   after directory creation, without making network requests.
 #'   Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   Default is `FALSE`.
@@ -109,11 +109,9 @@
 #' requests and does not verify remote availability. No shell-command file
 #' is created.
 #'
-#' Full downloads check the first URL with the shared preflight helper.
-#' A failed preflight emits a warning and downloading is still attempted.
 #' [download_run_method()] skips existing non-empty destination files and
-#' records individual download failures in its summary. The preflight check
-#' uses its own retry settings; file downloads use the shared default timeout.
+#' records individual download failures in its summary. File downloads use
+#' the shared default timeout.
 #' Extraction and cleanup occur before returning, and extraction errors can
 #' prevent a normal return. Summary counts describe downloads, not extraction.
 #' @return
@@ -470,9 +468,6 @@ download_edgar <- function(
       df_download$destfile
     )))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

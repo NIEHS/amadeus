@@ -488,15 +488,23 @@ testthat::test_that("download_edgar mock download with hash", {
 })
 
 ################################################################################
-##### download_edgar missing URL warning branch (some URLs return FALSE)
-testthat::test_that("download_edgar missing URL warning path", {
+##### download_edgar delegates transfers without preliminary URL probes
+testthat::test_that("download_edgar(download=TRUE): skips URL probes", {
   call_idx <- 0L
   testthat::local_mocked_bindings(
     check_url_status = function(u, ...) {
       call_idx <<- call_idx + 1L
-      call_idx > 1L # First URL is invalid (FALSE), rest are valid (TRUE)
+      FALSE
     },
-    download_run_method = function(...) list(success = 1, failed = 0),
+    download_run_method = function(urls, ...) {
+      list(
+        success = length(urls),
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
+    },
     download_unzip = function(...) invisible(NULL),
     download_remove_zips = function(...) invisible(NULL),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
@@ -504,7 +512,7 @@ testthat::test_that("download_edgar missing URL warning path", {
   )
   withr::with_tempdir({
     testthat::expect_warning(
-      suppressMessages(
+      result <- suppressMessages(
         download_edgar(
           species = c("CO", "SO2"),
           temp_res = "yearly",
@@ -517,18 +525,20 @@ testthat::test_that("download_edgar missing URL warning path", {
           hash = FALSE
         )
       ),
-      "Preflight URL check failed"
+      regexp = NA
     )
+    testthat::expect_identical(call_idx, 0L)
+    testthat::expect_equal(result$success, 2L)
+    testthat::expect_equal(result$failed, 0L)
   })
 })
 
 ################################################################################
-##### download_edgar all-URLs-invalid error (covers line 4057)
-testthat::test_that("download_edgar(download=TRUE): warns on failed preflight and returns failures", {
+##### download_edgar preserves the runner's failure summary
+testthat::test_that("download_edgar(download=TRUE): returns failure details", {
   urls_seen <- NULL
   # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
-    check_url_status = function(...) FALSE,
     download_run_method = function(urls, destfiles, ...) {
       urls_seen <<- urls
       list(
@@ -545,21 +555,18 @@ testthat::test_that("download_edgar(download=TRUE): warns on failed preflight an
   )
   # ----------------------------------------------------------------------------
   withr::with_tempdir({
-    testthat::expect_warning(
-      result <- suppressMessages(
-        download_edgar(
-          species = "CO",
-          temp_res = "yearly",
-          sector_yearly = "ENE",
-          year_range = c(2021, 2022),
-          acknowledgement = TRUE,
-          download = TRUE,
-          directory_to_save = ".",
-          unzip = FALSE,
-          hash = FALSE
-        )
-      ),
-      regexp = "Preflight URL check failed"
+    result <- suppressMessages(
+      download_edgar(
+        species = "CO",
+        temp_res = "yearly",
+        sector_yearly = "ENE",
+        year_range = c(2021, 2022),
+        acknowledgement = TRUE,
+        download = TRUE,
+        directory_to_save = ".",
+        unzip = FALSE,
+        hash = FALSE
+      )
     )
     # --------------------------------------------------------------------------
     testthat::expect_length(urls_seen, 2L)

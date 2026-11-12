@@ -55,8 +55,9 @@ are saved in that collection's \code{metadata} subdirectory.}
 that the downloads may require substantial storage and memory.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} emits a warning and returns
-a download preview. Authentication checks, file discovery, directory
-creation, and the preflight URL check still run before returning.}
+a download preview. Required token lookup, directory creation, and file
+discovery still run before returning. Standard collections require remote
+listing requests in preview mode; FWI URLs are constructed locally.}
 
 \item{remove_command}{logical(1). Deprecated and ignored. \code{TRUE} emits a
 warning.}
@@ -113,10 +114,9 @@ warning after the remaining files have been attempted.
 
 Listing requests to the same host are spaced by at least \code{rate_limit}
 seconds; 0 disables listing throttling. File downloads use the host-based
-token bucket described in \code{\link[=download_run_method]{download_run_method()}}. The preflight URL check
-uses its own request settings. Discovery and file downloads use their
-default per-attempt timeout of 3600 seconds; this function does not expose
-a \code{timeout} argument.
+token bucket described in \code{\link[=download_run_method]{download_run_method()}}. Discovery and file
+downloads use their default per-attempt timeout of 3600 seconds; this
+function does not expose a \code{timeout} argument.
 }
 \note{
 Due to NASA data access policies, standard MERRA-2 GES DISC downloads

@@ -57,11 +57,9 @@
 #' `zip_files/` and `data_files/` are sibling directories created beneath
 #' `directory_to_save`, including when `unzip = FALSE` or `download = FALSE`.
 #'
-#' Actual downloads check the first planned URL before downloading.
-#' A failed preflight check emits a warning and allows execution to continue;
-#' it does not verify availability for every requested year. Preview mode
-#' creates the output directories but skips the preflight check and makes no
-#' network requests.
+#' Preview mode creates the output directories and makes no network requests.
+#' Individual download failures are recorded by [download_run_method()] during
+#' file transfers.
 #'
 #' All archives share `data_files/` as their extraction destination. Names
 #' and paths stored inside each archive are preserved. Pass the directory
@@ -175,9 +173,6 @@ download_improve <- function(
   if (!isTRUE(download)) {
     return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

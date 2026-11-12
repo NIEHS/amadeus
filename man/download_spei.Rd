@@ -38,7 +38,7 @@ for previews. Downloads and extracted files may require substantial
 storage. Default is \code{FALSE}.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a
-preview after directory creation, before preflight checks or downloading.
+preview after directory creation, without making network requests.
 Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -53,8 +53,7 @@ summary. Default is \code{FALSE}; ignored when \code{download = FALSE}.}
 \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
-the initial attempt. Must be at least 1. Default is \code{3L}. Preflight
-checks use their own request settings.}
+the initial attempt. Must be at least 1. Default is \code{3L}.}
 
 \item{rate_limit}{numeric(1). Finite, non-negative request-throttling
 interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
@@ -88,9 +87,9 @@ when retaining multiple versions.
 
 A preview creates the output directory and returns the URL and destination
 without contacting the server. Existing files remain in the preview.
-Actual downloads perform a preflight check, which warns on failure, then
-call \code{\link[=download_run_method]{download_run_method()}}. The runner skips existing non-empty files
-and reports failures without selecting another database version.
+Actual downloads use \code{\link[=download_run_method]{download_run_method()}}, which skips existing
+non-empty files and reports failures without selecting another database
+version.
 }
 \examples{
 \dontrun{

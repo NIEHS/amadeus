@@ -90,7 +90,7 @@ Archives are saved in \verb{zip_files/} and extracted into \verb{data_files/}.}
 extracted data can require substantial storage.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation, before preflight checks or file downloads.
+after directory creation, without making network requests.
 Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -164,11 +164,9 @@ files. A preview creates the output directories but makes no network
 requests and does not verify remote availability. No shell-command file
 is created.
 
-Full downloads check the first URL with the shared preflight helper.
-A failed preflight emits a warning and downloading is still attempted.
 \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty destination files and
-records individual download failures in its summary. The preflight check
-uses its own retry settings; file downloads use the shared default timeout.
+records individual download failures in its summary. File downloads use
+the shared default timeout.
 Extraction and cleanup occur before returning, and extraction errors can
 prevent a normal return. Summary counts describe downloads, not extraction.
 }

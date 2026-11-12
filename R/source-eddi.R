@@ -33,10 +33,8 @@
 #'
 #' A preview creates the output directory and returns all planned URLs and
 #' destinations, including existing files, without contacting the provider.
-#' Actual downloads check the first URL before calling [download_run_method()].
-#' The current preflight helper uses HTTP status checks although these URLs
-#' use FTP; a failed check warns and allows the download attempt to proceed.
-#' The runner skips existing non-empty files and records individual failures.
+#' Actual downloads use [download_run_method()], which skips existing non-empty
+#' files and records individual transfer failures.
 #' @return With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files`. Otherwise, an invisible download summary from
 #'   [download_run_method()] when `hash = FALSE`, or a visible character scalar
@@ -133,9 +131,6 @@ download_eddi <- function(
       df_download$destfile
     )))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

@@ -48,7 +48,8 @@ are saved directly in this directory.}
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after token lookup, discovery, directory creation, and the preflight check.}
+after token lookup, directory creation, and discovery. Discovery still
+queries CMR in preview mode; data files are not downloaded.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.}
 
@@ -105,8 +106,7 @@ endpoints. A file count is reported without claiming daily or monthly
 completeness for tiled, swath, or composite products.
 
 Discovery keeps the existing 120-second per-attempt timeout; file downloads
-use \code{\link[=download_run_method]{download_run_method()}}'s default timeout. The preflight check uses its
-own request settings.
+use \code{\link[=download_run_method]{download_run_method()}}'s default timeout.
 }
 \examples{
 \dontrun{

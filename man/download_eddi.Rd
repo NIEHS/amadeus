@@ -37,7 +37,7 @@ for previews. Downloads and extracted files may require substantial
 storage. Default is \code{FALSE}.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a
-preview after directory creation, before preflight checks or downloading.
+preview after directory creation, without making network requests.
 Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -52,8 +52,7 @@ summary. Default is \code{FALSE}; ignored when \code{download = FALSE}.}
 \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
-the initial attempt. Must be at least 1. Default is \code{3L}. Preflight
-checks use their own request settings.}
+the initial attempt. Must be at least 1. Default is \code{3L}.}
 
 \item{rate_limit}{numeric(1). Finite, non-negative request-throttling
 interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
@@ -82,10 +81,8 @@ not discovered from directory listings.
 
 A preview creates the output directory and returns all planned URLs and
 destinations, including existing files, without contacting the provider.
-Actual downloads check the first URL before calling \code{\link[=download_run_method]{download_run_method()}}.
-The current preflight helper uses HTTP status checks although these URLs
-use FTP; a failed check warns and allows the download attempt to proceed.
-The runner skips existing non-empty files and records individual failures.
+Actual downloads use \code{\link[=download_run_method]{download_run_method()}}, which skips existing non-empty
+files and records individual transfer failures.
 }
 \examples{
 \dontrun{

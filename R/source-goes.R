@@ -32,8 +32,8 @@
 #'   see Details.
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation, discovery, and the preflight check, without
-#'   downloading data files. Default is `TRUE`.
+#'   after directory creation and discovery, without downloading data files.
+#'   Discovery still queries S3 listings in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   Default is `FALSE`.
 #' @param show_progress logical(1). Show per-file download progress. Default
@@ -66,14 +66,12 @@
 #' A successfully retrieved listing with no matching files emits a message
 #' and contributes no rows. Errors while requesting, parsing, or processing
 #' any listing stop discovery before downloading. Files are not required for
-#' every requested date. If all listings are empty, the preflight check warns;
-#' `download = TRUE` then errors with `"No URLs provided for download."`,
-#' whereas `download = FALSE` returns an empty preview.
+#' every requested date. If all listings are empty, `download = TRUE` errors
+#' with `"No URLs provided for download."`, whereas `download = FALSE` returns
+#' an empty preview.
 #'
 #' Discovery uses a 60-second timeout per request attempt. File downloads use
-#' [download_run_method()]'s default timeout of 3600 seconds. The preflight
-#' check probes the first discovered URL using its own request settings; a
-#' failed check warns and allows the download or preview to proceed.
+#' [download_run_method()]'s default timeout of 3600 seconds.
 #' @return
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
@@ -188,9 +186,6 @@ download_goes <- function(
       df_download$destfile
     )))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity.
-  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus:::download_run_method(

@@ -42,7 +42,7 @@ extracted into separate per-archive directories under \verb{data_files/}.}
 archives and extracted rasters can require substantial storage.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation, before the preflight check of the first URL. No
+after directory creation, without contacting the provider. No
 archives are downloaded or extracted in preview mode. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -100,9 +100,9 @@ each archive are preserved. Pass the corresponding per-archive directory
 or an extracted TIFF path to \code{\link[=process_cropscape]{process_cropscape()}}.
 
 Preview destinations refer to the archive files in \verb{zip_files/}.
-For actual downloads, the preflight check contacts the first URL; a failed
-check emits a warning. Preview mode skips this check. Its request settings
-are separate from those used for file downloads.
+Actual downloads use \code{\link[=download_run_method]{download_run_method()}}, which skips existing
+non-empty archives and records individual download failures. Existing
+archives are still passed to extraction when \code{unzip = TRUE}.
 
 Hashing covers all files recursively under \verb{data_files/}, including the
 per-archive subdirectories and existing files, and excludes archives in

@@ -95,11 +95,9 @@ The selected product determines the filename prefix. For example,
 \verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
 \code{directory_to_save}, including when \code{unzip = FALSE} or \code{download = FALSE}.
 
-Actual downloads check the first planned URL before downloading.
-A failed preflight check emits a warning and allows execution to continue;
-it does not verify availability for every requested year. Preview mode
-creates the output directories but skips the preflight check and makes no
-network requests.
+Preview mode creates the output directories and makes no network requests.
+Individual download failures are recorded by \code{\link[=download_run_method]{download_run_method()}} during
+file transfers.
 
 All archives share \verb{data_files/} as their extraction destination. Names
 and paths stored inside each archive are preserved. Pass the directory

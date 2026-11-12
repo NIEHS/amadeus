@@ -35,7 +35,7 @@ extracted into separate per-archive directories under \verb{data_files/}.}
 archives and extracted CSV files can require substantial storage.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation, before the preflight check of the first URL. No
+after directory creation, without contacting the provider. No
 archives are downloaded or extracted in preview mode. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -96,9 +96,8 @@ Preview destinations refer to the archives in \verb{zip_files/}, including
 files that already exist locally. For actual downloads,
 \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives; they are still
 passed to extraction when \code{unzip = TRUE}.
-For actual downloads, the preflight check contacts the first URL; a failed
-check emits a warning. Preview mode skips this check. Its request settings
-are separate from those used for file downloads.
+Preview mode makes no network requests. Individual download failures are
+recorded by the shared runner during file transfers.
 
 Hashing covers all files recursively under \verb{data_files/}, including the
 per-archive subdirectories and existing files, and excludes archives in

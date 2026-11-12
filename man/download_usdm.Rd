@@ -33,7 +33,7 @@ for previews. Downloads and extracted files may require substantial
 storage. Default is \code{FALSE}.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a
-preview after directory creation, before preflight checks or downloading.
+preview after directory creation, without making network requests.
 Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -49,8 +49,7 @@ With \code{unzip = FALSE}, hashing still uses \verb{data_files/}, not the archiv
 \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
-the initial attempt. Must be at least 1. Default is \code{3L}. Preflight
-checks use their own request settings.}
+the initial attempt. Must be at least 1. Default is \code{3L}.}
 
 \item{rate_limit}{numeric(1). Finite, non-negative request-throttling
 interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
@@ -87,8 +86,7 @@ directory listings or establish availability for every selected date.
 
 Both \verb{zip_files/} and \verb{data_files/} are created before a preview returns,
 including when extraction is disabled. Preview results include existing
-archive paths and require no network requests. Actual downloads check the
-first URL; a failed preflight warns and downloading is still attempted.
+archive paths and require no network requests.
 
 \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives and records
 individual download failures. All planned archives are subsequently passed

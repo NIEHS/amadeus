@@ -721,10 +721,9 @@ testthat::test_that("download_drought USDM hash=TRUE returns hash", {
 })
 
 testthat::test_that(
-  "download_drought(source=usdm): continues after failed preflight", {
+  "download_drought(source=usdm): forwards URLs and returns results", {
     captured_urls <- NULL
     testthat::local_mocked_bindings(
-      check_url_status = function(...) FALSE,
       check_destfile = function(...) TRUE,
       download_run_method = function(urls, ...) {
         captured_urls <<- urls
@@ -748,7 +747,7 @@ testthat::test_that(
           directory_to_save = ".",
           acknowledgement = TRUE
         )),
-        regexp = "Preflight URL check failed; attempting direct download"
+        regexp = NA
       )
       testthat::expect_identical(
         result,
@@ -1587,37 +1586,32 @@ testthat::test_that("download_drought(source=spei, hash=TRUE): hashes existing f
   })
 })
 
-testthat::test_that("download_drought(source=spei): warns before download errors", {
+testthat::test_that("download_drought(source=spei): propagates errors", {
   testthat::local_mocked_bindings(
     check_destfile = function(...) TRUE,
-    check_url_status = function(...) FALSE,
     download_run_method = function(...) stop("HTTP 404"),
     .package = "amadeus"
   )
   withr::with_tempdir({
-    testthat::expect_warning(
-      testthat::expect_error(
-        amadeus::download_drought(
-          source = "spei",
-          date = "2020-01-01",
-          timescale = 1L,
-          directory_to_save = ".",
-          acknowledgement = TRUE
-        ),
-        "HTTP 404|SPEI timescale"
+    testthat::expect_error(
+      amadeus::download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
       ),
-      "Preflight URL check failed; attempting direct download"
+      "HTTP 404|SPEI timescale"
     )
   })
 })
 
 testthat::test_that(
-  "download_drought(source=spei): downloads after failed preflight",
+  "download_drought(source=spei): forwards the selected version URL",
   {
     captured_urls <- character(0)
     testthat::local_mocked_bindings(
       check_destfile = function(...) TRUE,
-      check_url_status = function(...) FALSE,
       download_run_method = function(urls, ...) {
         captured_urls <<- c(captured_urls, urls)
         list(success = 1, failed = 0, skipped = 0)
@@ -1635,7 +1629,7 @@ testthat::test_that(
             acknowledgement = TRUE
           )
         ),
-        "Preflight URL check failed; attempting direct download"
+        regexp = NA
       )
       testthat::expect_equal(result$success, 1L)
       testthat::expect_equal(

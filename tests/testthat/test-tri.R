@@ -156,12 +156,6 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
   download_urls_seen <- character()
   destfiles_seen <- character()
   # --------------------------------------------------------------------------
-  # Prevent the preflight check from accessing the network.
-  testthat::local_mocked_bindings(
-    check_preflight = function(...) invisible(NULL),
-    .package = "amadeus"
-  )
-  # --------------------------------------------------------------------------
   # Mock HTTP transfers; retain real filtering and download-result handling.
   testthat::local_mocked_bindings(
     req_perform = function(req, path, ...) {

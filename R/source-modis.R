@@ -25,7 +25,8 @@
 #'   are saved directly in this directory.
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after token lookup, discovery, directory creation, and the preflight check.
+#'   after token lookup, directory creation, and discovery. Discovery still
+#'   queries CMR in preview mode; data files are not downloaded.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #' @param show_progress logical(1). Show per-file download progress. Discovery
 #'   and summary messages may still be printed when `FALSE`.
@@ -61,8 +62,7 @@
 #' completeness for tiled, swath, or composite products.
 #'
 #' Discovery keeps the existing 120-second per-attempt timeout; file downloads
-#' use [download_run_method()]'s default timeout. The preflight check uses its
-#' own request settings.
+#' use [download_run_method()]'s default timeout.
 #' @return
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
@@ -242,9 +242,6 @@ download_modis <- function(
       df_download$destfile
     )))
   }
-  # ----------------------------------------------------------------------------
-  # Check first URL for validity, including before a preview.
-  amadeus:::check_preflight(df_download$url[1L])
   # ----------------------------------------------------------------------------
   # Run download using the same retry and rate-limit inputs as discovery.
   download_result <- amadeus:::download_run_method(

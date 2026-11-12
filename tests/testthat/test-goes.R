@@ -69,7 +69,6 @@ testthat::test_that("download_goes errors on invalid product", {
 
 testthat::test_that("download_goes maps product to ABI-L2 ADP S3 prefixes", {
   testthat::local_mocked_bindings(
-    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) {
       list(success = 1, failed = 0, skipped = 0)
     },
@@ -128,7 +127,6 @@ testthat::test_that("download_goes remove_command deprecation warning", {
         destfile = paste0(df$dir, df$prefix, "00/mock.nc")
       )
     },
-    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) {
       list(success = 0, failed = 0, skipped = 1)
     },
@@ -159,7 +157,6 @@ testthat::test_that("download_goes download=FALSE deprecation warning", {
         destfile = paste0(df$dir, df$prefix, "00/mock.nc")
       )
     },
-    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) {
       list(success = 0, failed = 0, skipped = 1)
     },
@@ -184,7 +181,6 @@ testthat::test_that("download_goes download=FALSE deprecation warning", {
 
 testthat::test_that("download_goes mock: hash=TRUE returns hash", {
   testthat::local_mocked_bindings(
-    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) list(success = 1, failed = 0),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -240,10 +236,6 @@ testthat::test_that("download_goes dispatch via download_data", {
 })
 
 testthat::test_that("download_goes single-date + download=FALSE returns listing", {
-  testthat::local_mocked_bindings(
-    check_preflight = function(...) invisible(NULL),
-    .package = "amadeus"
-  )
   testthat::local_mocked_bindings(
     req_perform = function(req, ...) {
       httr2::response(
@@ -325,7 +317,6 @@ testthat::test_that("download_goes hash=FALSE returns download result", {
     .package = "httr2"
   )
   testthat::local_mocked_bindings(
-    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) {
       list(success = 1, failed = 0, skipped = 0)
     },
