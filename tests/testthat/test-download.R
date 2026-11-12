@@ -86,20 +86,22 @@ testthat::test_that("download_data (expected errors - directory)", {
   }
 })
 
-testthat::test_that("download_data (expected errors - temporal range)", {
-  # download_gridmet() and download_terraclimate() do not validate the
-  # year range explicitly; the expected error here depends on the
-  # upstream server returning a 404 propagating through
-  # download_run_method(). That propagation is timing-sensitive and
-  # flakes under covr's serialized test runner in coverage CI even
-  # though the package-check jobs (ubuntu/macos/windows) pass. Skip
-  # under coverage CI so a non-deterministic network behavior cannot
-  # zero out the coverage signal.
-  testthat::skip_if(
-    identical(Sys.getenv("AMADEUS_COVERAGE_CI"), "true"),
-    "Flaky under covr: relies on remote 404 propagating to expect_error."
+testthat::test_that("download sources(date/year): reject invalid inputs", {
+  # ----------------------------------------------------------------------------
+  # Local date/year validation must fail before discovery or file transfers.
+  # Supply a test token so NASA authentication cannot mask validation errors.
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected download execution."),
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Unexpected HTTP request."),
+    .package = "httr2"
   )
   withr::with_tempdir({
+    # --------------------------------------------------------------------------
+    # Each source reports the invalid date or year, not a remote HTTP error.
     testthat::expect_error(
       download_geos(
         date = c("1900-01-01", "2018-01-01"),
@@ -698,14 +700,13 @@ testthat::test_that("download workflow with hash (LIVE)", {
   })
 })
 
-testthat::test_that("download with show_progress = FALSE and hash = FALSE", {
+testthat::test_that("download_ecoregion(show_progress=FALSE): summarizes", {
   skip_on_cran()
   skip_if_offline()
   # ----------------------------------------------------------------------------
   withr::with_tempdir({
-    # Test that downloads work without progress display
-    # Should return invisible NULL when hash = FALSE
-    result <- suppressMessages(
+    # Download without a progress display and preserve return visibility.
+    result <- withVisible(suppressMessages(
       download_ecoregion(
         directory_to_save = ".",
         acknowledgement = TRUE,
@@ -714,15 +715,22 @@ testthat::test_that("download with show_progress = FALSE and hash = FALSE", {
         show_progress = FALSE,
         hash = FALSE
       )
-    )
+    ))
     # --------------------------------------------------------------------------
-    # Should return NULL
-    testthat::expect_null(result)
+    # A successful transfer returns all five summary fields invisibly.
+    testthat::expect_false(result$visible)
+    testthat::expect_equal(result$value, list(
+      success = 1,
+      failed = 0,
+      skipped = 0,
+      failed_urls = character(0),
+      failed_files = character(0)
+    ))
     # --------------------------------------------------------------------------
     # Check file was created in the correct location
     testthat::expect_true(dir.exists("zip_files"))
     zip_files <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)
-    testthat::expect_true(length(zip_files) > 0)
+    testthat::expect_length(zip_files, 1L)
     testthat::expect_true(all(file.size(zip_files) > 0))
   })
 })
@@ -756,13 +764,13 @@ testthat::test_that("download with show_progress = FALSE and hash = TRUE", {
   })
 })
 
-testthat::test_that("download with show_progress = TRUE works", {
+testthat::test_that("download_koppen_geiger(show_progress=TRUE): summarizes", {
   skip_on_cran()
   skip_if_offline()
   # ----------------------------------------------------------------------------
   withr::with_tempdir({
-    # Test that downloads work with progress display
-    result <- suppressMessages(
+    # Download with progress enabled and preserve return visibility.
+    result <- withVisible(suppressMessages(
       download_koppen_geiger(
         data_resolution = "0.5",
         time_period = "Present",
@@ -773,15 +781,23 @@ testthat::test_that("download with show_progress = TRUE works", {
         show_progress = TRUE,
         hash = FALSE
       )
-    )
+    ))
     # --------------------------------------------------------------------------
-    # Should return NULL
-    testthat::expect_null(result)
+    # Progress settings do not change the five-field summary or its visibility.
+    testthat::expect_false(result$visible)
+    testthat::expect_equal(result$value, list(
+      success = 1,
+      failed = 0,
+      skipped = 0,
+      failed_urls = character(0),
+      failed_files = character(0)
+    ))
     # --------------------------------------------------------------------------
     # Check file was created
     testthat::expect_true(dir.exists("zip_files"))
     zip_files <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)
-    testthat::expect_true(length(zip_files) > 0)
+    testthat::expect_length(zip_files, 1L)
+    testthat::expect_gt(file.size(zip_files), 0)
   })
 })
 

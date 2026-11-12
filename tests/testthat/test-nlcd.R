@@ -3,113 +3,77 @@
 
 ################################################################################
 ##### download_nlcd
-testthat::test_that("download_nlcd", {
-  skip_on_cran()
-  skip_if_offline()
+testthat::test_that("download_nlcd(download=FALSE): previews products", {
   # ----------------------------------------------------------------------------
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # ----------------------------------------------------------------------------
-  # function parameters
-  years <- sample(1985:2023L, size = 2)
+  # Cover every product deterministically at both supported year boundaries.
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "nlcd"
+  )
   products <- c(
-    "Land Cover",
-    "Land Cover Change",
-    "Land Cover Confidence",
-    "Fractional Impervious Surface",
-    "Impervious Descriptor",
+    "Land Cover", "Land Cover Change", "Land Cover Confidence",
+    "Fractional Impervious Surface", "Impervious Descriptor",
     "Spectral Change Day of Year"
   )
-  product_codes <- c(
-    "LndCov",
-    "LndChg",
-    "LndCnf",
-    "FctImp",
-    "ImpDsc",
-    "SpcChg"
+  product_codes <- c("LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg")
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
   )
-  # ----------------------------------------------------------------------------
-  withr::with_tempdir({
-    directory_to_save <- file.path(getwd(), "nlcd")
-    # --------------------------------------------------------------------------
-    # run download function
-    for (y in seq_along(years)) {
-      p <- sample(seq_along(products), size = 1L)
+  for (year in c(1985L, 2024L)) {
+    for (p in seq_along(products)) {
       # ------------------------------------------------------------------------
-      # Expect deprecation warning with download = FALSE
+      # The preview contains a provider URL and its matching zip_files path.
       testthat::expect_warning(
-        download_data(
+        result <- withVisible(suppressMessages(amadeus::download_data(
           dataset_name = "nlcd",
-          year = years[y],
+          year = year,
           product = products[p],
           directory_to_save = directory_to_save,
           acknowledgement = TRUE,
           download = FALSE,
-          remove_command = FALSE,
           unzip = FALSE
-        ),
+        ))),
         "Setting download=FALSE is deprecated"
       )
-      # ------------------------------------------------------------------------
-      # Check that directory was created
-      testthat::expect_true(
-        dir.exists(directory_to_save)
+      filename <- sprintf(
+        "Annual_NLCD_%s_%d_CU_C1V1.zip", product_codes[p], year
       )
-      # ------------------------------------------------------------------------
-      # define file path with commands
-      commands_path <- paste0(
-        amadeus:::download_sanitize_path(directory_to_save),
-        "nlcd_",
-        tolower(product_codes[p]),
-        "_",
-        years[y],
-        "_",
-        Sys.Date(),
-        "_curl_command.txt"
-      )
-      # ------------------------------------------------------------------------
-      # Only proceed if commands file exists
-      if (file.exists(commands_path)) {
-        # import commands
-        commands <- read_commands(commands_path = commands_path)
-        # extract urls
-        urls <- extract_urls(commands = commands, position = 5)
-        # check HTTP URL status
-        url_status <- amadeus:::check_urls(urls = urls, size = 1L)
-        # implement unit tests
-        test_download_functions(
-          directory_to_save = directory_to_save,
-          commands_path = commands_path,
-          url_status = url_status
-        )
-        # remove file with commands after test
-        file.remove(commands_path)
-      }
-    }
-    # --------------------------------------------------------------------------
-    # Test error case with invalid year
-    # This should produce BOTH warnings (download=FALSE and remove_command=TRUE)
-    # AND an error. We need to capture the warnings
-    # while still expecting the error.
-    testthat::expect_error(
-      testthat::expect_warning(
-        testthat::expect_warning(
-          download_data(
-            dataset_name = "nlcd",
-            year = 1900,
-            product = "land cover",
-            directory_to_save = directory_to_save,
-            acknowledgement = TRUE,
-            download = FALSE,
-            remove_command = TRUE
-          ),
-          regexp = "Setting download=FALSE is deprecated"
+      testthat::expect_false(result$visible)
+      testthat::expect_identical(result$value, list(
+        urls = paste0(
+          "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/",
+          filename
         ),
-        regexp = "Parameter 'remove_command' is deprecated"
-      )
-    )
-  })
-  # Automatic cleanup when withr::with_tempdir exits
+        destfiles = file.path(directory_to_save, "zip_files", filename),
+        n_files = 1L
+      ))
+    }
+  }
+  # ----------------------------------------------------------------------------
+  # Previewing creates the layout without writing archives or command files.
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "zip_files")))
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "data_files")))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
+  # ----------------------------------------------------------------------------
+  # Deprecated controls warn before the invalid-year request is rejected.
+  testthat::expect_error(
+    testthat::expect_warning(
+      testthat::expect_warning(
+        amadeus::download_data(
+          dataset_name = "nlcd",
+          year = 1900,
+          product = "land cover",
+          directory_to_save = directory_to_save,
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+        ),
+        "Setting download=FALSE is deprecated"
+      ),
+      "Parameter 'remove_command' is deprecated"
+    ),
+    "year"
+  )
 })
 
 ################################################################################

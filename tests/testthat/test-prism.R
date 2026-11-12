@@ -138,37 +138,49 @@ testthat::test_that("download_prism mock download (unzip + remove_zip + hash)", 
   })
 })
 
-testthat::test_that("download_prism mock download (hash = FALSE)", {
+testthat::test_that("download_prism(hash=FALSE): returns runner summary", {
+  # ----------------------------------------------------------------------------
+  # Supply a valid ZIP and a realistic runner result for archive validation.
+  expected_result <- list(
+    success = 1,
+    failed = 0,
+    skipped = 0,
+    failed_urls = character(0),
+    failed_files = character(0)
+  )
   testthat::local_mocked_bindings(
     download_run_method = function(urls, destfiles, ...) {
       payload <- tempfile(fileext = ".txt")
       writeLines("prism test payload", payload)
       utils::zip(destfiles, payload, flags = "-q")
       unlink(payload)
-      invisible(NULL)
+      invisible(expected_result)
     },
     download_unzip = function(...) invisible(NULL),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_hash = function(...) stop("hash=FALSE must not hash files."),
     .package = "amadeus"
   )
+  # ----------------------------------------------------------------------------
+  # Keep real PRISM archive validation and return handling in this test.
   withr::with_tempdir({
-    result <- suppressWarnings(
-      suppressMessages(
-        download_prism(
-          time = "201005",
-          element = "ppt",
-          data_type = "ts",
-          format = "nc",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = TRUE,
-          unzip = FALSE,
-          remove_zip = FALSE,
-          hash = FALSE
-        )
+    result <- withVisible(suppressMessages(
+      download_prism(
+        time = "201005",
+        element = "ppt",
+        data_type = "ts",
+        format = "nc",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        remove_zip = FALSE,
+        hash = FALSE
       )
-    )
-    testthat::expect_null(result)
+    ))
+    # --------------------------------------------------------------------------
+    # The source returns the complete runner result unchanged and invisibly.
+    testthat::expect_identical(result$value, expected_result)
+    testthat::expect_false(result$visible)
   })
 })
 

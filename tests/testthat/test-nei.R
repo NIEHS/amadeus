@@ -4,68 +4,45 @@
 
 ################################################################################
 ##### download_nei
-testthat::test_that("download_nei", {
-  skip_on_cran()
-  skip_if_offline()
+testthat::test_that("download_nei(download=FALSE): previews archives", {
   # ----------------------------------------------------------------------------
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  directory_to_save <- paste0(tempdir(), "/nei/")
-  # ----------------------------------------------------------------------------
-  # run download function
-  year <- c(2017L, 2020L)
-  # ----------------------------------------------------------------------------
-  # Expect deprecation warning with download = FALSE
+  # Verify the actual preview instead of reading obsolete shell commands.
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "nei"
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
   testthat::expect_warning(
-    download_data(
+    result <- withVisible(suppressMessages(amadeus::download_data(
       dataset_name = "nei",
+      year = c(2017L, 2020L),
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
-      download = FALSE,
-      year = year,
-      remove_command = FALSE
-    ),
+      download = FALSE
+    ))),
     "Setting download=FALSE is deprecated"
   )
   # ----------------------------------------------------------------------------
-  # Check that directory was created
-  testthat::expect_true(
-    dir.exists(directory_to_save)
+  # Each selected inventory has its own URL suffix and local archive filename.
+  filenames <- c(
+    "2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip"
   )
+  testthat::expect_false(result$visible)
+  testthat::expect_identical(result$value, list(
+    urls = paste0("https://gaftp.epa.gov/air/nei/", c(
+      "2017/data_summaries/2017v1/2017neiApr_onroad_byregions.zip",
+      "2020/data_summaries/2020nei_onroad_byregion.zip"
+    )),
+    destfiles = file.path(directory_to_save, "zip_files", filenames),
+    n_files = 2L
+  ))
   # ----------------------------------------------------------------------------
-  # define file path with commands
-  commands_path <- paste0(
-    amadeus:::download_sanitize_path(directory_to_save),
-    "NEI_AADT_",
-    paste(year, collapse = "-"),
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
-  # ----------------------------------------------------------------------------
-  # Only proceed if commands file exists
-  if (file.exists(commands_path)) {
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 6)
-    # check HTTP URL status
-    url_status <-
-      httr::HEAD(urls[1])
-    url_status <- url_status$status_code
-    # implement unit tests
-    test_download_functions(
-      directory_to_save = directory_to_save,
-      commands_path = commands_path,
-      url_status = url_status
-    )
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
-  # ----------------------------------------------------------------------------
-  # remove temporary nei
-  unlink(directory_to_save, recursive = TRUE)
+  # Output directories exist, but previewing writes no archives or commands.
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "zip_files")))
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "data_files")))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
 })
 
 testthat::test_that("download_nei (live)", {
@@ -167,62 +144,53 @@ testthat::test_that("download_nei range (live)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that("download_nei (expected errors)", {
-  skip_on_cran()
-  skip_if_offline()
+testthat::test_that("download_nei(year): rejects unavailable inventories", {
   # ----------------------------------------------------------------------------
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  tdir <- tempdir()
-  directory_to_save <- paste0(tempdir(), "/epa/")
-  # ----------------------------------------------------------------------------
-  # run download function
-  year <- 2000:2002
+  # Year validation and previewing do not require provider availability.
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "nei"
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
   testthat::expect_error(
     testthat::expect_warning(
-      download_data(
+      amadeus::download_data(
         dataset_name = "nei",
+        year = 2000:2002,
         directory_to_save = directory_to_save,
         acknowledgement = TRUE,
-        download = FALSE,
-        year = year,
-        remove_command = FALSE
-      )
+        download = FALSE
+      ),
+      "Setting download=FALSE is deprecated"
     ),
     "No available years to download."
   )
+  testthat::expect_false(dir.exists(directory_to_save))
   # ----------------------------------------------------------------------------
-  # run download function
-  year <- c(2017L)
+  # A supported scalar year returns one planned archive, without a command file.
   testthat::expect_warning(
-    download_data(
+    result <- suppressMessages(amadeus::download_data(
       dataset_name = "nei",
+      year = 2017L,
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
-      download = FALSE,
-      year = year,
-      remove_command = FALSE
-    ),
+      download = FALSE
+    )),
     "Setting download=FALSE is deprecated"
   )
-  # ----------------------------------------------------------------------------
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "NEI_AADT_",
-    paste(year, collapse = "-"),
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
-  # ----------------------------------------------------------------------------
-  # Only remove if file exists
-  if (file.exists(commands_path)) {
-    file.remove(commands_path)
-  }
-  # ----------------------------------------------------------------------------
-  unlink(directory_to_save, recursive = TRUE)
+  testthat::expect_identical(result, list(
+    urls = paste0(
+      "https://gaftp.epa.gov/air/nei/2017/data_summaries/2017v1/",
+      "2017neiApr_onroad_byregions.zip"
+    ),
+    destfiles = file.path(
+      directory_to_save, "zip_files", "2017neiApr_onroad_byregions.zip"
+    ),
+    n_files = 1L
+  ))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
 })
 
 testthat::test_that("download_nei remove_command deprecation warning", {
@@ -486,31 +454,22 @@ testthat::test_that("download_nei mock download hash=FALSE", {
 })
 
 ################################################################################
-##### download_nei epa_certificate_path deprecation and unzip paths
+##### download_nei removed certificate argument and unzip paths
 
-testthat::test_that("download_nei epa_certificate_path deprecation warning", {
-  testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
-    .package = "amadeus"
+testthat::test_that("download_nei(epa_certificate_path): rejects removed arg", {
+  # ----------------------------------------------------------------------------
+  # Removed certificate arguments are rejected at entry without a warning.
+  testthat::expect_error(
+    amadeus::download_nei(
+      year = c(2017, 2020),
+      epa_certificate_path = "/fake/cert.pem",
+      directory_to_save = tempdir(),
+      acknowledgement = TRUE,
+      unzip = FALSE,
+      hash = FALSE
+    ),
+    "unused argument.*epa_certificate_path"
   )
-  withr::with_tempdir({
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = c(2017, 2020),
-          epa_certificate_path = "/fake/cert.pem",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = TRUE,
-          unzip = FALSE,
-          hash = FALSE
-        )
-      ),
-      "deprecated"
-    )
-  })
 })
 
 ################################################################################
