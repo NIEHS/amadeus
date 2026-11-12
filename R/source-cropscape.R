@@ -40,7 +40,8 @@
 #'   `FALSE` skips extraction and creation of the per-archive directories.
 #' @param remove_zip logical(1). Remove downloaded archives and their
 #'   `zip_files/` directory, including its remaining contents, after the
-#'   extraction step. Default is `FALSE`. Ignored when `download = FALSE`.
+#'   extraction loop finishes. Default is `FALSE`; requires `unzip = TRUE`.
+#'   Ignored when `download = FALSE`.
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `data_files/` instead of the download summary. Default is `FALSE`.
 #'   Ignored when `download = FALSE`.
@@ -66,9 +67,10 @@
 #' check emits a warning. Preview mode skips this check. Its request settings
 #' are separate from those used for file downloads.
 #'
-#' Hashing covers all files under `data_files/`, including existing files,
-#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
-#' uses `data_files/`, which may be empty or contain previously extracted data.
+#' Hashing covers all files recursively under `data_files/`, including the
+#' per-archive subdirectories and existing files, and excludes archives in
+#' `zip_files/`. With `unzip = FALSE`, hashing still uses `data_files/`, which
+#' may be empty or contain previously extracted data.
 #' @author Insang Song
 #' @return
 #' With `download = FALSE`, an invisible preview list containing `urls`,
@@ -190,20 +192,12 @@ download_cropscape <- function(
     invisible(lapply(chr_dirs_to_unzip, amadeus:::download_setup_dir))
   }
   # ----------------------------------------------------------------------------
-  # Pair each archive with its own destination. Cleanup follows all extractions.
-  mapply(
-    amadeus:::download_unzip,
+  # Unzip downloaded .zip files.
+  amadeus:::download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dirs_to_unzip,
-    MoreArgs = list(unzip = unzip),
-    SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = chr_filenames
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

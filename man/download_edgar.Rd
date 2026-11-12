@@ -101,12 +101,12 @@ Default is \code{FALSE}.}
 \verb{zip_files/} without extraction.}
 
 \item{remove_zip}{logical(1). Remove archives and their parent \verb{zip_files/}
-directory recursively after extraction, including any other files in
-that directory. Requires \code{unzip = TRUE}. Default is \code{FALSE}.}
+directory recursively after the extraction loop finishes, including any
+other files in that directory. Requires \code{unzip = TRUE}. Default is \code{FALSE}.}
 
-\item{hash}{logical(1). Return the combined MD5 hash of \verb{data_files/}
-when \code{TRUE}, including previously extracted files. With \code{unzip = FALSE},
-this still hashes \verb{data_files/}, not the downloaded archives.
+\item{hash}{logical(1). Return the combined MD5 hash of all files recursively
+under \verb{data_files/}, including previously extracted files.
+With \code{unzip = FALSE}, this still hashes \verb{data_files/}, not the archives.
 Default is \code{FALSE}; ignored when \code{download = FALSE}.}
 
 \item{show_progress}{logical(1). Show per-file download progress. Default

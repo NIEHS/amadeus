@@ -32,7 +32,8 @@ requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
 Default is \code{c(2018, 2022)}. Missing, fractional, and future years are
 rejected.}
 
-\item{directory_to_save}{character(1). Directory to save data.}
+\item{directory_to_save}{character(1). Parent directory. Archives are saved
+in \verb{zip_files/} and extracted data in \verb{data_files/}.}
 
 \item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
@@ -40,14 +41,20 @@ rejected.}
 
 \item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip zip files (default TRUE).}
+\item{unzip}{logical(1). Extract all planned ZIP archives, including existing
+archives, into \verb{data_files/}. Default is \code{TRUE}; \code{FALSE} skips extraction
+and CSV layout normalization.}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default
-FALSE).}
+\item{remove_zip}{logical(1). Remove archives and their \verb{zip_files/}
+directory recursively, including remaining contents, after extraction and
+CSV layout normalization. Default is \code{FALSE}; requires \code{unzip = TRUE}.}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
-\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+\item{hash}{logical(1). Return a combined MD5 hash of all files recursively
+under \verb{data_files/}, including existing files. Default is \code{FALSE}; ignored
+when \code{download = FALSE}. With \code{unzip = FALSE}, hashing still uses
+\verb{data_files/}, which may be empty or contain previously extracted data.}
 
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
 
@@ -60,7 +67,7 @@ With \code{download = FALSE}, an invisible preview list containing
 \code{success}, \code{failed}, \code{skipped}, \code{failed_urls}, and \code{failed_files}. The two
 failure vectors are \code{character(0)} when no downloads failed, including when
 every file was skipped. With \code{download = TRUE} and \code{hash = TRUE}, a visible
-character scalar containing the combined MD5 hash of the output directory.
+character scalar containing the combined MD5 hash of \verb{data_files/}.
 }
 \description{
 The \code{download_aqs()} function accesses and downloads Air Quality
@@ -81,6 +88,10 @@ Common AQS parameter codes include:
 
 This list is not exhaustive; for the full official table, see the linked EPA
 AQS parameter code table.
+
+Downloaded and existing archives are extracted into the shared \verb{data_files/}
+directory. The CSV layout is then normalized, followed by optional archive
+removal and hashing of the resulting data directory.
 }
 \note{
 AQS data does not require authentication.

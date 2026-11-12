@@ -68,11 +68,11 @@
 #'   `data_files/`. Default is `TRUE`. When `FALSE`, archives remain in
 #'   `zip_files/` without extraction.
 #' @param remove_zip logical(1). Remove archives and their parent `zip_files/`
-#'   directory recursively after extraction, including any other files in
-#'   that directory. Requires `unzip = TRUE`. Default is `FALSE`.
-#' @param hash logical(1). Return the combined MD5 hash of `data_files/`
-#'   when `TRUE`, including previously extracted files. With `unzip = FALSE`,
-#'   this still hashes `data_files/`, not the downloaded archives.
+#'   directory recursively after the extraction loop finishes, including any
+#'   other files in that directory. Requires `unzip = TRUE`. Default is `FALSE`.
+#' @param hash logical(1). Return the combined MD5 hash of all files recursively
+#'   under `data_files/`, including previously extracted files.
+#'   With `unzip = FALSE`, this still hashes `data_files/`, not the archives.
 #'   Default is `FALSE`; ignored when `download = FALSE`.
 #' @param show_progress logical(1). Show per-file download progress. Default
 #'   is `TRUE`; summary messages may still be printed when `FALSE`.
@@ -485,17 +485,11 @@ download_edgar <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded or existing archives.
-  sapply(
-    df_download$destfile,
-    amadeus:::download_unzip,
+  amadeus:::download_unzip(
+    file_name = df_download$destfile,
     directory_to_unzip = chr_dir_to_save,
-    unzip = unzip
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files after all extractions.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = df_download$destfile
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

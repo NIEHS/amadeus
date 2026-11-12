@@ -25,7 +25,7 @@
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
 #'   archives and extracted CSV files can require substantial storage.
 #' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
-#'   after directory creation and a preflight check of the first URL. No
+#'   after directory creation, before the preflight check of the first URL. No
 #'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
@@ -33,8 +33,8 @@
 #'   directories under `data_files/`. Default is `TRUE`; `FALSE` skips
 #'   extraction and creation of the per-archive directories.
 #' @param remove_zip logical(1). Remove downloaded archives and their
-#'   `zip_files/` directory, including remaining contents, after all archives
-#'   have been extracted. Default is `FALSE`. May be `TRUE` only when
+#'   `zip_files/` directory, including remaining contents, after the extraction
+#'   loop finishes. Default is `FALSE`. May be `TRUE` only when
 #'   `unzip = TRUE`. No removal occurs when `download = FALSE`.
 #' @param show_progress logical(1). Show file download progress. Default is
 #'   `TRUE`. Other status messages may still be printed when `FALSE`.
@@ -61,13 +61,14 @@
 #' files that already exist locally. For actual downloads,
 #' [download_run_method()] skips existing non-empty archives; they are still
 #' passed to extraction when `unzip = TRUE`.
-#' The preflight check contacts the first URL even in preview mode; a failed
-#' check emits a warning. Its request settings are separate from those used
-#' for file downloads.
+#' For actual downloads, the preflight check contacts the first URL; a failed
+#' check emits a warning. Preview mode skips this check. Its request settings
+#' are separate from those used for file downloads.
 #'
-#' Hashing covers all files under `data_files/`, including existing files,
-#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
-#' uses `data_files/`, which may be empty or contain previously extracted data.
+#' Hashing covers all files recursively under `data_files/`, including the
+#' per-archive subdirectories and existing files, and excludes archives in
+#' `zip_files/`. With `unzip = FALSE`, hashing still uses `data_files/`, which
+#' may be empty or contain previously extracted data.
 #'
 #' Download support covers more inventory years than [process_nei()], which
 #' currently accepts only 2017 and 2020.
@@ -228,20 +229,12 @@ download_nei <- function(
     invisible(lapply(chr_dirs_to_unzip, amadeus:::download_setup_dir))
   }
   # ----------------------------------------------------------------------------
-  # Pair each archive with its own destination. Cleanup follows all extractions.
-  mapply(
-    amadeus:::download_unzip,
+  # Unzip downloaded .zip files.
+  amadeus:::download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dirs_to_unzip,
-    MoreArgs = list(unzip = unzip),
-    SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = chr_filenames
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

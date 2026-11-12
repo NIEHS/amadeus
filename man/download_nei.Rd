@@ -35,7 +35,7 @@ extracted into separate per-archive directories under \verb{data_files/}.}
 archives and extracted CSV files can require substantial storage.}
 
 \item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
-after directory creation and a preflight check of the first URL. No
+after directory creation, before the preflight check of the first URL. No
 archives are downloaded or extracted in preview mode. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
@@ -46,8 +46,8 @@ directories under \verb{data_files/}. Default is \code{TRUE}; \code{FALSE} skips
 extraction and creation of the per-archive directories.}
 
 \item{remove_zip}{logical(1). Remove downloaded archives and their
-\verb{zip_files/} directory, including remaining contents, after all archives
-have been extracted. Default is \code{FALSE}. May be \code{TRUE} only when
+\verb{zip_files/} directory, including remaining contents, after the extraction
+loop finishes. Default is \code{FALSE}. May be \code{TRUE} only when
 \code{unzip = TRUE}. No removal occurs when \code{download = FALSE}.}
 
 \item{show_progress}{logical(1). Show file download progress. Default is
@@ -96,13 +96,14 @@ Preview destinations refer to the archives in \verb{zip_files/}, including
 files that already exist locally. For actual downloads,
 \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives; they are still
 passed to extraction when \code{unzip = TRUE}.
-The preflight check contacts the first URL even in preview mode; a failed
-check emits a warning. Its request settings are separate from those used
-for file downloads.
+For actual downloads, the preflight check contacts the first URL; a failed
+check emits a warning. Preview mode skips this check. Its request settings
+are separate from those used for file downloads.
 
-Hashing covers all files under \verb{data_files/}, including existing files,
-and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
-uses \verb{data_files/}, which may be empty or contain previously extracted data.
+Hashing covers all files recursively under \verb{data_files/}, including the
+per-archive subdirectories and existing files, and excludes archives in
+\verb{zip_files/}. With \code{unzip = FALSE}, hashing still uses \verb{data_files/}, which
+may be empty or contain previously extracted data.
 
 Download support covers more inventory years than \code{\link[=process_nei]{process_nei()}}, which
 currently accepts only 2017 and 2020.

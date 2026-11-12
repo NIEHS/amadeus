@@ -39,10 +39,10 @@ Default is \code{TRUE}.}
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
 No command file is generated. Default is \code{FALSE}.}
 
-\item{hash}{logical(1). Return a combined MD5 hash of all files under
-\verb{data_files/}, including existing files, instead of the download summary.
-Default is \code{FALSE}; ignored when \code{download = FALSE}. With \code{unzip = FALSE},
-hashing still uses \verb{data_files/}, not the downloaded archives.}
+\item{hash}{logical(1). Return a combined MD5 hash of all files recursively
+under \verb{data_files/}, including existing files, instead of the download
+summary. Default is \code{FALSE}; ignored when \code{download = FALSE}.
+With \code{unzip = FALSE}, hashing still uses \verb{data_files/}, not the archives.}
 
 \item{show_progress}{logical(1). Show file download progress. Default is
 \code{TRUE}. Other status and summary messages may still be printed when
@@ -59,9 +59,9 @@ interval in seconds, passed to \code{\link[=download_run_method]{download_run_me
 \verb{data_files/}. Default is \code{TRUE}; \code{FALSE} skips extraction.}
 
 \item{remove_zip}{logical(1). Remove archives and their parent \verb{zip_files/}
-directory recursively after extraction, including any remaining contents.
-Requires \code{unzip = TRUE}. Default is \code{FALSE}. No cleanup occurs during
-previews.}
+directory recursively after the extraction loop finishes, including any
+remaining contents. Requires \code{unzip = TRUE}. Default is \code{FALSE}.
+No cleanup occurs during previews.}
 
 \item{...}{Reserved for future use; currently ignored.}
 }

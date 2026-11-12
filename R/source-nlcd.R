@@ -24,19 +24,25 @@
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
 #'   Requested years must be within 1985-2024. Default is 2021.
 #'   Missing, fractional, and future years are rejected.
-#' @param directory_to_save character(1). Directory to save downloaded files.
+#' @param directory_to_save character(1). Parent directory. Archives are saved
+#'   in `zip_files/` and extracted data in `data_files/`.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
 #' download.
 #' @param download logical(1). DEPRECATED. Downloads now happen automatically.
 #'   Set to FALSE to skip downloading (generates file list only).
 #' @param remove_command logical(1). Deprecated, ignored.
-#' @param unzip logical(1). Unzip downloaded files? Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files after extraction? Default is
-#' \code{FALSE}.
+#' @param unzip logical(1). Extract all planned yearly archives, including
+#'   existing archives, into the shared `data_files/` directory. Default is
+#'   `TRUE`; `FALSE` skips extraction.
+#' @param remove_zip logical(1). Remove archives and their `zip_files/`
+#'   directory recursively, including remaining contents, after the extraction
+#'   loop finishes. Default is `FALSE`; requires `unzip = TRUE`.
 #' @param show_progress logical(1). Show download progress? Default is
 #' \code{TRUE}.
-#' @param hash logical(1). Return hash of downloaded files? Default is
-#' \code{FALSE}.
+#' @param hash logical(1). Return a combined MD5 hash of all files recursively
+#'   under `data_files/`, including existing files. Default is `FALSE`; ignored
+#'   when `download = FALSE`. With `unzip = FALSE`, hashing still uses
+#'   `data_files/`, which may be empty or contain previously extracted data.
 #' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song, Kyle Messier
@@ -178,13 +184,8 @@ download_nlcd <- function(
   amadeus:::download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
-    unzip = unzip
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = chr_filenames
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

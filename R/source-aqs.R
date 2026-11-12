@@ -25,6 +25,10 @@
 #'
 #' This list is not exhaustive; for the full official table, see the linked EPA
 #' AQS parameter code table.
+#'
+#' Downloaded and existing archives are extracted into the shared `data_files/`
+#' directory. The CSV layout is then normalized, followed by optional archive
+#' removal and hashing of the resulting data directory.
 #' @param parameter_code integer(1). EPA pollutant parameter code. See
 #'   Details for a short list of common codes.
 #' @param resolution_temporal character(1). "daily" or "hourly".
@@ -33,15 +37,22 @@
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
 #'   Default is `c(2018, 2022)`. Missing, fractional, and future years are
 #'   rejected.
-#' @param directory_to_save character(1). Directory to save data.
+#' @param directory_to_save character(1). Parent directory. Archives are saved
+#'   in `zip_files/` and extracted data in `data_files/`.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
-#' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default
-#' FALSE).
+#' @param unzip logical(1). Extract all planned ZIP archives, including existing
+#'   archives, into `data_files/`. Default is `TRUE`; `FALSE` skips extraction
+#'   and CSV layout normalization.
+#' @param remove_zip logical(1). Remove archives and their `zip_files/`
+#'   directory recursively, including remaining contents, after extraction and
+#'   CSV layout normalization. Default is `FALSE`; requires `unzip = TRUE`.
 #' @param show_progress logical(1). Show download progress (default TRUE)
-#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param hash logical(1). Return a combined MD5 hash of all files recursively
+#'   under `data_files/`, including existing files. Default is `FALSE`; ignored
+#'   when `download = FALSE`. With `unzip = FALSE`, hashing still uses
+#'   `data_files/`, which may be empty or contain previously extracted data.
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
@@ -51,7 +62,7 @@
 #' `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`. The two
 #' failure vectors are `character(0)` when no downloads failed, including when
 #' every file was skipped. With `download = TRUE` and `hash = TRUE`, a visible
-#' character scalar containing the combined MD5 hash of the output directory.
+#' character scalar containing the combined MD5 hash of `data_files/`.
 #' @importFrom Rdpack reprompt
 #' @seealso
 #'   [EPA AQS Parameter Codes](
@@ -159,9 +170,8 @@ download_aqs <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  sapply(
-    chr_filenames,
-    amadeus:::download_unzip,
+  amadeus:::download_unzip(
+    file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip
   )

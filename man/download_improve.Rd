@@ -50,8 +50,8 @@ No command file is generated. Default is \code{FALSE}.}
 extracting their contents.}
 
 \item{remove_zip}{logical(1). Remove downloaded archives and their
-\verb{zip_files/} directory, including remaining contents, after all archives
-have been extracted. Default is \code{FALSE}. May be \code{TRUE} only when
+\verb{zip_files/} directory, including remaining contents, after the extraction
+loop finishes. Default is \code{FALSE}. May be \code{TRUE} only when
 \code{unzip = TRUE}.}
 
 \item{show_progress}{logical(1). Show file download progress. Default is
@@ -95,10 +95,11 @@ The selected product determines the filename prefix. For example,
 \verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
 \code{directory_to_save}, including when \code{unzip = FALSE} or \code{download = FALSE}.
 
-The first planned URL is checked before returning a preview or downloading.
+Actual downloads check the first planned URL before downloading.
 A failed preflight check emits a warning and allows execution to continue;
 it does not verify availability for every requested year. Preview mode
-therefore still makes network requests and may create directories.
+creates the output directories but skips the preflight check and makes no
+network requests.
 
 All archives share \verb{data_files/} as their extraction destination. Names
 and paths stored inside each archive are preserved. Pass the directory
@@ -109,9 +110,10 @@ as \code{path} to \code{\link[=process_improve]{process_improve()}}.
 Those archives are still passed to extraction when \code{unzip = TRUE}.
 Existing extracted \code{.txt} files alone do not cause a download to be skipped.
 
-Hashing covers all files under \verb{data_files/}, including existing files,
-and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
-uses \verb{data_files/}, which may be empty or contain previously extracted data.
+Hashing covers all files recursively under \verb{data_files/}, including existing
+files, and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing
+still uses \verb{data_files/}, which may be empty or contain previously extracted
+data.
 }
 \note{
 IMPROVE data does not require authentication. Annual downloads contain

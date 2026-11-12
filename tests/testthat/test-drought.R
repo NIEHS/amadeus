@@ -2024,40 +2024,42 @@ testthat::test_that(
         )
         list(success = 2L, failed = 0L, skipped = 0L)
       },
-      download_unzip = function(file_name, directory_to_unzip, ...) {
+      download_unzip = function(file_name, directory_to_unzip, remove, ...) {
+        testthat::expect_false(remove)
+        testthat::expect_identical(file_name, downloaded_archives)
         extraction_directory <<- directory_to_unzip
         dir.create(
           directory_to_unzip,
           recursive = TRUE,
           showWarnings = FALSE
         )
-        date_string <- sub(
-          ".*USDM_([0-9]{8})_M\\.zip$",
-          "\\1",
-          basename(file_name)
-        )
-        source_files <- list.files(
-          fixture_directory,
-          pattern = paste0("^USDM_", date_string, "\\."),
-          full.names = TRUE
-        )
-        testthat::expect_length(source_files, 5L)
-        destinations <- file.path(
-          directory_to_unzip,
-          basename(source_files)
-        )
-        copied <- file.copy(
-          source_files,
-          destinations,
-          overwrite = TRUE
-        )
-        testthat::expect_true(all(copied))
-        extracted_files <<- c(extracted_files, destinations)
-        invisible(NULL)
-      },
-      download_remove_zips = function(remove, download_name) {
-        testthat::expect_false(remove)
-        testthat::expect_identical(download_name, downloaded_archives)
+        # ----------------------------------------------------------------------
+        # Copy one complete fixture bundle for each archive in the batch.
+        lapply(file_name, function(archive_file) {
+          date_string <- sub(
+            ".*USDM_([0-9]{8})_M\\.zip$",
+            "\\1",
+            basename(archive_file)
+          )
+          source_files <- list.files(
+            fixture_directory,
+            pattern = paste0("^USDM_", date_string, "\\."),
+            full.names = TRUE
+          )
+          testthat::expect_length(source_files, 5L)
+          destinations <- file.path(
+            directory_to_unzip,
+            basename(source_files)
+          )
+          copied <- file.copy(
+            source_files,
+            destinations,
+            overwrite = TRUE
+          )
+          testthat::expect_true(all(copied))
+          extracted_files <<- c(extracted_files, destinations)
+          invisible(NULL)
+        })
         invisible(NULL)
       }
     )

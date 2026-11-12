@@ -39,8 +39,8 @@
 #'   `data_files/`. Default is `TRUE`; `FALSE` retains the archives without
 #'   extracting their contents.
 #' @param remove_zip logical(1). Remove downloaded archives and their
-#'   `zip_files/` directory, including remaining contents, after all archives
-#'   have been extracted. Default is `FALSE`. May be `TRUE` only when
+#'   `zip_files/` directory, including remaining contents, after the extraction
+#'   loop finishes. Default is `FALSE`. May be `TRUE` only when
 #'   `unzip = TRUE`.
 #' @param show_progress logical(1). Show file download progress. Default is
 #'   `TRUE`. Other status messages may still be printed when `FALSE`.
@@ -57,10 +57,11 @@
 #' `zip_files/` and `data_files/` are sibling directories created beneath
 #' `directory_to_save`, including when `unzip = FALSE` or `download = FALSE`.
 #'
-#' The first planned URL is checked before returning a preview or downloading.
+#' Actual downloads check the first planned URL before downloading.
 #' A failed preflight check emits a warning and allows execution to continue;
 #' it does not verify availability for every requested year. Preview mode
-#' therefore still makes network requests and may create directories.
+#' creates the output directories but skips the preflight check and makes no
+#' network requests.
 #'
 #' All archives share `data_files/` as their extraction destination. Names
 #' and paths stored inside each archive are preserved. Pass the directory
@@ -71,9 +72,10 @@
 #' Those archives are still passed to extraction when `unzip = TRUE`.
 #' Existing extracted `.txt` files alone do not cause a download to be skipped.
 #'
-#' Hashing covers all files under `data_files/`, including existing files,
-#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
-#' uses `data_files/`, which may be empty or contain previously extracted data.
+#' Hashing covers all files recursively under `data_files/`, including existing
+#' files, and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing
+#' still uses `data_files/`, which may be empty or contain previously extracted
+#' data.
 #' @author Insang Song, Mitchell Manware
 #' @return
 #' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
@@ -188,17 +190,11 @@ download_improve <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  sapply(
-    chr_filenames,
-    amadeus:::download_unzip,
+  amadeus:::download_unzip(
+    file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
-    unzip = unzip
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = chr_filenames
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

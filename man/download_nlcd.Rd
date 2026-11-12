@@ -36,7 +36,8 @@ requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
 Requested years must be within 1985-2024. Default is 2021.
 Missing, fractional, and future years are rejected.}
 
-\item{directory_to_save}{character(1). Directory to save downloaded files.}
+\item{directory_to_save}{character(1). Parent directory. Archives are saved
+in \verb{zip_files/} and extracted data in \verb{data_files/}.}
 
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with
 download.}
@@ -46,16 +47,21 @@ Set to FALSE to skip downloading (generates file list only).}
 
 \item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip downloaded files? Default is \code{TRUE}.}
+\item{unzip}{logical(1). Extract all planned yearly archives, including
+existing archives, into the shared \verb{data_files/} directory. Default is
+\code{TRUE}; \code{FALSE} skips extraction.}
 
-\item{remove_zip}{logical(1). Remove zip files after extraction? Default is
-\code{FALSE}.}
+\item{remove_zip}{logical(1). Remove archives and their \verb{zip_files/}
+directory recursively, including remaining contents, after the extraction
+loop finishes. Default is \code{FALSE}; requires \code{unzip = TRUE}.}
 
 \item{show_progress}{logical(1). Show download progress? Default is
 \code{TRUE}.}
 
-\item{hash}{logical(1). Return hash of downloaded files? Default is
-\code{FALSE}.}
+\item{hash}{logical(1). Return a combined MD5 hash of all files recursively
+under \verb{data_files/}, including existing files. Default is \code{FALSE}; ignored
+when \code{download = FALSE}. With \code{unzip = FALSE}, hashing still uses
+\verb{data_files/}, which may be empty or contain previously extracted data.}
 
 \item{max_tries}{integer(1). Maximum download retry attempts. Default is 20.}
 

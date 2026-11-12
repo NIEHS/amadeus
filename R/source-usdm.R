@@ -17,16 +17,16 @@
 #'   Archives are saved in `zip_files/` and extracted into `data_files/`.
 #' @inheritParams download_drought acknowledgement download remove_command
 #' @inheritParams download_drought show_progress max_tries rate_limit
-#' @param hash logical(1). Return a combined MD5 hash of all files under
-#'   `data_files/`, including existing files, instead of the download summary.
-#'   Default is `FALSE`; ignored when `download = FALSE`. With `unzip = FALSE`,
-#'   hashing still uses `data_files/`, not the downloaded archives.
+#' @param hash logical(1). Return a combined MD5 hash of all files recursively
+#'   under `data_files/`, including existing files, instead of the download
+#'   summary. Default is `FALSE`; ignored when `download = FALSE`.
+#'   With `unzip = FALSE`, hashing still uses `data_files/`, not the archives.
 #' @param unzip logical(1). Extract downloaded or existing archives into
 #'   `data_files/`. Default is `TRUE`; `FALSE` skips extraction.
 #' @param remove_zip logical(1). Remove archives and their parent `zip_files/`
-#'   directory recursively after extraction, including any remaining contents.
-#'   Requires `unzip = TRUE`. Default is `FALSE`. No cleanup occurs during
-#'   previews.
+#'   directory recursively after the extraction loop finishes, including any
+#'   remaining contents. Requires `unzip = TRUE`. Default is `FALSE`.
+#'   No cleanup occurs during previews.
 #' @param ... Reserved for future use; currently ignored.
 #' @details
 #' Each selected Tuesday maps to a `USDM_YYYYMMDD_M.zip` archive at the
@@ -144,17 +144,11 @@ download_usdm <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  sapply(
-    chr_filenames,
-    amadeus:::download_unzip,
+  amadeus:::download_unzip(
+    file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
-    unzip = unzip
-  )
-  # ----------------------------------------------------------------------------
-  # Remove zip files.
-  amadeus:::download_remove_zips(
-    remove = remove_zip,
-    download_name = chr_filenames
+    unzip = unzip,
+    remove = remove_zip
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.

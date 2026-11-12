@@ -54,7 +54,8 @@ into per-archive directories under \verb{data_files/}. Default is \code{TRUE};
 
 \item{remove_zip}{logical(1). Remove downloaded archives and their
 \verb{zip_files/} directory, including its remaining contents, after the
-extraction step. Default is \code{FALSE}. Ignored when \code{download = FALSE}.}
+extraction loop finishes. Default is \code{FALSE}; requires \code{unzip = TRUE}.
+Ignored when \code{download = FALSE}.}
 
 \item{hash}{logical(1). Return a combined MD5 hash of the files under
 \verb{data_files/} instead of the download summary. Default is \code{FALSE}.
@@ -103,9 +104,10 @@ For actual downloads, the preflight check contacts the first URL; a failed
 check emits a warning. Preview mode skips this check. Its request settings
 are separate from those used for file downloads.
 
-Hashing covers all files under \verb{data_files/}, including existing files,
-and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
-uses \verb{data_files/}, which may be empty or contain previously extracted data.
+Hashing covers all files recursively under \verb{data_files/}, including the
+per-archive subdirectories and existing files, and excludes archives in
+\verb{zip_files/}. With \code{unzip = FALSE}, hashing still uses \verb{data_files/}, which
+may be empty or contain previously extracted data.
 }
 \examples{
 \dontrun{

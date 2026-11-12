@@ -28,7 +28,9 @@ in \code{"YYYY-MM-DD"} format, in either order. All dates must be between
 the entire request to fail before directory creation or network requests;
 the range is not filtered or truncated.}
 
-\item{directory_to_save}{character(1). Directory to save data.}
+\item{directory_to_save}{character(1). Parent directory. Shapefile archives
+are saved in \verb{zip_files/} and extracted into \verb{data_files/}. KML files are
+saved directly in \verb{data_files/}.}
 
 \item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
@@ -36,14 +38,22 @@ the range is not filtered or truncated.}
 
 \item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip zip files (default TRUE).}
+\item{unzip}{logical(1). Extract all planned Shapefile ZIP archives,
+including existing archives, into the shared \verb{data_files/} directory.
+Default is \code{TRUE}; \code{FALSE} skips extraction. KML files do not require
+extraction.}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default
-FALSE).}
+\item{remove_zip}{logical(1). Remove Shapefile archives and their
+\verb{zip_files/} directory recursively, including remaining contents, after
+the extraction loop finishes. Default is \code{FALSE}; requires \code{unzip = TRUE}.
+No archive cleanup is performed for KML downloads.}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
-\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+\item{hash}{logical(1). Return a combined MD5 hash of all files recursively
+under \verb{data_files/}, including existing files. Default is \code{FALSE}; ignored
+when \code{download = FALSE}. With Shapefile downloads and \code{unzip = FALSE},
+hashing still uses \verb{data_files/}, which may be empty or contain older data.}
 
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
 
@@ -56,7 +66,7 @@ With \code{download = FALSE}, an invisible preview list containing
 \code{success}, \code{failed}, \code{skipped}, \code{failed_urls}, and \code{failed_files}. The two
 failure vectors are \code{character(0)} when no downloads failed, including when
 every file was skipped. With \code{download = TRUE} and \code{hash = TRUE}, a visible
-character scalar containing the combined MD5 hash of the output directory.
+character scalar containing the combined MD5 hash of \verb{data_files/}.
 }
 \description{
 The \code{download_hms()} function accesses and downloads

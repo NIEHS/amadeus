@@ -9,13 +9,17 @@ download_hash(hash = TRUE, dir = NULL)
 \arguments{
 \item{hash}{logical(1). Create hash of downloaded files.}
 
-\item{dir}{character(1). Directory path.}
+\item{dir}{character(1). Root directory to hash. Sibling directories are not
+included; hashing \verb{data_files/} therefore excludes sibling \verb{zip_files/}.}
 }
 \value{
-character(1) Combined 128-bit md5sum of download files.
+With \code{hash = TRUE}, a character(1) combined MD5 hash. With
+\code{hash = FALSE}, invisible \code{NULL}.
 }
 \description{
-Create a combined md5sum hash based on the files in a specified directory.
+Create a combined MD5 hash from file contents recursively under a specified
+directory, including files in nested subdirectories and previously saved
+files.
 }
 \keyword{auxiliary}
 \keyword{internal}

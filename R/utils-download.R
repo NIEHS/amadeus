@@ -667,13 +667,33 @@ validate_zip <- function(files) {
 ################################################################################
 #' Extract downloaded archives
 #' @description
-#' Extract downloaded ".zip" or ".7z" files.
-#' @param file_name character(1). Full archive file path
-#' @param directory_to_unzip character(1). Directory to extract
-#' data
-#' @param unzip logical(1). Extract (\code{TRUE}) or not.
-#' @param remove logical(1). Confirm removal. Default is FALSE.
-#' @return NULL; extracts downloaded archive files
+#' Extract one or more downloaded `.zip`, `.7z`, `.tar`, or `.gz` archives,
+#' including `.tar.gz` files, into shared or separate directories.
+#' @param file_name character vector. One or more non-missing, non-empty
+#'   archive paths, in extraction order.
+#' @param directory_to_unzip character vector. One shared extraction directory
+#'   or one directory per archive, matched by position to `file_name`.
+#'   Paths must be non-missing and non-empty; other vector lengths are rejected.
+#' @param unzip logical(1). Extract the supplied archives. Default is `TRUE`.
+#'   `FALSE` skips path validation, extraction, and removal.
+#' @param remove logical(1). Run [download_remove_zips()] once for the complete
+#'   archive vector after the extraction loop finishes. Default is `FALSE`;
+#'   ignored when `unzip = FALSE`.
+#' @details
+#' Archives are extracted sequentially. ZIP files use [utils::unzip()]; `.7z`,
+#' `.tar`, and `.gz` files use [archive::archive_extract()]. Paths stored inside
+#' each archive are preserved beneath its corresponding extraction directory.
+#' An extraction error stops the remaining extractions and prevents cleanup;
+#' files already extracted remain on disk. Warnings from the extraction
+#' functions are not converted to errors.
+#' @note When `remove = TRUE`, the existing cleanup helper removes the supplied
+#'   archives and recursively deletes their immediate parent directories,
+#'   including any remaining contents. Removal occurs after the extraction
+#'   loop, not between individual archives.
+#' @return Invisible `NULL`, for both single and multiple archives and when
+#'   `unzip = FALSE`. Extracted paths and per-file statuses are not returned.
+#' @seealso [download_remove_zips()], [utils::unzip()],
+#'   [archive::archive_extract()]
 #' @keywords internal
 #' @export
 download_unzip <- function(
@@ -683,49 +703,90 @@ download_unzip <- function(
   remove = FALSE
 ) {
   # ----------------------------------------------------------------------------
-  # Return NULL if `unzip = FALSE`.
+  # Skip extraction and removal when unzip = FALSE.
   if (!unzip) {
     message(paste0("Downloaded files will not be unzipped.\n"))
-    return(NULL)
+    return(invisible(NULL))
   }
   # ----------------------------------------------------------------------------
-  # Unzip according to compression type.
-  ext <- tolower(tools::file_ext(file_name))
-  message(paste0("Unzipping files...\n"))
-  if (ext == "zip") {
-    unzip(file_name, exdir = directory_to_unzip)
-  } else if (ext %in% c("7z", "gz", "tar")) {
-    archive::archive_extract(file_name, dir = directory_to_unzip)
-  } else {
-    stop("Unsupported archive format. Expected .zip, .7z., .tar, or .gz")
-  }
-  # ----------------------------------------------------------------------------
-  # Report where the extracted files were saved.
-  message(paste0(
-    "Files unzipped and saved in ",
+  # Accept one or more archives and extraction directories.
+  checkmate::assert_character(
+    file_name,
+    min.len = 1L,
+    min.chars = 1L,
+    any.missing = FALSE
+  )
+  checkmate::assert_character(
     directory_to_unzip,
-    ".\n"
-  ))
+    min.len = 1L,
+    min.chars = 1L,
+    any.missing = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Allow one shared directory or exactly one directory per archive.
+  int_nfile <- length(file_name)
+  checkmate::assert_subset(length(directory_to_unzip), c(1L, int_nfile))
+  # ----------------------------------------------------------------------------
+  # Expand a shared directory while preserving explicit archive/directory pairs.
+  chr_directories <- if (length(directory_to_unzip) == 1L) {
+    rep(directory_to_unzip, int_nfile)
+  } else {
+    directory_to_unzip
+  }
+  # ----------------------------------------------------------------------------
+  # Extract each archive into its corresponding directory.
+  lapply(
+    seq_along(file_name),
+    function(f) {
+      chr_file <- file_name[f]
+      chr_directory <- chr_directories[f]
+      chr_extension <- tolower(tools::file_ext(chr_file))
+      # ------------------------------------------------------------------------
+      # Select the extraction method separately for each archive.
+      message("Unzipping ", chr_file, "...")
+      if (chr_extension == "zip") {
+        utils::unzip(chr_file, exdir = chr_directory)
+      } else if (chr_extension %in% c("7z", "gz", "tar")) {
+        archive::archive_extract(chr_file, dir = chr_directory)
+      } else {
+        stop(
+          "Unsupported archive format for '",
+          chr_file,
+          "'. Expected .zip, .7z, .tar, or .gz.",
+          call. = FALSE
+        )
+      }
+      # ------------------------------------------------------------------------
+      # Report the extraction directory.
+      message("Files unzipped and saved in ", chr_directory, ".")
+      invisible(NULL)
+    }
+  )
   # ----------------------------------------------------------------------------
   # Remove downloaded archives and their parent directories when requested.
   amadeus:::download_remove_zips(
     remove = remove,
     download_name = file_name
   )
+  # ----------------------------------------------------------------------------
+  # Return NULL.
+  invisible(NULL)
 }
 
 ################################################################################
 #' Remove zip files
 #' @description
-#' Remove downloaded ".zip" files.
+#' Remove supplied archive files and recursively delete their parent
+#' directories.
 #' @param remove logical(1). Confirm removal. Default is FALSE.
-#' @param download_name character. Full zip file path
+#' @param download_name character vector. Archive file paths to remove.
 #' @note
-#' !!! USE THE FUNCTION WITH CAUTION !!!
-#' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
-#' ".zip" files without unzipping will retain none of the downloaded data.
-#' then it will remove all files in the second higher level directory.
-#' @return NULL; removes downloaded zip files after they are unzipped
+#' With `remove = TRUE`, each immediate parent directory returned by
+#' `dirname(download_name)` is deleted recursively, including files that were
+#' not listed in `download_name`. This helper does not check whether extraction
+#' occurred. Call it only after all required extractions from those directories
+#' have finished, with extracted data stored outside the directories removed.
+#' @return Invisible `NULL`; optionally removes archives and their directories.
 #' @keywords internal
 #' @export
 download_remove_zips <- function(
@@ -747,10 +808,14 @@ download_remove_zips <- function(
 ################################################################################
 #' Create hash of downloaded files.
 #' @description
-#' Create a combined md5sum hash based on the files in a specified directory.
+#' Create a combined MD5 hash from file contents recursively under a specified
+#' directory, including files in nested subdirectories and previously saved
+#' files.
 #' @param hash logical(1). Create hash of downloaded files.
-#' @param dir character(1). Directory path.
-#' @return character(1) Combined 128-bit md5sum of download files.
+#' @param dir character(1). Root directory to hash. Sibling directories are not
+#'   included; hashing `data_files/` therefore excludes sibling `zip_files/`.
+#' @return With `hash = TRUE`, a character(1) combined MD5 hash. With
+#'   `hash = FALSE`, invisible `NULL`.
 #' @keywords internal auxiliary
 #' @export
 download_hash <- function(
@@ -787,7 +852,9 @@ download_hash <- function(
 #' @param hash logical(1). Return a directory hash instead of the download
 #'   summary.
 #' @param directory_to_save character(1). Directory containing downloaded or
-#'   extracted files. Used only when `hash = TRUE`.
+#'   extracted files. All files recursively under this directory are included,
+#'   including existing files and files in per-archive subdirectories. Used only
+#'   when `hash = TRUE`; the caller selects the directory to hash.
 #' @return `results`, returned invisibly when `hash = FALSE`; otherwise a
 #'   character scalar containing the combined MD5 hash from [download_hash()].
 #' @seealso [download_run_method()], [download_hash()]
