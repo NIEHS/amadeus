@@ -1031,3 +1031,80 @@ testthat::test_that("process_goes(path=<inconsistent variable index>): errors on
     )
   })
 })
+
+
+################################################################################
+##### GOES empty listings and transient-response classification
+
+testthat::test_that("discover_goes(): preserves empty listing columns", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "application/xml"),
+        body = charToRaw(paste0(
+          '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+          '</ListBucketResult>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://noaa-goes16.s3.amazonaws.com/",
+    product = "ADP-C", date = "20200101", dir = "data/",
+    prefix = "ABI-L2-ADPC/2020/001/"
+  )
+  # --------------------------------------------------------------------------
+  # A successful but empty listing returns a typed table for callers to handle.
+  testthat::expect_message(
+    result <- amadeus:::discover_goes(df, rate_limit = 0),
+    "No GOES files found for ADP-C on 20200101.", fixed = TRUE
+  )
+  expected <- cbind(
+    df[FALSE, , drop = FALSE],
+    data.frame(
+      file = character(), url = character(),
+      vdir = character(), destfile = character()
+    )
+  )
+  testthat::expect_identical(result, expected)
+})
+
+testthat::test_that("discover_goes(): classifies transient statuses", {
+  request <- NULL
+  key <- "ABI-L2-ADPC/2020/001/00/example.nc"
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      request <<- req
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "application/xml"),
+        body = charToRaw(paste0(
+          '<ListBucketResult><Contents><Key>', key,
+          '</Key></Contents></ListBucketResult>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://noaa-goes16.s3.amazonaws.com/",
+    product = "ADP-C", date = "20200101", dir = "data/",
+    prefix = "ABI-L2-ADPC/2020/001/"
+  )
+  result <- amadeus:::discover_goes(df, max_tries = 3L, rate_limit = 0)
+  # --------------------------------------------------------------------------
+  # Exercise the installed predicate without sleeping or performing retries.
+  is_transient <- request$policies$retry_is_transient
+  statuses <- c(429L, 503L, 504L, 200L, 404L)
+  testthat::expect_identical(
+    vapply(statuses, function(status) {
+      is_transient(httr2::response(status_code = status))
+    }, logical(1)),
+    c(TRUE, TRUE, TRUE, FALSE, FALSE)
+  )
+  testthat::expect_equal(request$policies$retry_max_tries, 3)
+  testthat::expect_identical(result$url, paste0(df$base, key))
+  testthat::expect_identical(result$destfile, paste0(df$dir, key))
+})

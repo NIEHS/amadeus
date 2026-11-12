@@ -1198,3 +1198,27 @@ testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calc
     }
   })
 })
+
+
+################################################################################
+##### Unsupported EDGAR monthly text requests fail before download setup
+
+testthat::test_that("download_edgar(temp_res=monthly, format=txt): errors", {
+  directory <- file.path(withr::local_tempdir(), "not-created")
+  testthat::local_mocked_bindings(
+    download_setup_dir = function(...) stop("Invalid request reached setup."),
+    download_run_method = function(...) stop("Unexpected invalid download."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # A valid emissions selection isolates the unsupported monthly text format.
+  testthat::expect_error(
+    amadeus::download_edgar(
+      species = "NOx", version = "8.1", temp_res = "monthly",
+      format = "txt", output = "emi",
+      directory_to_save = directory, acknowledgement = TRUE
+    ),
+    "Monthly resolution is only supported for format 'nc'.", fixed = TRUE
+  )
+  testthat::expect_false(dir.exists(directory))
+})

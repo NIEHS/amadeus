@@ -607,3 +607,53 @@ testthat::test_that("download_nei stops on unrecognized year", {
     "NEI data is not available for year"
   )
 })
+
+
+################################################################################
+##### download_nei mixed supported and unsupported year preview
+
+testthat::test_that("download_nei(year=c(2017, 2019)): plans supported years", {
+  directory <- normalizePath(withr::local_tempdir(), winslash = "/")
+  warnings <- character()
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # Retain both the deprecation warning and the unsupported-year explanation.
+  result <- withVisible(withCallingHandlers(
+    suppressMessages(amadeus::download_nei(
+      year = c(2017L, 2019L),
+      directory_to_save = directory,
+      acknowledgement = TRUE,
+      download = FALSE
+    )),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  ))
+  # --------------------------------------------------------------------------
+  # A mixed request must retain its supported inventory and matching filename.
+  testthat::expect_length(warnings, 2L)
+  testthat::expect_match(
+    warnings[1L], "download=FALSE is deprecated", fixed = TRUE
+  )
+  testthat::expect_match(
+    warnings[2L], "not available for year(s): 2019", fixed = TRUE
+  )
+  testthat::expect_match(
+    warnings[2L], "Proceeding with download for year(s): 2017.", fixed = TRUE
+  )
+  testthat::expect_false(result$visible)
+  testthat::expect_identical(result$value, list(
+    urls = paste0(
+      "https://gaftp.epa.gov/air/nei/2017/data_summaries/",
+      "2017v1/2017neiApr_onroad_byregions.zip"
+    ),
+    destfiles = file.path(
+      directory, "zip_files", "2017neiApr_onroad_byregions.zip"
+    ),
+    n_files = 1L
+  ))
+})

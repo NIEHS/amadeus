@@ -563,3 +563,50 @@ testthat::test_that("calculate_prism(radius=1000): extraction uses a single buff
 
   testthat::expect_equal(result$ppt_1000, expected[[1]])
 })
+
+
+################################################################################
+##### Archive validation rejects warnings and handles empty response previews
+
+testthat::test_that("validate_zip(): rejects warning-only archive listings", {
+  path <- file.path(withr::local_tempdir(), "damaged.zip")
+  writeLines("provider error response", path)
+  testthat::local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      testthat::expect_identical(zipfile, path)
+      testthat::expect_true(list)
+      warning("Incomplete archive listing.")
+      data.frame(Name = "partial.tif", Length = 1)
+    },
+    .package = "utils"
+  )
+  # --------------------------------------------------------------------------
+  # A listing warning must not be treated as successful archive validation.
+  testthat::expect_error(
+    amadeus:::validate_zip(path),
+    paste0(
+      "Downloaded archive 'damaged.zip' is not a valid zip file.",
+      "Response preview: provider error response"
+    ),
+    fixed = TRUE
+  )
+  testthat::expect_identical(readLines(path), "provider error response")
+})
+
+testthat::test_that("validate_zip(): handles an empty response preview", {
+  path <- file.path(withr::local_tempdir(), "empty.zip")
+  writeBin(raw(), path)
+  testthat::local_mocked_bindings(
+    unzip = function(...) stop("Cannot read archive listing."),
+    .package = "utils"
+  )
+  # --------------------------------------------------------------------------
+  # An empty response still reports the archive name without a preview suffix.
+  testthat::expect_equal(file.size(path), 0)
+  error <- tryCatch(amadeus:::validate_zip(path), error = identity)
+  testthat::expect_s3_class(error, "error")
+  testthat::expect_identical(
+    conditionMessage(error),
+    "Downloaded archive 'empty.zip' is not a valid zip file."
+  )
+})

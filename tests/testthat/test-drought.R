@@ -2132,3 +2132,105 @@ testthat::test_that("USDM linked mock workflow: extracts complete bundles and ca
     tolerance = 1e-6
   )
 })
+
+
+################################################################################
+##### Direct source previews retain planned files without downloading
+
+testthat::test_that("download_eddi(download=FALSE): previews Tuesday grids", {
+  directory <- normalizePath(withr::local_tempdir(), winslash = "/")
+  files <- c("EDDI_ETrs_01mn_20191231.asc", "EDDI_ETrs_01mn_20200107.asc")
+  writeLines("existing grid", file.path(directory, files[1L]))
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    download_hash = function(...) stop("Unexpected preview hash."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # Crossing a year boundary must select the correct remote year per Tuesday.
+  testthat::expect_warning(
+    result <- withVisible(suppressMessages(amadeus::download_eddi(
+      date = c("2019-12-30", "2020-01-08"),
+      timescale = 1L,
+      directory_to_save = directory,
+      acknowledgement = TRUE,
+      download = FALSE,
+      hash = TRUE
+    ))),
+    "download=FALSE is deprecated", fixed = TRUE
+  )
+  # --------------------------------------------------------------------------
+  # Existing destinations stay in the preview, which takes precedence over hash.
+  testthat::expect_false(result$visible)
+  testthat::expect_identical(result$value, list(
+    urls = paste0(
+      "ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data/",
+      c("2019/", "2020/"), files
+    ),
+    destfiles = file.path(directory, files),
+    n_files = 2L
+  ))
+  testthat::expect_identical(list.files(directory), files[1L])
+  testthat::expect_identical(
+    readLines(file.path(directory, files[1L])), "existing grid"
+  )
+})
+
+testthat::test_that("download_spei(download=FALSE): previews each version", {
+  directory <- normalizePath(withr::local_tempdir(), winslash = "/")
+  versions <- c("2.11", "2.10", "legacy")
+  endpoints <- c("spei_database_2_11/nc", "spei_database_2_10/nc", "files")
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # The selected version changes the URL while preserving the flat local name.
+  for (i in seq_along(versions)) {
+    testthat::expect_warning(
+      result <- withVisible(suppressMessages(amadeus::download_spei(
+        timescale = 3L,
+        version = versions[i],
+        directory_to_save = directory,
+        acknowledgement = TRUE,
+        download = FALSE
+      ))),
+      "download=FALSE is deprecated", fixed = TRUE
+    )
+    testthat::expect_false(result$visible)
+    testthat::expect_identical(result$value, list(
+      urls = paste0("https://spei.csic.es/", endpoints[i], "/spei03.nc"),
+      destfiles = file.path(directory, "spei03.nc"),
+      n_files = 1L
+    ))
+  }
+  testthat::expect_length(list.files(directory, recursive = TRUE), 0L)
+})
+
+testthat::test_that("download_usdm(download=FALSE): previews archive paths", {
+  directory <- normalizePath(withr::local_tempdir(), winslash = "/")
+  files <- c("USDM_20200107_M.zip", "USDM_20200114_M.zip")
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    download_unzip = function(...) stop("Unexpected preview extraction."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # Preview the real archive layout without transferring or extracting files.
+  testthat::expect_warning(
+    result <- withVisible(suppressMessages(amadeus::download_usdm(
+      date = c("2020-01-07", "2020-01-14"),
+      directory_to_save = directory,
+      acknowledgement = TRUE,
+      download = FALSE
+    ))),
+    "download=FALSE is deprecated", fixed = TRUE
+  )
+  testthat::expect_false(result$visible)
+  testthat::expect_identical(result$value, list(
+    urls = paste0("https://droughtmonitor.unl.edu/data/shapefiles_m/", files),
+    destfiles = file.path(directory, "zip_files", files),
+    n_files = 2L
+  ))
+  testthat::expect_length(list.files(directory, recursive = TRUE), 0L)
+})

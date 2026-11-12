@@ -3738,3 +3738,200 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
     "No MODIS files found"
   )
 })
+
+
+################################################################################
+##### CMR pagination uses real response parsing without contacting NASA
+
+testthat::test_that("query_modis_granules(): combines pages using a cursor", {
+  requests <- list()
+  cursor <- '["opaque continuation",42]'
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      requests[[length(requests) + 1L]] <<- req
+      page <- length(requests)
+      if (page > 2L) stop("Unexpected additional CMR request.")
+      ids <- if (page == 1L) seq_len(2000L) else 2001L
+      records <- sprintf(
+        '{"id":"G%04d","links":[{"href":"https://example.org/%04d.hdf"}]}',
+        ids, ids
+      )
+      httr2::response(
+        url = req$url,
+        headers = list(
+          "Content-Type" = "application/json",
+          "CMR-Hits" = "2001",
+          "CMR-Search-After" = cursor
+        ),
+        body = charToRaw(paste0(
+          '{"feed":{"entry":[', paste(records, collapse = ","), ']}}'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # A full first page must not truncate a query containing 2001 records.
+  result <- suppressMessages(amadeus:::query_modis_granules(
+    product = "MOD11A1", version = "061",
+    date = c("2020-01-01", "2020-01-31"),
+    extent = c(-80, 30, -70, 40), max_tries = 3L, rate_limit = 0
+  ))
+  testthat::expect_length(requests, 2L)
+  testthat::expect_length(result, 2001L)
+  testthat::expect_identical(
+    vapply(result, function(x) x$id, character(1)),
+    sprintf("G%04d", seq_len(2001L))
+  )
+  testthat::expect_identical(
+    result[[2001L]]$links[[1L]]$href, "https://example.org/2001.hdf"
+  )
+  # --------------------------------------------------------------------------
+  # Only the continuation header changes; query and request safeguards persist.
+  testthat::expect_false("CMR-Search-After" %in% names(requests[[1L]]$headers))
+  testthat::expect_identical(
+    requests[[2L]]$headers[["CMR-Search-After"]], cursor
+  )
+  testthat::expect_identical(requests[[2L]]$url, requests[[1L]]$url)
+  query <- httr2::url_parse(requests[[1L]]$url)$query
+  testthat::expect_identical(query$short_name, "MOD11A1")
+  testthat::expect_identical(query$version, "061")
+  testthat::expect_identical(query$page_size, "2000")
+  testthat::expect_identical(query$temporal, "2020-01-01,2020-01-31")
+  testthat::expect_identical(query$bounding_box, "-80,30,-70,40")
+  for (req in requests) {
+    testthat::expect_equal(req$options$timeout_ms, 120000)
+    testthat::expect_equal(req$options$connecttimeout, 30)
+    testthat::expect_equal(req$policies$retry_max_tries, 3)
+    testthat::expect_true(req$policies$retry_on_failure)
+  }
+})
+
+testthat::test_that("query_modis_granules(): requires a continuation cursor", {
+  body <- charToRaw(paste0(
+    '{"feed":{"entry":[', paste(rep("{}", 2000L), collapse = ","), ']}}'
+  ))
+  calls <- 0L
+  # --------------------------------------------------------------------------
+  # A full page with more advertised hits requires a nonempty continuation.
+  for (cursor in list(NULL, "")) {
+    testthat::local_mocked_bindings(
+      req_perform = function(req, ...) {
+        calls <<- calls + 1L
+        if (calls > 2L) stop("Unexpected additional CMR request.")
+        headers <- list(
+          "Content-Type" = "application/json", "CMR-Hits" = "2001"
+        )
+        if (!is.null(cursor)) headers[["CMR-Search-After"]] <- cursor
+        httr2::response(url = req$url, headers = headers, body = body)
+      },
+      .package = "httr2"
+    )
+    testthat::expect_error(
+      amadeus:::query_modis_granules(
+        product = "MOD11A1", version = "061",
+        date = c("2020-01-01", "2020-01-31"),
+        extent = c(-80, 30, -70, 40), rate_limit = 0
+      ),
+      "CMR pagination is incomplete: missing CMR-Search-After header.",
+      fixed = TRUE
+    )
+  }
+  testthat::expect_identical(calls, 2L)
+})
+
+testthat::test_that("query_modis_granules(): stops when a cursor repeats", {
+  body <- charToRaw(paste0(
+    '{"feed":{"entry":[', paste(rep("{}", 2000L), collapse = ","), ']}}'
+  ))
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      if (calls > 2L) stop("Unexpected additional CMR request.")
+      httr2::response(
+        url = req$url,
+        headers = list(
+          "Content-Type" = "application/json",
+          "CMR-Hits" = "4001", "CMR-Search-After" = "same-cursor"
+        ),
+        body = body
+      )
+    },
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # Reject the repeated continuation rather than looping or returning a subset.
+  testthat::expect_error(
+    amadeus:::query_modis_granules(
+      product = "MOD11A1", version = "061",
+      date = c("2020-01-01", "2020-01-31"),
+      extent = c(-80, 30, -70, 40), rate_limit = 0
+    ),
+    "CMR pagination is incomplete: repeated CMR-Search-After value.",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 2L)
+})
+
+testthat::test_that("query_modis_granules(): rejects changing totals", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      if (calls > 2L) stop("Unexpected additional CMR request.")
+      count <- if (calls == 1L) 2000L else 1L
+      httr2::response(
+        url = req$url,
+        headers = list(
+          "Content-Type" = "application/json",
+          "CMR-Hits" = as.character(2000L + calls),
+          "CMR-Search-After" = "next-page"
+        ),
+        body = charToRaw(paste0(
+          '{"feed":{"entry":[', paste(rep("{}", count), collapse = ","), ']}}'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # The catalog total must remain stable throughout a paginated query.
+  testthat::expect_error(
+    amadeus:::query_modis_granules(
+      product = "MOD11A1", version = "061",
+      date = c("2020-01-01", "2020-01-31"),
+      extent = c(-80, 30, -70, 40), rate_limit = 0
+    ),
+    "CMR result count changed during pagination; retry the query.", fixed = TRUE
+  )
+  testthat::expect_identical(calls, 2L)
+})
+
+testthat::test_that("query_modis_granules(): rejects premature termination", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      if (calls > 1L) stop("Unexpected additional CMR request.")
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "application/json", "CMR-Hits" = "2"),
+        body = charToRaw('{"feed":{"entry":[{"id":"only-record"}]}}')
+      )
+    },
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # A short page is an error when it does not account for all advertised hits.
+  testthat::expect_error(
+    amadeus:::query_modis_granules(
+      product = "MOD11A1", version = "061",
+      date = c("2020-01-01", "2020-01-31"),
+      extent = c(-80, 30, -70, 40), rate_limit = 0
+    ),
+    "CMR pagination is incomplete: retrieved 1 of 2 granule records.",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 1L)
+})

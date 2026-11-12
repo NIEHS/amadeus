@@ -1381,3 +1381,125 @@ testthat::test_that("calculate_merra2 .by_time level-aware grouping", {
   testthat::expect_equal(lev2, 35)
   testthat::expect_s3_class(result_mean$time, "POSIXct")
 })
+
+
+################################################################################
+##### MERRA-2 discovery validates inputs and listing completeness
+
+testthat::test_that("discover_merra2(base): rejects non-directory HTTP URLs", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # Reject unsupported schemes and paths that are not directory URLs.
+  bases <- c("ftp://example.org/data/", "https://example.org/data/file.nc4")
+  for (base in bases) {
+    df <- data.frame(base = base, date = "20200101", vdir = "data/")
+    testthat::expect_error(
+      amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+      "Each base must be an HTTP(S) directory URL ending in '/'.", fixed = TRUE
+    )
+  }
+})
+
+testthat::test_that("discover_merra2(date): rejects invalid dates", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # Both formatting errors and impossible calendar dates fail before HTTP.
+  for (date in c("2020-01-01", "20200230", "20201301")) {
+    df <- data.frame(
+      base = "https://example.org/data/", date = date, vdir = "data/"
+    )
+    testthat::expect_error(
+      amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+      "Dates must be valid YYYYMMDD strings.", fixed = TRUE
+    )
+  }
+})
+
+testthat::test_that("discover_merra2(df): rejects conflicting destinations", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/", date = "20200101",
+    vdir = c("first/", "second/")
+  )
+  # --------------------------------------------------------------------------
+  # One base/date pair cannot identify two different destinations.
+  testthat::expect_error(
+    amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+    "Each base/date pair must identify exactly one input row.", fixed = TRUE
+  )
+})
+
+testthat::test_that("discover_merra2(): requires data for every date", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "text/html"),
+        body = charToRaw(paste0(
+          '<html><body><a href="MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'day 1</a><a href="MERRA2_400.inst1_2d_asm_Nx.20200102.nc4.xml">',
+          'day 2 metadata</a></body></html>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/",
+    date = c("20200101", "20200102"), vdir = "data/"
+  )
+  # --------------------------------------------------------------------------
+  # Metadata alone cannot satisfy the requested day's required .nc4 file.
+  testthat::expect_error(
+    amadeus:::discover_merra2(
+      df, collection = "inst1_2d_asm_Nx", rate_limit = 0
+    ),
+    "Missing MERRA-2 data for 20200102 in: https://example.org/data/",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 1L)
+})
+
+testthat::test_that("discover_merra2(): rejects conflicting filenames", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "text/html"),
+        body = charToRaw(paste0(
+          '<html><body>',
+          '<a href="first/MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'first</a><a href="second/MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'second</a></body></html>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/", date = "20200101", vdir = "data/"
+  )
+  # --------------------------------------------------------------------------
+  # Different remote paths must not silently overwrite the same local file.
+  testthat::expect_error(
+    amadeus:::discover_merra2(
+      df, collection = "inst1_2d_asm_Nx", rate_limit = 0
+    ),
+    "Multiple URLs map to the same file name in: https://example.org/data/",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 1L)
+})
