@@ -1,0 +1,9 @@
+file,change,impact
+R/storage_boundary.R,"Retained build-status fix; added .publication_sha(), .publication_path(), .publication_release(), storage_publish_manifest(), storage_verify_publication()",Post-calculation publication and once-per-open consumer verification; no scientific dispatch
+R/schema_export.R,Bind manifest after DB checks; protect critical files; completion receipt includes manifest hash; final pointer replaced via same-directory rename,Publication/discovery behavior; ordinary science and schema meanings unchanged
+R/database.R,Saved DuckDB query invokes publication verifier before readonly connection,Adds owned-snapshot I/O per open; no raw-source reread
+dev/validate_release.R,New release revision/profile and runtime fingerprints,Build-only requalification; scientific policy remains pending
+check_setup.R,Optional output-filesystem chmod/rename probe,Read-only setup check; no installation or package mutation
+tests/replay.sh and tests/capture_environment.R,"Test-only request runner and automatic diagnostics, including failure capture",Not imported by Amadeus; no new runtime Python
+tests/direct_source_check.R,Independent nearest-coordinate CF decoder comparison,"Scientific QA only, not replacement production science"
+review/*.csv,Scientific decisions and independent replay templates,Manual approval records; not runtime metadata imports

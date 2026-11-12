@@ -1,0 +1,9 @@
+{
+  "boundary_checks_passed": true,
+  "sql_rules": 60,
+  "structural_json_schema": true,
+  "geometry": true,
+  "full_column_Parquet_readback": true,
+  "parquet_sha256": "56a6df8092c853cc4a45bb072cc18ad8447e3748421677b3411037b7bf2ec1bc",
+  "publication_accepted": false
+}

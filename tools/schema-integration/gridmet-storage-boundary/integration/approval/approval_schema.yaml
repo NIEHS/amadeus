@@ -1,0 +1,47 @@
+id: https://example.org/amadeus/pilot-approval
+name: gridmet_approval_contract
+prefixes:
+  linkml: https://w3id.org/linkml/
+  pilot: https://example.org/amadeus/pilot-approval/
+default_prefix: pilot
+imports:
+  - linkml:types
+classes:
+  ApprovalCatalog:
+    tree_root: true
+    attributes:
+      id: {range: string, required: true}
+      dataset: {range: string, required: true}
+      production_approved: {range: boolean, required: true}
+      policies: {range: VariablePolicy, required: true, multivalued: true, inlined_as_list: true}
+      evidence: {range: Evidence, required: true, multivalued: true, inlined_as_list: true}
+  VariablePolicy:
+    attributes:
+      code: {range: string, required: true}
+      status: {range: QualificationStatus, required: true}
+      scope: {range: string, required: true}
+      native_unit: {range: string, required: true}
+      output_unit: {range: string, required: true}
+      source_unit_aliases: {range: string, required: true}
+      conversion: {range: Conversion, required: true}
+      database_tolerance: {range: double, required: true, minimum_value: 0}
+      evidence_id: {range: string, required: true}
+      scientific_review: {range: ReviewStatus, required: true}
+  Evidence:
+    attributes:
+      id: {range: string, required: true}
+      file: {range: string, required: true}
+      sha256: {range: string, required: true, pattern: '^[a-f0-9]{64}$'}
+enums:
+  QualificationStatus:
+    permissible_values:
+      recognized:
+      enabled_for_testing:
+      qualified:
+  Conversion:
+    permissible_values:
+      identity:
+  ReviewStatus:
+    permissible_values:
+      pending:
+      reviewed:

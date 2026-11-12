@@ -1,0 +1,58 @@
+{
+  "revision": "publication-manifest-v1",
+  "engines": [
+    "duckdb"
+  ],
+  "instance_sha256": "594f55ed2312ee4cad80d04bbc8b972a114289ee9480a3edf1d4796f1b101d32",
+  "schema_sha256": "cb8a1481cf4604aad68e05ffd599a39c85bd021784a8e10adaac8420e7de119e",
+  "runtime_contract_sha256": "730f7bf63d0ea58001aec1868f23dcb1cded73c0ac843b8afaaa210ca5d5e59d",
+  "files": {
+    "schema-instance.json": {
+      "bytes": 16843,
+      "sha256": "594f55ed2312ee4cad80d04bbc8b972a114289ee9480a3edf1d4796f1b101d32"
+    },
+    "acceptance.json": {
+      "bytes": 1925,
+      "sha256": "ec847630057040b87187e7293ed365a1d0ffd11dda8f0f20f3a49a7664dffbaa"
+    },
+    "results.csv": {
+      "bytes": 278,
+      "sha256": "a3c50f3cabd65067d4300edba3261d037ffd4c35570ab81b8223d400a8603463"
+    },
+    "source-metadata.json": {
+      "bytes": 1729,
+      "sha256": "94e396e5ab8c0914d109b3bd285d5a95d6d3c9ad7f6a143ecc8632571ffadd38"
+    },
+    "direct-output-context.json": {
+      "bytes": 701,
+      "sha256": "d917cafe38efc7d21309eb5cfc9f4e8579ff7bf430eb040c1b2c727b67bcd485"
+    },
+    "provenance/execution.rds": {
+      "bytes": 1486,
+      "sha256": "e2733242aff75f642a54f69296cb9627af98eace7afa73eb196b53acce794e53"
+    },
+    "provenance/events.json": {
+      "bytes": 7016,
+      "sha256": "32f44750ee1375ac571b931800895ae07af5d10120e8c96a033eed3d95f2b2a3"
+    },
+    "provenance/seal.json": {
+      "bytes": 385,
+      "sha256": "b2d0953fbf0b276b544f10c2d32ded212ca66ead09742cff7b1f7c3073dbc302"
+    },
+    "database/duckdb/gridmet.duckdb": {
+      "bytes": 15216640,
+      "sha256": "5878422529a88f4006ed57f378485c92fef2153f28f668cede6f832f8ef440a7"
+    },
+    "database/duckdb/receipt.json": {
+      "bytes": 736,
+      "sha256": "aa11e4f3499a9aeab226d50106d358b14eb6212111b020c7ba140a504ffa6201"
+    },
+    "database/duckdb/accepted-values.parquet": {
+      "bytes": 6373,
+      "sha256": "66a16ca948f577157078539b2a84e7624f2811239ebd7e8966ee064ce2168b3f"
+    }
+  },
+  "verification_scope": "Owned published snapshot bytes; no provider reread; unsigned local receipt chain",
+  "immutable_policy": "New run directory; no overwrite; read-only published files; coordinated privileged edits not independently attested",
+  "production_approved": false
+}

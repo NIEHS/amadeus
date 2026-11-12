@@ -1,0 +1,10 @@
+workload,comparison,paired_repetitions,median_paired_seconds,median_paired_percent
+small,pilot minus ordinary,5,11.4554567337036,76.27920522069074
+small,candidate minus ordinary,5,12.819804668426501,89.31579534519881
+small,candidate minus pilot,5,1.957808732986397,7.39542143282701
+all16,pilot minus ordinary,5,51.7005739212036,279.9964226192769
+all16,candidate minus ordinary,5,67.7641739845275,366.36773991189904
+all16,candidate minus pilot,5,17.164365768432603,24.43304622370901
+scaled,pilot minus ordinary,5,52.584780216217105,200.78724054002697
+scaled,candidate minus ordinary,5,68.9736158847809,264.71409754883246
+scaled,candidate minus pilot,5,16.386023998260498,21.53442502285523

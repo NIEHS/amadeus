@@ -1,0 +1,10 @@
+{
+  "query_succeeded": true,
+  "owned_copied_source_files_removed": [
+    "/tmp/gridmet-storage-release.z6v56_9e/private-cache/tmmx/tmmx_2025.nc",
+    "/tmp/gridmet-storage-release.z6v56_9e/private-cache/pr/pr_2025.nc"
+  ],
+  "global_source_cache_untouched": true,
+  "scope": "Local source-availability test; not independent reviewer/environment replay",
+  "run": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-portable/direct-ac3c8cbc161968cf"
+}

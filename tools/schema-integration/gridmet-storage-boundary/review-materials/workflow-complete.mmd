@@ -1,0 +1,36 @@
+flowchart TD
+ subgraph GOVERNANCE[Development and review - not runtime AI]
+ AI[AI assists drafts / code / tests / documentation] -. proposals only .-> HD[Human reviews authority / units / time / binding / provenance / acceptance]
+ HD -. decisions pending .-> RG[Versioned rule / implementation / evidence / approval registers]
+ end
+ subgraph BUILD[Build and release]
+ Y[LinkML source modules and isolated approval definition] --> B[Build QA and pinned contracts]
+ A[Amadeus code and label metadata plus frozen unit policy] --> B
+ X[Optional external catalog] -. proposed and unimplemented .-> A
+ end
+ RG -. reviewed definitions .-> B
+ U[User variables / dates / locations / paths] --> DL[Amadeus download]
+ DL --> PR[Amadeus process]
+ PR --> CA[Amadeus calculate]
+ DL -. observe .-> RC[Explicit provenance recorder]
+ PR -. observe .-> RC
+ CA -. observe .-> RC
+ CA --> EX[Post-calculation export]
+ RC --> EX
+ B --> EX
+ EX --> V[Actual source / request / units / schema / lineage checks]
+ V -. observed outcomes .-> RG
+ V --> PQ[Typed Parquet and readback]
+ PQ --> DB[DuckDB load / 102 SQL / fidelity / reopen]
+ DB --> MF[Manifest binds files / receipts / release / instance]
+ MF --> RO[Read-only critical files]
+ RO --> WF[Workflow completion binds manifest SHA]
+ WF --> LP[Final LATEST pointer]
+ LP --> OP[Verified store open]
+ OP --> Q[Read-only query]
+ OP -. fail .-> REJ[Reject missing / changed / incomplete publication]
+ CA -. separate QA only .-> CF[Direct NetCDF source comparison]
+ Q -. evidence .-> HR[Human scientific review and independent replay]
+ CF -. evidence .-> HR
+ HR -. record actual decisions .-> RG
+ HR -. pending sign-off .-> B

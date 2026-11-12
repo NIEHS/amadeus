@@ -1,0 +1,39 @@
+{
+  "review_date": "2026-11-09",
+  "comparison": "optimized pilot vs latest package-metadata recorded candidate",
+  "dates": [
+    "2025-02-06",
+    "2025-02-09"
+  ],
+  "sites": [
+    "raleigh",
+    "denver",
+    "phoenix"
+  ],
+  "matched_cases": 8,
+  "repetitions_per_arm_per_workload": 2,
+  "small_records": 24,
+  "all16_records": 192,
+  "total_returned_rows_across_executions": 864,
+  "all_four_pairs_native_metadata_graph_match": true,
+  "maximum_cross_arm_native_difference": 0,
+  "SQL_checks_per_case": 102,
+  "package_inventory_codes": 33,
+  "active_qualified_profile_codes": 16,
+  "inventory_only_codes_rejected": 17,
+  "inventory_build_scope_checks_passed": 28,
+  "metadata_authority_probes": 5,
+  "authority_probes_all_accepted_by_build": true,
+  "independent_code_qualification_approval_enforced": false,
+  "scientific_units_correctness_proven_by_build": false,
+  "candidate_package_labels_JSON_and_DB_verified": true,
+  "catalog_identity_receipt_links_verified": true,
+  "postrun_source_RDS_database_audits_passed": true,
+  "critical_code_and_source_bytes_unchanged": true,
+  "source_mode": "identical cached annual files; fresh scientific executions",
+  "new_provider_download": false,
+  "external_spreadsheet_imported": false,
+  "schema_repo_or_core_Amadeus_changed": false,
+  "whole_model_equivalence_proven": false,
+  "production_approved": false
+}

@@ -1,0 +1,3 @@
+Reviewer,Environment,Request,Release_SHA256,Source_identity,Expected_records,Actual_records,Missing_values,Schema_accepted,Workflow_completed,SQL_checks,Verified_saved_query,Direct_source_check,Run_path,Status,Notes
+,,"small: tmmx,pr; Raleigh; Feb10-11 2025",,,4,,,,,,,,,not_run,Independent colleague/environment needed; do not prefill success
+,,all16; Raleigh/Denver/Phoenix; Feb10-16 2025,,,336,,,,,,,,,not_run,Include affected Ubuntu/R/terra stack if available

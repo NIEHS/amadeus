@@ -1,0 +1,3 @@
+case,reference,native_values_match,maximum_difference
+final-small,Prior frozen ordinary Amadeus comparator,True,0.0
+final-full,Prior frozen ordinary Amadeus comparator,True,0.0

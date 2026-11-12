@@ -1,0 +1,179 @@
+{
+    "$defs": {
+        "ApprovalCatalog": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "dataset": {
+                    "type": "string"
+                },
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/Evidence"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "policies": {
+                    "items": {
+                        "$ref": "#/$defs/VariablePolicy"
+                    },
+                    "type": "array"
+                },
+                "production_approved": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "id",
+                "dataset",
+                "production_approved",
+                "policies",
+                "evidence"
+            ],
+            "title": "ApprovalCatalog",
+            "type": "object"
+        },
+        "Conversion": {
+            "description": "",
+            "enum": [
+                "identity"
+            ],
+            "title": "Conversion",
+            "type": "string"
+        },
+        "Evidence": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "file": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sha256": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "file",
+                "sha256"
+            ],
+            "title": "Evidence",
+            "type": "object"
+        },
+        "QualificationStatus": {
+            "description": "",
+            "enum": [
+                "recognized",
+                "enabled_for_testing",
+                "qualified"
+            ],
+            "title": "QualificationStatus",
+            "type": "string"
+        },
+        "ReviewStatus": {
+            "description": "",
+            "enum": [
+                "pending",
+                "reviewed"
+            ],
+            "title": "ReviewStatus",
+            "type": "string"
+        },
+        "VariablePolicy": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "conversion": {
+                    "$ref": "#/$defs/Conversion"
+                },
+                "database_tolerance": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "evidence_id": {
+                    "type": "string"
+                },
+                "native_unit": {
+                    "type": "string"
+                },
+                "output_unit": {
+                    "type": "string"
+                },
+                "scientific_review": {
+                    "$ref": "#/$defs/ReviewStatus"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "source_unit_aliases": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/$defs/QualificationStatus"
+                }
+            },
+            "required": [
+                "code",
+                "status",
+                "scope",
+                "native_unit",
+                "output_unit",
+                "source_unit_aliases",
+                "conversion",
+                "database_tolerance",
+                "evidence_id",
+                "scientific_review"
+            ],
+            "title": "VariablePolicy",
+            "type": "object"
+        }
+    },
+    "$id": "https://example.org/amadeus/pilot-approval",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "",
+    "metamodel_version": "1.11.0",
+    "properties": {
+        "dataset": {
+            "type": "string"
+        },
+        "evidence": {
+            "items": {
+                "$ref": "#/$defs/Evidence"
+            },
+            "type": "array"
+        },
+        "id": {
+            "type": "string"
+        },
+        "policies": {
+            "items": {
+                "$ref": "#/$defs/VariablePolicy"
+            },
+            "type": "array"
+        },
+        "production_approved": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "id",
+        "dataset",
+        "production_approved",
+        "policies",
+        "evidence"
+    ],
+    "title": "gridmet_approval_contract",
+    "type": "object",
+    "version": null
+}

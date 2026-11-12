@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-12",
+  "documentation_only": true,
+  "stage_rows": 13,
+  "exact_storage_SQL_rule_rows": 60,
+  "non_SQL_family_rows": 8,
+  "human_decisions_pending": 6,
+  "protected_files_byte_identical": 139,
+  "test_to_rule_mapping": "suite references only; individual negative-test mapping pending",
+  "historical_AI_authorship": "not independently attested",
+  "new_scientific_or_performance_tests": false,
+  "new_runtime_dependencies": false,
+  "runtime_or_approval_behavior_changed": false,
+  "production_approval": false,
+  "Office_rendering_executed": false,
+  "Mermaid_renderer_executed": false
+}

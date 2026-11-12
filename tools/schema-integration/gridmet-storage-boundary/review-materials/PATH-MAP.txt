@@ -1,0 +1,2 @@
+Review pack relocation map
+../integration/... in review text means ../integration/... from this directory. Actual current code is not duplicated. Release ZIP paths in earlier narrative refer to archived review material; current code is directly included in this branch folder. Historical evidence paths remain historical identifiers. New tests generate new outputs; archived successes are not a tester result.

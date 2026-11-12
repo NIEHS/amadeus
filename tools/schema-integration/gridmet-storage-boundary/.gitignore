@@ -1,0 +1,8 @@
+# Scientific results and local caches are created per tester, never committed by default.
+/outputs/
+/raw-cache/
+/scratch/
+/faults/
+.Rhistory
+.RData
+.Rproj.user/

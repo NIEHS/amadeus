@@ -1,0 +1,1127 @@
+SLIDE 1: Amadeus schema integration: gridMET review
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Amadeus schema integration: gridMET review
+Amadeus Schema Integration at the Storage Boundary
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+1
+Evidence: LATEST, HIST
+Ordinary Amadeus workflows, explicit provenance recording, and
+schema enforcement during export and loading.
+Preserve science
+Reuse existing download,
+process and calculate
+routes.
+Validate publication
+Connect metadata,
+contracts, provenance,
+Parquet and DuckDB.
+Decide with evidence
+Compare correctness,
+coverage, cost and
+remaining risks.
+
+PRESENTER NOTES
+Presentation package is for review before a manual branch push. No source repository/core Amadeus changes or push occurred. The latest corrected release is distinguished from historical timed implementations throughout. Every graphic and text item in the PPTX is editable; PDF/PNG previews use the same scene but are not Microsoft PowerPoint renders.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 2: The proposal keeps Amadeus at the center
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+The proposal keeps Amadeus at the center
+Optional integration consumes scientific outputs; it is not a new scientific pipeline.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+2
+Evidence: LATEST, CHANGES
+RESPONSIBILITY
+WHO DOES IT
+BOUNDARY
+Dataset routes and
+science
+Existing Amadeus functions
+No namespace patch or new scientific
+dispatcher
+Calls, inputs and
+recording
+Ordinary caller + explicit
+recorder
+Caller still chooses arguments/order; no
+hidden package hook
+Contract and publication
+External export/storage support
+Can reject publication after calculation
+Store inspection
+Verified query entry point
+Read-only connection after snapshot checks
+Existing R integration packages; no runtime Python. Filesystem/I/O changes are explicit.
+
+PRESENTER NOTES
+Avoid saying external integration has no influence whatsoever: the caller supplies arguments, records lifecycle and may stop when publication fails. Export serialization, read-only permissions and integrity gates add behavior outside core Amadeus. The dependency points toward Amadeus; Amadeus does not require these helpers.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 3: Three implementation versions must stay distinct
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Three implementation versions must stay distinct
+Ordinary Amadeus is an additional scientific/performance baseline.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+3
+Evidence: HIST, LATEST
+VERSION
+WHAT IT ESTABLISHES
+WHAT IT DOES NOT ESTABLISH
+Optimized pilot
+Workflow/generated-R checks;
+measured in the 45-run study
+Latest publication-manifest
+protections
+Measured candidate
+Recorded ordinary calls + post-calc
+storage boundary; same build policy
+Consolidated build-status guard or
+protected saved query
+Current corrected
+release
+Guard consolidated; manifest/query
+integrity; 26 publication tests
+A new matched full-workflow
+runtime/memory comparison
+Historical performance labels remain “pilot” and “candidate” for traceability.
+
+PRESENTER NOTES
+The pilot review copy received the same build-only code/unit approval policy to reduce policy confounding, while its original metadata mapping remained. The latest candidate contains subsequent integrity changes. Do not place the new 0.13-second verification result into the old full-workflow timing bars.
+
+EVIDENCE
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 4: End-to-end: from request to a verified query
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+End-to-end: from request to a verified query
+Build definitions once; validate real data when it exists; publish a bound snapshot.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+4
+Evidence: LATEST, CHANGES
+LinkML + catalog
+Reviewed policy and compiled
+contracts
+Ordinary request
+Variables, dates, locations and
+paths
+Amadeus science
+Download → process → calculate
+Post-calc export
+Recorded context + actual outputs
++ contracts
+Parquet + DuckDB
+Typing/readback; load;
+SQL/fidelity/reopen
+Publication + query
+Manifest → completion → verified
+open
+Recording during science; validation after calculate; human approval pending.
+
+PRESENTER NOTES
+The upper build box feeds the post-calculation writer, not scientific dispatch. Request feeds ordinary scientific calls. Recorder start/finish/source observations occur alongside science, with the contract verifier running after calculation. Detailed module/file mapping and the complete Mermaid/SVG flow are supplied separately.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 5: LinkML defines the contract; artifacts carry it to runtime
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+LinkML defines the contract; artifacts carry it to runtime
+Source YAML modules are build inputs. Runtime reads compiled contracts and data.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+5
+Evidence: CHANGES, LATEST
+SOURCE MODULE
+ROLE IN THE INTEGRATION
+amadeus_schema.yaml + common
+Composition and shared identifiers/types
+catalog
+Dataset/product/variable/asset metadata structures
+request
+Requested variables, locations and time-window structures
+provenance + value
+Execution/lineage records and reported values
+Isolated approval extension
+Qualification status, native-unit policy and evidence fields
+Generated JSON/R/SQL are pinned. The core schema repository was not edited.
+
+PRESENTER NOTES
+The module names are LinkML source modules, not proof of implemented database SQL namespaces. Generated tables follow model classes (e.g. ProductVariable, ToolRun, AmbientValueAtLocation); future planned operational schema layouts/migrations are not implemented here. The approval extension is isolated in the release copy, not silently adopted into the upstream schema repository. Main generated R validators remain pinned artifacts; the current candidate does not execute them as its runtime validator. JSON Schema/SQL/shared boundary checks enforce actual records. Build consistency does not establish scientific truth.
+
+EVIDENCE
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 6: Metadata has explicit authorities
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Metadata has explicit authorities
+One released catalog connects source descriptions with actual observed data.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+6
+Evidence: SCI, LATEST, DIRECT
+PROPERTY
+CURRENT AUTHORITY
+LIMIT
+Supported codes / labels
+Installed Amadeus mapping helpers
+33 recognized ≠ 33 onboarded
+Native/output units and
+tolerance
+Frozen policy + observed NetCDF units
+Scientific review pending; identity
+only
+File identity / grid / source
+name
+Actual source file observations
+No claim of continuous
+immutability
+Request and output context
+Caller inputs and actual outputs
+Not inferred solely from a result
+table
+Coverage, license, external
+mappings
+Only supplied/approved information
+Do not invent absent metadata
+16 native daily codes are active; PDSI/SPEI/EDDI are not newly qualified here.
+
+PRESENTER NOTES
+Amadeus-derived does not mean all metadata came from package helpers. Native units and aliases/tolerances are carried by the reviewed-policy candidate; actual CF attributes are retained. Coverage must not be inferred from function default years. The unit-review worksheet contains source facts and supporting numeric evidence, with human decisions still pending.
+
+EVIDENCE
+SCI: evidence/sci.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/review/scientific-unit-review.csv
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+DIRECT: evidence/direct.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/direct-source-values.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 7: The user supplies ordinary scientific inputs
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+The user supplies ordinary scientific inputs
+The integration adds explicit observation and a final export, not a second dataset route.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+7
+Evidence: LATEST, CURRENTCASES
+Example request
+Variables: tmmx, pr
+Dates: 10–11 February 2025
+Site: Raleigh
+Source cache and output paths
+No user-authored schema JSON or
+spreadsheet
+Existing Amadeus functions
+download_data(dataset_name = "gridmet", ...)
+process_covariates(covariate = "gridmet", ...)
+calculate_covariates(covariate = "gridmet", ...)
+
+Then: export_gridmet(outputs, request, recorded context, ...)
+Scientific profile: point/radius 0, mean, native daily values; no temporal aggregation.
+
+PRESENTER NOTES
+Scientific calls and argument expressions were matched between ordinary baseline, pilot and measured candidate. The common test handoff writes/reopens TIFF and restores expected date labels/names; this is not independent proof of physical intervals. The user can use ordinary argument inputs; the supplied shell replay wrapper is qualification convenience, not a new mandatory Amadeus API.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CURRENTCASES: evidence/currentcases.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/case-summary.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 8: External R responsibilities are visible and limited
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+External R responsibilities are visible and limited
+Existing file names are retained; core Amadeus remains independent.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+8
+Evidence: CHANGES, INVENTORY
+FILE / FUNCTIONS
+PURPOSE
+WHEN
+dev/check_approval.R; validate_release.R
+Policy/evidence QA and release fingerprints
+Build
+provenance_recorder.R
+Observe calls/source/output context; verify
+recording
+During science / after
+calc
+export_gridmet.R; schema_export.R
+Map supplied results and publish accepted
+records
+After calculate
+storage_boundary.R
+JSON/semantic/Parquet checks; publication
+and verification
+Write / store open
+database.R; parquet_experiment.R
+R-native loading, SQL/fidelity/reopen and
+saved queries
+Load / query
+No example_gridmet.R or schema_validator.R runtime dependency in the current release.
+
+PRESENTER NOTES
+Full static named-function and file inventories are bundled. Added publication helpers are in the existing storage_boundary.R file: .publication_sha, .publication_path, .publication_release, storage_publish_manifest, storage_verify_publication. Do not infer universal dataset orchestration from shared helpers; gridMET mapping/profile assumptions remain. No core scientific function is nested/changed.
+
+EVIDENCE
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+INVENTORY: evidence/inventory.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/function-inventory.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 9: Validation is placed where its inputs become available
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Validation is placed where its inputs become available
+No separate user-facing validation call is required for export or saved queries.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+9
+Evidence: LATEST, CHANGES
+STAGE
+WHAT IS CHECKED
+WHY HERE
+Build
+Definitions, code/unit policy, evidence, compiled
+artifact agreement
+Stable facts before distribution
+Scientific execution
+Amadeus argument checks; explicit recording
+Observe history; no schema gate
+injected into science
+After calculation /
+write
+Actual outputs, source units, membership, schema,
+lineage, Parquet readback
+Actual data now exists
+Load / saved open
+SQL/fidelity/reopen; then completion + byte identity
+Validate storage and detect later
+changes
+Parquet typing supports the contract; semantic rules and actual-data checks still execute.
+
+PRESENTER NOTES
+There is runtime validation, automatically performed after calculation and at storage/open boundaries. Stable definitions are not repeatedly linted per request; runtime verifies critical fingerprints and actual data. Build-only approval cannot prevalidate future source values, requests or output contents.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 10: One value has a traceable record chain
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+One value has a traceable record chain
+Example: Raleigh maximum temperature, 10 February 2025 = 279.1 K.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+10
+Evidence: LATEST, AUDIT, DIRECT
+User request
+tmmx / Raleigh / date window
+Calculation run
+Function, arguments, role, time,
+output
+Value + asset
+279.1 K; request/variable/run
+links
+Source identity
+tmmx_2025.nc; SHA
+b8583ca388c0…
+Recording evidence
+Execution RDS + events + seal
+Published snapshot
+Instance + Parquet + DB +
+receipts
+Observed context is stronger than a plausible record; the local chain is still unsigned.
+
+PRESENTER NOTES
+Source example is bundled in demo-files/snapshot. Concrete value ID: gridmetteam:direct-c81f0ec28ed71101/value/tmmx/raleigh/2025-02-10. Source tmmx SHA256 b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746. Graph above is conceptual, not every physical edge. Cached route execution is not proof original acquisition occurred now. Recorder raster fingerprints cover metadata only; continuous source immutability and independent attestation remain unestablished.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+AUDIT: evidence/audit.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/case-audits.csv
+DIRECT: evidence/direct.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/direct-source-values.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 11: Parquet preserves typed records and supports efficient access
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Parquet preserves typed records and supports efficient access
+Here, Parquet I/O uses DuckDB; Arrow/nanoparquet are not compared.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+11
+Evidence: LATEST, CHANGES
+What it contributes
+Typed extracted-value rows
+and compact storage.
+Source grids remain assets.
+Readback compares written
+records with accepted
+values.
+What still needs rules
+Units, references, request
+membership, lineage,
+missingness and scientific
+meaning are not proven by
+typing.
+How it is connected
+Pinned contracts,
+catalog/instance identities
+and receipts bind the file to
+the release and database.
+Boundary and adapter both materialize Parquet; no zero-copy or free-validation claim.
+
+PRESENTER NOTES
+Parquet here carries extracted-value table columns, including unit/reference fields; other metadata classes are loaded from accepted records, not all exported as Parquet. Source gridded arrays remain assets rather than all grid cells being forced into observation rows. The file footer is not claimed to contain/enforce the complete LinkML contract. Actual semantic checks run in R/JSON/SQL at the boundary. Technical metadata/catalog sidecars and manifest hashes bind the artifact. Readback tests include keys/counts/types/values and shared semantic checks; direct arbitrary file reads bypass the publication protocol.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 12: Publication and query verification are separate phases
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Publication and query verification are separate phases
+A completed database publication is more than schema acceptance.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+12
+Evidence: LATEST, PUBTEST, FAIL
+1. Load and verify
+DDL → 102 SQL → fidelity →
+reopen
+2. Bind snapshot
+Manifest hashes owned data +
+receipts
+3. Complete
+Read-only files → workflow →
+LATEST
+4. Verify at store open
+Successful release + completion + manifest +
+file/receipt bindings
+5. Query read-only
+No provider NetCDF reread; edited snapshot
+rejected
+Failed load: schema outputs may remain; no completed workflow or pointer advance.
+
+PRESENTER NOTES
+Checks cover 11 owned artifacts on the tested Parquet/DuckDB path. Manifest is bound into workflow completion; artifact paths are relative/whitelisted. The data/receipt chain is unsigned; direct DBI/IDE opening bypasses guards. Pointer replacement is not multi-file power-loss durability. A current consumer deliberately refuses older uncertified snapshots without the matching manifest/release.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+PUBTEST: evidence/pubtest.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/publication-tests.csv
+FAIL: evidence/fail.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/post-accept-failure.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 13: Pilot versus current storage-boundary integration
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Pilot versus current storage-boundary integration
+Both preserve the tested scientific route; their enforcement architecture differs.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+13
+Evidence: HIST, LATEST, CHANGES
+AREA
+OPTIMIZED PILOT
+CURRENT STORAGE-BOUNDARY RELEASE
+Scientific calls
+Existing Amadeus routes,
+caller-coordinated
+Same routes; ordinary caller + recording
+Validation
+Workflow/raster handoffs + generated
+R/JSON checks
+After calculate: JSON/shared R/SQL +
+write/readback
+Metadata /
+provenance
+Original mapping and call records
+Package labels/catalog + verified recorded
+context
+Saved database
+Historical saved-query trust gap
+Manifest/completion checks and byte
+verification
+Maintenance scope
+Workflow check orchestration
+Publication protocol + explicit metadata/profile
+Neither implementation changes core Amadeus. Dataset-specific policies remain explicit.
+
+PRESENTER NOTES
+Latest release has not been measured in a new N5 end-to-end study. The shared build approval policy was applied to the pilot review copy, not retroactively to all original history. Candidate does not remove actual runtime checking. Core science remains unchanged, while outside serialization/acceptance/query behavior changes intentionally.
+
+EVIDENCE
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CHANGES: evidence/changes.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/changes.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 14: Matched validation tests show bounded agreement
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Matched validation tests show bounded agreement
+Evidence from the frozen pilot/candidate comparison; newer integrity tests are separate.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+14
+Evidence: PARITY, SEMANTIC, RECORD, COVER
+TEST
+OBSERVED RESULT
+INTERPRETATION
+251 invalid mutations per
+arm
+502 rejections + 2 valid controls =
+504 outcomes
+Structural/semantic fixture agreement
+Focused historical gaps
+7 invalid cases rejected per arm
+Geometry, interval, clock label, binding,
+membership, producer, cycle
+Candidate recording checks
+16 checks passed
+Supplied context/output/evidence tampering
+and lifecycle
+Model coverage
+11 of 17 collections populated
+102 SQL checks are not full-model coverage
+Arbitrary descriptive text remains accepted; validators do not establish scientific truth.
+
+PRESENTER NOTES
+The two valid controls are the same valid document through both gates. The 18 focused observations include two controls and two intentional arbitrary-description acceptances. Seven illegal semantic mutations are rejected through each gate. This suite was executed on frozen pre-publication implementations; scientific schema/SQL rules are unchanged in the corrected release, but do not claim all 504 were rerun there. Record-only gates can accept valid-shaped false history; independent evidence audit and recorder verification are distinct.
+
+EVIDENCE
+PARITY: evidence/parity.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/schema-parity.csv
+SEMANTIC: evidence/semantic.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/semantic-gap-tests.csv
+RECORD: evidence/record.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/recording-tests.csv
+COVER: evidence/cover.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/model-coverage.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 15: Latest corrected release: end-to-end evidence
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Latest corrected release: end-to-end evidence
+Fresh scientific executions used identical cached sources, not new provider downloads.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+15
+Evidence: LATEST, CURRENTCASES, PUBTEST, DIRECT, AUDIT, FAIL
+EVIDENCE
+RESULT
+WHAT IT SUPPORTS
+Fresh execution cases
+4, 336 and 4 accepted results; 102 SQL
+each
+Complete typed/storage/query path
+Native regression
+Maximum difference from ordinary
+reference = 0
+Preserved tested values
+Publication checks
+26 passed
+Changed DB/Parquet/receipts, status,
+coverage, relocation
+Independent ncdf4 reads
+336 values within declared tolerances
+Source mapping and packed-value
+decoding
+Load failure and retry
+Incomplete publication rejected; fresh
+retry passed
+Bounded recovery; not power-loss proof
+Source-copy removal and schema-only export were also tested; original cache untouched.
+
+PRESENTER NOTES
+Three fresh cases are four-result baseline, 336-result full profile and four-result private-source removal scenario. The private copy source-removal query proves saved-query availability independence, not independent environmental replay. Two retained-source regression runs received actual asset/call/RDS/recording/database audits. The latest release also consolidates the successful-build flag guard, previously absent in the measured candidate.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CURRENTCASES: evidence/currentcases.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/case-summary.csv
+PUBTEST: evidence/pubtest.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/publication-tests.csv
+DIRECT: evidence/direct.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/direct-source-values.csv
+AUDIT: evidence/audit.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/case-audits.csv
+FAIL: evidence/fail.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/post-accept-failure.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 16: Performance study: controlled comparisons, explicit limits
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Performance study: controlled comparisons, explicit limits
+45 completed processes: 3 arms × 3 request sizes × 5 repetitions.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+16
+Evidence: HIST, PERF, SENS
+DESIGN
+DETAIL
+Request sizes
+4 values; 32 values; 336 values
+Scientific controls
+Same calls/arguments, source bytes and TIFF handoff
+Execution controls
+Fresh R processes; randomized arm order within matched blocks
+Measurements
+Whole-process elapsed; main HWM; sampled process-tree RSS; output bytes
+Limits
+Warm filesystem/cached sources; shared host; request-cardinality scaling
+Interrupted attempt excluded; completed runs retained; N4 sensitivity is reported.
+
+PRESENTER NOTES
+Request dates Feb10-16 2025 as applicable, one location/two days for small and all16 sizes, three locations/seven days for scaled. Ordinary uses the same common TIFF handoff, not claimed to be fastest in-memory Amadeus. Existing cache may still incur provider preflight calls. Interactive session interruption split all16 repetition3; 22 complete measurements retained, partial attempt excluded/retried; excluding that paired block did not reverse timing conclusion. Current corrected publication release is not an arm in this study.
+
+EVIDENCE
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+PERF: evidence/perf.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/performance-summary.csv
+SENS: evidence/sens.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/interruption-sensitivity.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 17: Historical runtime: integration has a measurable cost
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Historical runtime: integration has a measurable cost
+Whole-process medians in seconds; corrected publication release is not timed here.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+17
+Evidence: PERF, PAIRED
+Ordinary Amadeus
+Optimized pilot
+Measured candidate
+15.02
+26.47
+27.45
+4 results
+18.50
+70.14
+86.26
+32 results
+25.59
+79.11
+94.18
+336 results
+Added cost buys metadata, provenance, validation and storage; it is not isolated validation cost.
+
+PRESENTER NOTES
+Exact medians ordinary/pilot/measured candidate: small15.0178/26.4733/27.4513; all16 18.4962/70.1409/86.2604; scaled25.5874/79.1090/94.1832 seconds. Median paired candidate-minus-pilot percent7.40/24.43/21.53. Ratios of group medians and median paired percentage are different estimators. Do not claim the latest manifest/guard release has these exact timings. Bars are editable vector shapes, not linked Excel charts; CSV contains source values and spread.
+
+EVIDENCE
+PERF: evidence/perf.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/performance-summary.csv
+PAIRED: evidence/paired.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/paired-performance.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 18: Historical memory: report different measures separately
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Historical memory: report different measures separately
+Largest request: 336 results; five executions per arm.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+18
+Evidence: PERF
+MEASURED ARM
+MEDIAN MAIN HWM, MiB
+MEDIAN TREE RSS PEAK, MiB
+Ordinary Amadeus
+669.4
+665.0
+Optimized pilot
+732.2
+968.2
+Measured candidate
+1039.5
+1035.1
+Main high-water memory and sampled process-tree RSS are not interchangeable. Tree sums can
+double-count shared pages and miss peaks.
+
+PRESENTER NOTES
+Main HWM is observed Linux VmHWM; tree is sampled descendant-process RSS sum. Values are medians of per-run peaks, not total machine RAM, R object sizes, or unique physical memory. Main HWM can exceed the same run’s sampled tree RSS due to timing/high-water differences. Candidate had higher main-process memory in these tests. No new full-workflow memory study of corrected publication release was run.
+
+EVIDENCE
+PERF: evidence/perf.csv
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/reports/performance-summary.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 19: Current integrity checking adds a scoped store-open cost
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Current integrity checking adds a scoped store-open cost
+Warm-cache component measurements; not full query startup or workflow speed.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+19
+Evidence: COST, LATEST, SOURCELESS, SCHEMAONLY
+About 0.13 seconds
+Median verification time for
+each tested snapshot size;
+three samples per size.
+About 15–16 MB
+11 owned artifacts verified.
+Original annual NetCDF files
+are not re-read.
+Once per open
+Each CLI invocation
+opens/verifies. No trusted
+stat-only cache or
+per-statement rehash.
+Large-store cost, cold-cache behavior and production concurrency still need qualification.
+
+PRESENTER NOTES
+Small observations0.130/0.158/0.123seconds; full0.130/0.129/0.130. Bytes15,254,112 and15,893,341. Excludes interpreter startup, DB connect/query and science. The source-availability test removed only owned copies after publication; original cache remained. Schema-only engine=none creates no published persistent DB and is rejected by DB-publication verifier as inapplicable; DuckDB is still used internally for storage checks.
+
+EVIDENCE
+COST: evidence/cost.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/store-open-verification-cost.csv
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+SOURCELESS: evidence/sourceless.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/source-independent-query.json
+SCHEMAONLY: evidence/schemaonly.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/schema-only-regression.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 20: Remaining gaps are decision inputs
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Remaining gaps are decision inputs
+Technical evidence is strong within scope; it is not production certification.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+20
+Evidence: CURRENTGAPS, SCI, REPLAY, STEPS
+AREA
+CURRENT LIMIT
+REQUIRED ACTION
+Scientific meaning
+Units/physical intervals/method suitability
+pending
+Human review of scoped policy and
+evidence
+Portability
+Successful host; colleague/affected stack not
+replayed
+Independent request and environment
+capture
+Trust and concurrency
+Unsigned chain; read-only bits do not stop
+privilege
+Choose actual
+immutable/access-control policy
+Durability and migration
+Bounded retries; no power-loss proof; old
+stores uncertified
+Agree durability/migration
+requirements
+Coverage and cost
+16 codes; point profile; DuckDB; latest total
+performance unmeasured
+Qualify broader uses and acceptable
+budgets
+Current production flag remains false; no reviewer success has been prefilled.
+
+PRESENTER NOTES
+Additional limits are in appendix and evidence/currentgaps.csv. Physical date-label agreement does not establish actual accumulation/measurement intervals. Historical source hash is not continuous immutability or source availability. Direct IDE/DBI access bypasses the supported query gate. Current scoped missingness requires finite values; it is not universal for all Amadeus datasets.
+
+EVIDENCE
+CURRENTGAPS: evidence/currentgaps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/limitations.csv
+SCI: evidence/sci.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/review/scientific-unit-review.csv
+REPLAY: evidence/replay.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/review/independent-replay-results.csv
+STEPS: evidence/steps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/step-status.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 21: External metadata can be added without runtime spreadsheets
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+External metadata can be added without runtime spreadsheets
+Future build-time modes; no external import/merge is implemented in this release.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+21
+Evidence: LATEST, SCI
+MODE
+BUILD-TIME APPROACH
+NON-NEGOTIABLE REQUIREMENTS
+Amadeus-derived baseline
+Package codes/labels + frozen policy +
+observed source facts
+Do not invent absent
+coverage/units
+External catalog baseline
+Reviewed catalog properties normalized to
+the same target
+Still confirm supported Amadeus
+routes; preserve observations
+Combined catalog
+Keyed merge with explicit field authority
+and conflict decisions
+No silent last-source-wins policy;
+one released catalog
+Stable keys, versions/hashes, required fields, unit meaning, scope evidence and review are required.
+
+PRESENTER NOTES
+External-only refers to catalog authoring properties, not scientific dispatch, source-observation replacement or executed-history claims. Proposed shared importer should compile one effective catalog at build. Source URI/version/review, units/aliases, coverage/calendar/CRS and conflict resolution must be explicit. Review CSVs are human worksheets, not operational dataset metadata ingestion. Current package baseline is incomplete and still needs policy and source facts.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+SCI: evidence/sci.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/review/scientific-unit-review.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 22: Decisions before wider adoption
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Decisions before wider adoption
+Adopt the architecture only with an explicit scope, trust model and measured cost.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+22
+Evidence: STEPS, LATEST, CURRENTGAPS
+DECISION
+EVIDENCE / OPEN GATE
+Accept the external post-calc boundary?
+Core unchanged; published-output enforcement demonstrated
+Approve the native scientific profile?
+336 source comparisons support review; human units/time/scope
+pending
+Which environment is supported?
+Capture identities and replay on independent/affected stack
+What protects published snapshots?
+Local integrity works; choose deployment immutability/durability
+policy
+What goes to the review branch?
+Current code, tests, docs, scoped evidence; exclude raw cache
+and tamper copies
+Review → independent replay/sign-off → limited shadow use → production decision.
+
+PRESENTER NOTES
+User requested review before pushing. This deck does not push, stage, commit or create a PR. Candidate is an architectural preference conditional on required safeguards and acceptable cost; it is not a demonstrated speed/memory optimization. A controlled full-workflow study of the corrected publication release is a next optional performance increment before promising production efficiency.
+
+EVIDENCE
+STEPS: evidence/steps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/step-status.csv
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+CURRENTGAPS: evidence/currentgaps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/limitations.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 23: A reproducible demonstration for the team
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+A reproducible demonstration for the team
+The review pack includes a portable snapshot and matching integration code.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+23
+Evidence: LATEST, PUBTEST
+OPEN / RUN
+WHAT TO SHOW
+demo-files/snapshot/results.csv
+Four native results: request keys, dates and values
+schema-instance.json +
+source-metadata.json
+Catalog/variable/units, source hash and record links
+publication-manifest.json + workflow receipt
+Completion and file/release bindings
+DEMO-WALKTHROUGH.txt
+Supported verified query of the bundled binary DB
+review worksheets + TEAM-REPLAY guide
+Pending scientific approval and independent replay
+Copied code and relocated snapshot were queried successfully; no provider download.
+
+PRESENTER NOTES
+The four-result snapshot is from the corrected release and uses the exact runtime contract supplied under ../integration. Source artifact paths in records remain historical; saved query does not need them. Do not treat ordinary direct DBI/IDE access as certified. The command is supplied in DEMO-WALKTHROUGH.txt with relative paths. Full implementation/evidence ZIP is also included for code review.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+PUBTEST: evidence/pubtest.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/publication-tests.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 24: Appendix: scientific and metadata limits
+
+APPENDIX / DETAILED LIMITATIONS
+Appendix: scientific and metadata limits
+Use the complete worksheets and gap register for decisions.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+24
+Evidence: CURRENTGAPS, SCI, DIRECT
+AREA
+LIMIT AND REVIEW IMPLICATION
+Scientific approval
+Numeric source agreement is not provider truth or scientific meaning approval.
+Physical time
+CF date coordinate/label agreement does not establish daily physical intervals.
+Scope
+16 native daily codes; point/radius 0 / mean; not all33 codes or methods.
+Model coverage
+Unpopulated classes and planned operational schemas/migrations remain unqualified.
+Metadata authority
+Package mapping is not complete catalog authority; external import deferred.
+Missingness / source lifecycle
+Finite policy is scoped; saved queries do not prove continued raw-file availability.
+
+PRESENTER NOTES
+These are review constraints, not a request to weaken rules. Changes to policy, units, scope or data meaning require explicit reviewed evidence and a new release, not a changed label or worksheet alone. Drought/PDSI/SPEI/EDDI class interpretations are outside the tested16-code profile.
+
+EVIDENCE
+CURRENTGAPS: evidence/currentgaps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/limitations.csv
+SCI: evidence/sci.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/review/scientific-unit-review.csv
+DIRECT: evidence/direct.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/direct-source-values.csv
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 25: Appendix: operational and performance limits
+
+APPENDIX / DETAILED LIMITATIONS
+Appendix: operational and performance limits
+Local byte integrity does not establish all deployment guarantees.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+25
+Evidence: CURRENTGAPS, COST, ENV
+AREA
+LIMIT AND REVIEW IMPLICATION
+Unsigned trust / concurrency
+Privileged coordinated rewrites and concurrent path replacement are not covered.
+Durability / recovery
+Pointer rename and bounded retry tests do not prove multi-file power-loss durability.
+Historical compatibility
+Old stores need matching release or explicit requalification; no silent certification.
+Access path
+Direct DBI/IDE or unrelated external-file SQL bypasses snapshot guarantees.
+Filesystem / environment
+chmod/rename capabilities explicit; ACL/NFS/Windows and independent stack pending.
+Performance / backend
+No latest N5 full-workflow benchmark; no Sedona, large-store or multi-source join
+qualification.
+
+PRESENTER NOTES
+Known successful environment is captured (local Amadeus2.0.4, R4.3.2 and observed spatial/database libraries), not asserted official-release equivalence or a universal minimum. No new R packages relative to the preceding candidate; the optional integration still needs documented packages such as jsonvalidate, digest, DBI and duckdb. File permissions and final-pointer behavior are new explicit outside-package operations and may need deployment-specific policy.
+
+EVIDENCE
+CURRENTGAPS: evidence/currentgaps.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/limitations.csv
+COST: evidence/cost.csv
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/store-open-verification-cost.csv
+ENV: evidence/env.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/reports/environment.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 26: Appendix: evidence and review package index
+
+APPENDIX / SOURCES AND REPRODUCIBILITY
+Appendix: evidence and review package index
+Source copies, build source, editable diagrams and presenter notes travel with the deck.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+26
+Evidence: LATEST, HIST
+LOCATION
+CONTENTS
+evidence/ + evidence-sources.json
+Copied CSV/JSON evidence; original paths and SHA256
+../integration/
+Current runtime/build code and pinned contracts
+implementation/*review.zip
+Complete corrected release and scientific/replay materials
+workflow-complete.mmd / .svg / .html
+Editable Mermaid, vector diagram and offline visual
+presenter-notes.txt; build_review.py
+Explanation/source pointers; reproducible authoring source
+Slides are editable shapes/text; PDF and previews are static. No repository edits or push.
+
+PRESENTER NOTES
+Primary evidence datasets are the latest storage release and prior consolidated comparison. The archive includes a compact demonstration, not the annual provider NetCDF sources. Static previews use DejaVu metrics while PPTX uses Arial; font substitution can differ. OOXML is validated and text-fit checked, but LibreOffice/Microsoft PowerPoint rendering is unavailable in this environment.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 27: AI assists development; humans approve meaning
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+AI assists development; humans approve meaning
+Every rule needs an authority, implementation, test evidence and human decision.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+27
+AI ASSISTANCE
+DETERMINISTIC EXECUTION
+HUMAN RESPONSIBILITY
+Draft mappings, checks and tests
+LinkML build and pinned contracts
+Approve metadata and scientific
+definitions
+Review code and explain evidence
+R / JSON Schema / SQL after calculate
+Approve units, physical time and
+binding
+Surface gaps and summarize
+results
+Manifest verification at saved-store
+open
+Review provenance truth and
+acceptance policy
+Document changes and limitations
+No live AI model judges results
+Decide release scope; approvals
+remain pending
+Test passes, build success and AI review do not constitute human scientific approval.
+
+PRESENTER NOTES
+This revision is AI-assisted documentation and inventory work. Historical per-line AI/human authorship is not independently attested. The permitted AI assistance column is guidance, not evidence of every historical action. Human review remains pending. No live model inference in execution.
+
+EVIDENCE
+
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 28: Trace a rule from authority to a human decision
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Trace a rule from authority to a human decision
+Use the supplied registers; preserve unknowns instead of inventing approval.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+28
+RECORD
+WHAT TO KEEP
+Authority
+Source/version/hash; observed fact versus reviewed scientific policy
+Implementation
+Stable rule ID and actual R / SQL / compiled contract location
+Test evidence
+Control, invalid case, outcome, version and coverage limits
+Contribution and
+approval
+Known AI assistance; human edits; reviewer/date/decision/scope
+All storage SQL rules enumerated; individual negative-test linkage still needs review.
+
+PRESENTER NOTES
+Read sql-rule-register.csv, boundary-rule-families.csv and human-review-decisions.csv. SQL rows retain exact implemented SQL and current artifact SHA. Suite references are not individual mutation coverage. Non-SQL rows are families, not every schema keyword or branch. No new automatic approval gate was implemented.
+
+EVIDENCE
+
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 29: Follow each stage without adding runtime AI
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Follow each stage without adding runtime AI
+Documentation-only update: scientific calls, runtime code and evidence are unchanged.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+29
+PHASE
+EXECUTION / DEPENDENCIES
+REVIEW POINT
+Build
+LinkML and build tools; compile contracts
+Scientific policy, metadata authority and
+scope
+Science + recording
+Existing Amadeus / spatial stack; explicit
+recorder
+Actual inputs, source identities and
+history
+After calculation
+R / JSON Schema / SQL; typed Parquet;
+DuckDB
+Binding, acceptance and readback
+evidence
+Saved open +
+release
+Hashes / DBI / DuckDB; separate human
+review
+Integrity, independent replay and release
+decision
+See stage-traceability.csv and dependency-and-execution-register.csv.
+
+PRESENTER NOTES
+The current architecture does not use pilot example_gridmet.R orchestration or schema_validator.R runtime checks. Existing Amadeus checks still execute. Recording is during science; integration validation follows calculate. Python build/authoring is separate; no runtime Python or AI service. Sedona optional and unqualified in latest scope.
+
+EVIDENCE
+
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.

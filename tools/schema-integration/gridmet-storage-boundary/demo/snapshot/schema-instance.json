@@ -1,0 +1,372 @@
+{
+  "schema_version": "0.1.0",
+  "data_sources": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/source/gridmet",
+      "name": "gridmet",
+      "homepage": "https://www.climatologylab.org/gridmet.html",
+      "access_protocol": "https_bulk_file"
+    }
+  ],
+  "products": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "name": "gridmet_daily",
+      "data_source": "gridmetteam:direct-c81f0ec28ed71101/source/gridmet",
+      "spatial_support_type": "raster_grid_cell",
+      "grid_definition": "gridmetteam:direct-c81f0ec28ed71101/grid/native",
+      "crs": "EPSG:4326",
+      "srid": 4326,
+      "temporal_resolution": "daily",
+      "day_boundary_convention": "observation_dependent",
+      "amadeus_dataset_name": "gridmet",
+      "amadeus_process_covariate": "gridmet",
+      "amadeus_calculate_covariate": "gridmet",
+      "description": "Team test: source date label encoded at nominal00:00UTC for serialization only. No verified physical sample interval, timezone or ontology equivalence asserted. No temporal aggregation."
+    }
+  ],
+  "grid_definitions": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/grid/native",
+      "crs": "EPSG:4326",
+      "resolution_x": 0.0416666666666667,
+      "resolution_y": 0.0416666666666667,
+      "resolution_unit": "deg"
+    }
+  ],
+  "canonical_variables": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/variable/tmmx",
+      "name": "gridmet_native_tmmx",
+      "label": "maximum near-surface air temperature",
+      "standard_name": "gridmetteam:native_tmmx",
+      "units_ucum": "K",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "intensive",
+      "description": "Local candidate for native point quantity; spatial support classification only; no temporal aggregation approval."
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/variable/pr",
+      "name": "gridmet_native_pr",
+      "label": "precipitation",
+      "standard_name": "gridmetteam:native_pr",
+      "units_ucum": "mm",
+      "value_data_type": "continuous_numeric",
+      "extensivity": "intensive",
+      "description": "Local candidate for native point quantity; spatial support classification only; no temporal aggregation approval."
+    }
+  ],
+  "product_variables": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/tmmx",
+      "native_name": "air_temperature",
+      "label": "maximum near-surface air temperature",
+      "native_units_ucum": "K",
+      "amadeus_variable_code": "tmmx",
+      "harmonization_note": "Identity numeric mapping; source unit spelling normalized only. Original attributes retained in source-metadata.json."
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/pr",
+      "native_name": "precipitation_amount",
+      "label": "precipitation",
+      "native_units_ucum": "mm",
+      "amadeus_variable_code": "pr",
+      "harmonization_note": "Identity numeric mapping; source unit spelling normalized only. Original attributes retained in source-metadata.json."
+    }
+  ],
+  "location_sets": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/location-set/user",
+      "locs_id_field": "site_id",
+      "crs": "EPSG:4326",
+      "phi_status": "no_phi",
+      "location_count": 1
+    }
+  ],
+  "locations": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/location/raleigh",
+      "location_set": "gridmetteam:direct-c81f0ec28ed71101/location-set/user",
+      "location_key": "raleigh",
+      "location_geom_wkt": "POINT (-78.638200000000 35.779600000000)",
+      "srid": 4326
+    }
+  ],
+  "extraction_requests": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/request/user",
+      "location_set": "gridmetteam:direct-c81f0ec28ed71101/location-set/user",
+      "requested_canonical_variables": [
+        "gridmetteam:direct-c81f0ec28ed71101/variable/tmmx",
+        "gridmetteam:direct-c81f0ec28ed71101/variable/pr"
+      ],
+      "requested_product_variables": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx",
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr"
+      ],
+      "time_window_start": "2025-02-10T00:00:00Z",
+      "time_window_end": "2025-02-12T00:00:00Z",
+      "extraction_method": "nearest_cell",
+      "buffer_radius_m": 0,
+      "temporal_grouping": "day",
+      "request_hash": "9dc7204c46a13bc3a47fe30548c5f5ff257c9a58da842ec908c85a0865e08162"
+    }
+  ],
+  "tool_runs": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/run/download",
+      "run_role": "download",
+      "tool_name": "amadeus",
+      "tool_version": "2.0.4",
+      "function_name": "download_data",
+      "run_arguments": "{\"dataset_name\":\"gridmet\",\"variables\":[\"tmmx\",\"pr\"],\"year\":2025}",
+      "run_timestamp_utc": "2026-11-09T19:42:57Z",
+      "run_duration_seconds": 10.2008283138275,
+      "status": "succeeded"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/run/process/tmmx/raleigh",
+      "run_role": "process",
+      "tool_name": "amadeus",
+      "tool_version": "2.0.4",
+      "function_name": "process_covariates",
+      "run_arguments": "{\"covariate\":\"gridmet\",\"variable\":\"tmmx\",\"site_id\":\"raleigh\",\"dates\":[\"2025-02-10\",\"2025-02-11\"],\"extent\":[-78.7582,-78.5182,35.6596,35.8996],\"output_row_count_convention\":\"0 tabular rows for raster output; raster dimensions are in the saved file\"}",
+      "run_timestamp_utc": "2026-11-09T19:43:09Z",
+      "run_duration_seconds": 0.216767311096191,
+      "status": "succeeded",
+      "output_row_count": 0,
+      "upstream_runs": [
+        "gridmetteam:direct-c81f0ec28ed71101/run/download"
+      ],
+      "input_asset_ids": [
+        "gridmetteam:direct-c81f0ec28ed71101/asset/raw/tmmx"
+      ]
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh",
+      "run_role": "calculate",
+      "tool_name": "amadeus",
+      "tool_version": "2.0.4",
+      "function_name": "calculate_covariates",
+      "run_arguments": "{\"covariate\":\"gridmet\",\"variable\":\"tmmx\",\"site_id\":\"raleigh\",\"radius\":0,\"fun\":\"mean\",\"by_time\":\"NULL; existing daily gridMET route\",\"geom\":false}",
+      "run_timestamp_utc": "2026-11-09T19:43:10Z",
+      "run_duration_seconds": 0.273957490921021,
+      "status": "succeeded",
+      "output_row_count": 2,
+      "upstream_runs": [
+        "gridmetteam:direct-c81f0ec28ed71101/run/process/tmmx/raleigh"
+      ],
+      "input_asset_ids": [
+        "gridmetteam:direct-c81f0ec28ed71101/asset/process/tmmx/raleigh"
+      ]
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/run/process/pr/raleigh",
+      "run_role": "process",
+      "tool_name": "amadeus",
+      "tool_version": "2.0.4",
+      "function_name": "process_covariates",
+      "run_arguments": "{\"covariate\":\"gridmet\",\"variable\":\"pr\",\"site_id\":\"raleigh\",\"dates\":[\"2025-02-10\",\"2025-02-11\"],\"extent\":[-78.7582,-78.5182,35.6596,35.8996],\"output_row_count_convention\":\"0 tabular rows for raster output; raster dimensions are in the saved file\"}",
+      "run_timestamp_utc": "2026-11-09T19:43:10Z",
+      "run_duration_seconds": 0.088712215423584,
+      "status": "succeeded",
+      "output_row_count": 0,
+      "upstream_runs": [
+        "gridmetteam:direct-c81f0ec28ed71101/run/download"
+      ],
+      "input_asset_ids": [
+        "gridmetteam:direct-c81f0ec28ed71101/asset/raw/pr"
+      ]
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh",
+      "run_role": "calculate",
+      "tool_name": "amadeus",
+      "tool_version": "2.0.4",
+      "function_name": "calculate_covariates",
+      "run_arguments": "{\"covariate\":\"gridmet\",\"variable\":\"pr\",\"site_id\":\"raleigh\",\"radius\":0,\"fun\":\"mean\",\"by_time\":\"NULL; existing daily gridMET route\",\"geom\":false}",
+      "run_timestamp_utc": "2026-11-09T19:43:10Z",
+      "run_duration_seconds": 0.0429625511169434,
+      "status": "succeeded",
+      "output_row_count": 2,
+      "upstream_runs": [
+        "gridmetteam:direct-c81f0ec28ed71101/run/process/pr/raleigh"
+      ],
+      "input_asset_ids": [
+        "gridmetteam:direct-c81f0ec28ed71101/asset/process/pr/raleigh"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/raw/tmmx",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/tmmx/tmmx_2025.nc",
+      "size_bytes": 151880260,
+      "sha256": "b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/download",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized",
+      "native_format": "netcdf4_cf",
+      "url": "https://www.northwestknowledge.net/metdata/data/tmmx_2025.nc"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/raw/pr",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/pr/pr_2025.nc",
+      "size_bytes": 59045725,
+      "sha256": "d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/download",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized",
+      "native_format": "netcdf4_cf",
+      "url": "https://www.northwestknowledge.net/metdata/data/pr_2025.nc"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/process/tmmx/raleigh",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/processed/002.tif",
+      "size_bytes": 1412,
+      "sha256": "20b4361ccf169895dfa0308da2c7e0bdd77624591600867217e8b78f78806a02",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/process/tmmx/raleigh",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized",
+      "native_format": "geotiff"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/tmmx/raleigh",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/ordinary/003.rds",
+      "size_bytes": 219,
+      "sha256": "faa7b95bdbab9457c07e01a4b9522267b841553c86c1e3fde86ef3845f817082",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/process/pr/raleigh",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/processed/004.tif",
+      "size_bytes": 1372,
+      "sha256": "bac2f0e51bb427f7cac16b07b7c5b211d663a4170823aa5acdd8e0d715c03838",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/process/pr/raleigh",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized",
+      "native_format": "geotiff"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/pr/raleigh",
+      "product": "gridmetteam:direct-c81f0ec28ed71101/product/daily",
+      "local_path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/ordinary/005.rds",
+      "size_bytes": 213,
+      "sha256": "001c603383c8741668bc5df3f564fe220fc5a671616014b87c7e2ab0f0376aa4",
+      "produced_by_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh",
+      "variables_present": [
+        "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr"
+      ],
+      "materialization_mode": "full_materialization",
+      "value_state": "materialized"
+    }
+  ],
+  "ambient_values_at_location": [
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/value/tmmx/raleigh/2025-02-10",
+      "location": "gridmetteam:direct-c81f0ec28ed71101/location/raleigh",
+      "extraction_request": "gridmetteam:direct-c81f0ec28ed71101/request/user",
+      "extraction_method": "nearest_cell",
+      "product_variable": "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/tmmx",
+      "asset": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/tmmx/raleigh",
+      "processing_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh",
+      "value": 279.1,
+      "native_value": 279.1,
+      "value_unit_ucum": "K",
+      "native_value_unit_ucum": "K",
+      "valid_time_start": "2025-02-10T00:00:00Z",
+      "temporal_grouping": "day",
+      "contributing_value_count": 1,
+      "data_status": "unknown",
+      "source_system": "gridmet",
+      "null_semantics": "present"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/value/tmmx/raleigh/2025-02-11",
+      "location": "gridmetteam:direct-c81f0ec28ed71101/location/raleigh",
+      "extraction_request": "gridmetteam:direct-c81f0ec28ed71101/request/user",
+      "extraction_method": "nearest_cell",
+      "product_variable": "gridmetteam:direct-c81f0ec28ed71101/product-variable/tmmx",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/tmmx",
+      "asset": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/tmmx/raleigh",
+      "processing_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh",
+      "value": 274.7,
+      "native_value": 274.7,
+      "value_unit_ucum": "K",
+      "native_value_unit_ucum": "K",
+      "valid_time_start": "2025-02-11T00:00:00Z",
+      "temporal_grouping": "day",
+      "contributing_value_count": 1,
+      "data_status": "unknown",
+      "source_system": "gridmet",
+      "null_semantics": "present"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/value/pr/raleigh/2025-02-10",
+      "location": "gridmetteam:direct-c81f0ec28ed71101/location/raleigh",
+      "extraction_request": "gridmetteam:direct-c81f0ec28ed71101/request/user",
+      "extraction_method": "nearest_cell",
+      "product_variable": "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/pr",
+      "asset": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/pr/raleigh",
+      "processing_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh",
+      "value": 0,
+      "native_value": 0,
+      "value_unit_ucum": "mm",
+      "native_value_unit_ucum": "mm",
+      "valid_time_start": "2025-02-10T00:00:00Z",
+      "temporal_grouping": "day",
+      "contributing_value_count": 1,
+      "data_status": "unknown",
+      "source_system": "gridmet",
+      "null_semantics": "true_zero"
+    },
+    {
+      "id": "gridmetteam:direct-c81f0ec28ed71101/value/pr/raleigh/2025-02-11",
+      "location": "gridmetteam:direct-c81f0ec28ed71101/location/raleigh",
+      "extraction_request": "gridmetteam:direct-c81f0ec28ed71101/request/user",
+      "extraction_method": "nearest_cell",
+      "product_variable": "gridmetteam:direct-c81f0ec28ed71101/product-variable/pr",
+      "canonical_variable": "gridmetteam:direct-c81f0ec28ed71101/variable/pr",
+      "asset": "gridmetteam:direct-c81f0ec28ed71101/asset/calculate/pr/raleigh",
+      "processing_run": "gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh",
+      "value": 14.8,
+      "native_value": 14.8,
+      "value_unit_ucum": "mm",
+      "native_value_unit_ucum": "mm",
+      "valid_time_start": "2025-02-11T00:00:00Z",
+      "temporal_grouping": "day",
+      "contributing_value_count": 1,
+      "data_status": "unknown",
+      "source_system": "gridmet",
+      "null_semantics": "present"
+    }
+  ]
+}

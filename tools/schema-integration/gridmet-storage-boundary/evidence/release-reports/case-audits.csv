@@ -1,0 +1,3 @@
+"case","arm","assets_verified","call_metadata_match","ordinary_RDS_match","recording_copy_matches","maximum_RDS_CSV_difference","actual_saved_database_values_match","maximum_saved_database_difference"
+1,"candidate",TRUE,TRUE,TRUE,TRUE,0,TRUE,1.22070312613687e-05
+2,"candidate",TRUE,TRUE,TRUE,TRUE,2.8421709430404e-14,TRUE,1.22070312613687e-05

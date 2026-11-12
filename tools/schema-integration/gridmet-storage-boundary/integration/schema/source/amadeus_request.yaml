@@ -1,0 +1,438 @@
+id: https://w3id.org/niehs/amadeus/request
+name: amadeus-request
+title: AmadeusDB — Request and Extraction Layer
+version: "0.1.0"
+description: |-
+  The query-first contract. The modernization plan's overarching goal is: a user
+  supplies geometry, time and optionally an outcome table; amadeus discovers and
+  subsets the required data, processes it through the spatial database, and
+  returns analysis-ready variables joined to the user's records.
+
+  This module makes that request a **first-class persisted object** rather than
+  a set of R function arguments. `ExtractionRequest` is `calculate_covariates()`
+  turned declarative: the same buffer radius, aggregation function, `.by_time`
+  grouping and weights, but serialisable, hashable, diffable and re-runnable.
+
+  Why that matters more than it looks
+  ----------------------------------
+  The project lead's stated motivation for amadeus is reproducibility — *"two
+  different people doing the same calculations get different results"*. That
+  cannot be fixed by recording outputs. It is fixed by making the *request*
+  the artifact: if the request is a row, then two runs are comparable by
+  comparing two rows, and "same inputs, same configuration → reuse valid
+  outputs" (the plan's idempotency principle) becomes a lookup instead of a
+  promise.
+
+  It also gives the `checkmate`-style argument validation the plan asks for a
+  single source of truth: the R argument checks and the database constraints
+  are generated from the same class.
+
+  The naming boundary
+  -------------------
+  The output class is `AmbientValueAtLocation`. Not `Exposure`, not
+  `ExposureEstimate`, not `PatientExposure` — even though the location may be a
+  patient's address and the row may carry a cohort key. Swap the person, keep
+  the address: the number does not change. amadeus ends at the geojoin; the
+  thing it delivers is an ambient value that has been *assigned* to a location.
+  Whoever turns that into an exposure does so downstream, with person-level
+  information amadeus does not hold.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+default_prefix: amadeus
+default_range: string
+
+imports:
+- linkml:types
+- amadeus_common
+- amadeus_catalog
+- amadeus_value
+
+#────────────────────────────────────────────────────────────────
+# CLASSES
+#────────────────────────────────────────────────────────────────
+
+classes:
+
+  LocationSet:
+    title: Location Set
+    description: >-
+      A user-supplied collection of locations — the `locs` argument, promoted to
+      an entity. Carries the identifier field name (`locs_id`), the CRS the user
+      supplied, and a PHI declaration.
+
+      `phi_status` defaults to `no_phi` and is the gate on everything else: if a
+      location set is flagged, results derived from it must not be written to
+      shared catalog tables or embedded in an exported EnVar record, whose
+      `phi_status` is a required field precisely so this cannot be left
+      implicit.
+    slots:
+    - id
+    - name
+    - description
+    - locs_id_field
+    - crs
+    - srid
+    - geometry_type
+    - location_count
+    - phi_status
+    - provided_by
+    - created_at
+    slot_usage:
+      locs_id_field:
+        required: true
+        description: >-
+          Name of the user's identifier column. amadeus already takes this as
+          `locs_id`; recording it means the output column names are derivable
+          rather than conventional.
+        examples:
+        - value: "site_id"
+      phi_status:
+        required: true
+      crs:
+        required: true
+        description: >-
+          Declared, never assumed. `calculate_covariates()` currently reprojects
+          `locs` to `crs(from)` silently; an undeclared input CRS is the most
+          common way a spatial join goes quietly wrong.
+
+  Location:
+    title: Location
+    description: >-
+      One location in a set, with an optional validity interval.
+
+      `valid_from` / `valid_to` exist because a residential address is not
+      timeless. Address histories, known travel intervals and synthetic
+      residence periods all need them, and without them a value is joined to a
+      place the subject may not have occupied on that date. amadeus does not
+      need to model *why* the interval exists — that is the health layer's
+      business — only to honour it in the join.
+    slots:
+    - id
+    - location_set
+    - location_key
+    - location_geom_wkt
+    - srid
+    - buffer_radius_m
+    - valid_from
+    - valid_to
+    - target_geography_type
+    slot_usage:
+      location_set:
+        required: true
+      location_key:
+        required: true
+        description: The user's own identifier value, preserved verbatim.
+      location_geom_wkt:
+        required: true
+
+  ExtractionRequest:
+    title: Extraction Request
+    description: >-
+      A declarative, reproducible specification of an extraction:
+      which variables, over which locations, for which time window, with which
+      buffer, aggregation, weighting and lags.
+
+      The rules below are the ones that make the request *checkable before it
+      runs*, which is the point. The extensivity rule in particular turns the
+      project lead's "intensive vs extensive should be explicit" from
+      documentation into a validation error.
+    slots:
+    - id
+    - name
+    - location_set
+    - requested_canonical_variables
+    - requested_product_variables
+    - time_window_start
+    - time_window_end
+    - temporal_grouping
+    - buffer_radius_m
+    - extraction_method
+    - aggregation_method
+    - weighting_product_variable
+    - lag_days
+    - target_geography_type
+    - output_orientation
+    - materialization_mode
+    - source_priority_policy
+    - status_mixing_policy
+    - strict_extensivity_check
+    - requested_by
+    - request_timestamp_utc
+    - request_hash
+    - generated_sql
+    slot_usage:
+      location_set:
+        required: true
+      time_window_start:
+        required: true
+      time_window_end:
+        required: true
+      extraction_method:
+        required: true
+      request_hash:
+        required: true
+        description: >-
+          Hash over the normalised request. The idempotency key: the same
+          request re-submitted resolves to the existing result set instead of
+          recomputing it, and a changed request is visibly a different request.
+      generated_sql:
+        description: >-
+          The SQL actually issued. Stored so the result is auditable against
+          the plan the optimiser chose, and so a user can take the query away
+          and run it themselves — which is the "same contract in R, SQL,
+          Python or a container" promise, made concrete.
+    rules:
+    - preconditions:
+        slot_conditions:
+          buffer_radius_m:
+            minimum_value: 0.000001
+      postconditions:
+        slot_conditions:
+          aggregation_method:
+            required: true
+      description: >-
+        A buffer without an aggregation method is ambiguous — there are now
+        many source values per location and nothing says how they combine.
+        amadeus's current default (`fun = "mean"`) is silently wrong for every
+        extensive variable.
+    - preconditions:
+        slot_conditions:
+          aggregation_method:
+            any_of:
+            - equals_string: population_weighted_mean
+      postconditions:
+        slot_conditions:
+          weighting_product_variable:
+            required: true
+      description: >-
+        Population weighting must name the population product it weighted by.
+        "Population-weighted" with no stated population raster is not
+        reproducible.
+    - preconditions:
+        slot_conditions:
+          status_mixing_policy:
+            equals_string: allow_with_policy
+      postconditions:
+        slot_conditions:
+          source_priority_policy:
+            required: true
+      description: >-
+        The AQS/AirNow rule, enforced at request time. Mixing preliminary and
+        quality-controlled values into one result requires the user to have
+        explicitly chosen a reconciliation policy. The default is to refuse.
+
+  AmbientValueAtLocation:
+    title: Ambient Value at Location
+    description: >-
+      The output row: an ambient value assigned to a user location for a time
+      interval, with the extraction that produced it recorded alongside.
+      This is what `calculate_covariates()` returns today, plus the metadata it
+      currently drops.
+
+      Not an exposure. The location may be a person's address and the row may
+      carry a cohort key, but the value is a property of the place: swap the
+      person, keep the address, and it does not change.
+
+      What today's output has, that this keeps: location key, time, value.
+      What today's output lacks, that this adds: which product variable and
+      which canonical variable (today encoded positionally in a column name
+      like `weasd_0`), the extraction method and buffer actually used, how many
+      source values contributed, coverage, distance to the contributing station,
+      the quality and status of the inputs, and the run that produced it.
+    is_a: AmbientValue
+    slots:
+    - location
+    - extraction_request
+    - buffer_radius_m
+    - extraction_method
+    - aggregation_method
+    - contributing_value_count
+    - coverage_fraction
+    - distance_to_source_m
+    - lag_days_applied
+    - temporal_grouping
+    - output_column_name
+    slot_usage:
+      location:
+        required: true
+      extraction_request:
+        required: true
+      extraction_method:
+        required: true
+      contributing_value_count:
+        description: >-
+          How many source values went into this one. A buffer mean over one
+          cell and over four hundred cells are different claims; today both
+          come back as an undistinguished number.
+      distance_to_source_m:
+        description: >-
+          Distance to the contributing station, for nearest-station extraction.
+          Paired with the request's max-distance setting, this is what makes a
+          nearest-station assignment defensible.
+      output_column_name:
+        description: >-
+          The wide-format column name this value would occupy, for backward
+          compatibility with existing amadeus and beethoven consumers
+          (`weasd_0`, `tmmx_10000`). Generated from the request, not parsed
+          back out of it — the long form is canonical and the wide form is a
+          projection.
+
+#────────────────────────────────────────────────────────────────
+# SLOTS
+#────────────────────────────────────────────────────────────────
+
+slots:
+
+  # ── LocationSet ───────────────────────────────────────────────
+  locs_id_field:
+    range: string
+
+  location_count:
+    range: integer
+
+  phi_status:
+    range: PhiStatusEnum
+    ifabsent: string(no_phi)
+    description: >-
+      Whether these locations are or derive from protected health information.
+      Gates persistence and export. Same slot name, range and value set as
+      EnVar's required `phi_status`, so an exported record carries it verbatim.
+    exact_mappings:
+    - envar:phi_status
+
+  provided_by:
+    range: string
+
+  created_at:
+    range: datetime
+
+  # ── Location ──────────────────────────────────────────────────
+  location_set:
+    range: LocationSet
+
+  location_key:
+    range: string
+
+  location_geom_wkt:
+    range: WktLiteral
+
+  buffer_radius_m:
+    range: float
+    minimum_value: 0.0
+    description: >-
+      Buffer radius in metres. Metres, explicitly — amadeus currently
+      interprets `radius` in the units of the *projected* geometry's CRS, which
+      for a geographic CRS means degrees, and the docs describe it as metres.
+      Declaring the unit in the schema removes the ambiguity.
+    exact_mappings:
+    - envar:extraction_buffer_m
+
+  valid_from:
+    range: date
+  valid_to:
+    range: date
+
+  target_geography_type:
+    range: TargetGeographyTypeEnum
+
+  # ── ExtractionRequest ─────────────────────────────────────────
+  requested_canonical_variables:
+    range: CanonicalVariable
+    multivalued: true
+    description: >-
+      Request by canonical variable to let the planner choose a source. The
+      preferred form: the user asks for daily maximum temperature, not for
+      `gridmet.tmmx`.
+
+  requested_product_variables:
+    range: ProductVariable
+    multivalued: true
+    description: >-
+      Request a specific source delivery, pinning the answer. Required when
+      reproducing a published result, since the planner's choice may change.
+
+  time_window_start:
+    range: datetime
+  time_window_end:
+    range: datetime
+
+  temporal_grouping:
+    range: TemporalGroupingEnum
+    description: The `.by_time` argument.
+
+  extraction_method:
+    range: ExtractionMethodEnum
+
+  weighting_product_variable:
+    range: ProductVariable
+    description: The product variable used as weights (a population density grid).
+
+  lag_days:
+    range: integer
+    multivalued: true
+    description: >-
+      Lags to compute, in days. `calculate_lagged()` already does this; naming
+      them in the request is what lets the result carry which lag it is.
+
+  output_orientation:
+    range: TableOrientationEnum
+    ifabsent: string(long)
+
+  source_priority_policy:
+    range: string
+    description: >-
+      Ordered source preference for reconciliation, e.g.
+      `aqs > airnow`. Required whenever `status_mixing_policy` is `allow_with_policy`.
+    examples:
+    - value: "aqs>airnow"
+
+  status_mixing_policy:
+    range: StatusMixingPolicyEnum
+    ifabsent: string(refuse)
+    description: >-
+      Whether preliminary and quality-controlled values may appear in one
+      result. Defaults to refusing.
+
+  strict_extensivity_check:
+    range: StrictnessEnum
+    ifabsent: string(strict)
+    description: >-
+      Whether to reject a request whose aggregation is illegal for the
+      variable's extensivity, or whose variable declares `extensivity: unknown`.
+      Defaults to on: an aggregation that cannot be justified should fail loudly
+      at request time, not produce a plausible number.
+
+  requested_by:
+    range: string
+
+  request_timestamp_utc:
+    range: datetime
+
+  request_hash:
+    range: Sha256
+
+  generated_sql:
+    range: string
+
+  # ── AmbientValueAtLocation ────────────────────────────────────
+  location:
+    range: Location
+
+  extraction_request:
+    range: ExtractionRequest
+
+  contributing_value_count:
+    range: integer
+
+  distance_to_source_m:
+    range: float
+
+  lag_days_applied:
+    range: integer
+
+  output_column_name:
+    range: string

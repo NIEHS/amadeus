@@ -1,0 +1,40 @@
+--- qualified-release/tests/publication_tests.R
++++ branch-package/tests/publication_tests.R
+@@ -1,15 +1,15 @@
+ b<-dirname(dirname(normalizePath(sub('^--file=','',grep('^--file=',commandArgs(),value=TRUE)[1]))));root<-file.path(b,'integration')
+ source(file.path(root,'R/storage_boundary.R'))
+-run<-readLines(file.path(b,'outputs/final-small/LATEST.txt'),n=1);rows<-list();cases<-list();sha<-function(p)digest::digest(file=p,algo='sha256')
++a<-commandArgs(TRUE);if(length(a)!=2L)stop('Usage: Rscript tests/publication_tests.R SNAPSHOT NEW_SCRATCH');run<-normalizePath(a[1],mustWork=TRUE);scratch<-a[2];if(file.exists(scratch))stop('Use a NEW scratch directory');dir.create(scratch,recursive=TRUE);for(n in c('faults','reports','verification'))dir.create(file.path(scratch,n));rows<-list();cases<-list();sha<-function(p)digest::digest(file=p,algo='sha256')
+ edit_json<-function(t,relative,fn){p<-file.path(t,relative);Sys.chmod(p,'0644');x<-jsonlite::read_json(p);jsonlite::write_json(fn(x),p,auto_unbox=TRUE,pretty=TRUE,digits=NA);Sys.chmod(p,'0444')}
+ append_byte<-function(t,f){p<-file.path(t,f);Sys.chmod(p,'0644');cat('\n',file=p,append=TRUE);Sys.chmod(p,'0444')}
+ run_case<-function(name,mutate=NULL,accept=FALSE,other_root=root){
+- t<-file.path(b,'faults',paste0('final-',name));dir.create(t);invisible(file.copy(list.files(run,all.files=TRUE,no..=TRUE,full.names=TRUE),t,recursive=TRUE))
++ t<-file.path(scratch,'faults',paste0('final-',name));dir.create(t);invisible(file.copy(list.files(run,all.files=TRUE,no..=TRUE,full.names=TRUE),t,recursive=TRUE))
+  if(!is.null(mutate))mutate(t)
+  msg<-'';result<-tryCatch({storage_verify_publication(other_root,t);TRUE},error=function(e){msg<<-conditionMessage(e);FALSE})
+  rows[[length(rows)+1]]<<-data.frame(test=name,expected_acceptance=accept,accepted=result,passed=result==accept,message=msg)
+  cases[[name]]<<-t
+- write.csv(do.call(rbind,rows),file.path(b,'reports/publication-tests.csv'),row.names=FALSE)
++ write.csv(do.call(rbind,rows),file.path(scratch,'reports/publication-tests.csv'),row.names=FALSE)
+ }
+ run_case('unaltered-relocated-snapshot',accept=TRUE)
+ run_case('database-value-edited',function(t){p<-file.path(t,'database/duckdb/gridmet.duckdb');Sys.chmod(p,'0644');con<-DBI::dbConnect(duckdb::duckdb(),dbdir=p);DBI::dbExecute(con,'UPDATE "AmbientValueAtLocation" SET value=value+1 WHERE id=(SELECT id FROM "AmbientValueAtLocation" LIMIT 1)');DBI::dbDisconnect(con,shutdown=TRUE);Sys.chmod(p,'0444')})
+@@ -37,15 +37,15 @@
+ run_case('resealed-wrong-acceptance-release',function(t){edit_json(t,'acceptance.json',function(x){x$runtime_contract_sha256<-paste(rep('a',64),collapse='');x});edit_json(t,'publication-manifest.json',function(x){x$files[['acceptance.json']]$sha256<-sha(file.path(t,'acceptance.json'));x$files[['acceptance.json']]$bytes<-as.numeric(file.info(file.path(t,'acceptance.json'))$size);x});edit_json(t,'workflow-receipt.json',function(x){x$publication_manifest_sha256<-sha(file.path(t,'publication-manifest.json'));x})})
+ # Recheck false/missing successful-build status against corrected helper, not production root mutation.
+ for(mode in c('false','missing')){
+- rr<-file.path(b,'faults',paste0('final-release-',mode));dir.create(rr);invisible(file.copy(list.files(root,all.files=TRUE,no..=TRUE,full.names=TRUE),rr,recursive=TRUE))
++ rr<-file.path(scratch,'faults',paste0('final-release-',mode));dir.create(rr);invisible(file.copy(list.files(root,all.files=TRUE,no..=TRUE,full.names=TRUE),rr,recursive=TRUE))
+  p<-file.path(rr,'release/runtime-contract.json');x<-jsonlite::read_json(p);x$build_qa_passed<-if(mode=='false')FALSE else NULL;jsonlite::write_json(x,p,auto_unbox=TRUE,pretty=TRUE)
+  run_case(paste0('release-status-',mode),other_root=rr)
+ }
+ # Actual supported CLI must reject edited DB before returning rows.
+ for(n in c('unaltered-relocated-snapshot','database-value-edited')){
+- log<-file.path(b,'verification',paste0('query-',n,'.log'))
++ log<-file.path(scratch,'verification',paste0('query-',n,'.log'))
+  status<-system2(file.path(R.home('bin'),'Rscript'),vapply(c(file.path(root,'R/database.R'),cases[[n]],'duckdb','SELECT COUNT(*) AS n FROM "AmbientValueAtLocation"'),shQuote,''),stdout=log,stderr=log)
+  rows[[length(rows)+1]]<-data.frame(test=paste0('CLI-',n),expected_acceptance=n=='unaltered-relocated-snapshot',accepted=status==0,passed=(status==0)==(n=='unaltered-relocated-snapshot'),message=paste(readLines(log),collapse='; '))
+ }
+-write.csv(do.call(rbind,rows),file.path(b,'reports/publication-tests.csv'),row.names=FALSE)
++write.csv(do.call(rbind,rows),file.path(scratch,'reports/publication-tests.csv'),row.names=FALSE)
+ stopifnot(all(do.call(rbind,rows)$passed));cat(length(rows),'publication checks passed\n')

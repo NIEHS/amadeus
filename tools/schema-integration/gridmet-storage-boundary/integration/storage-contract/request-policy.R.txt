@@ -1,0 +1,31 @@
+if (
+  anyNA(dates) ||
+    dates[1] > dates[2] ||
+    format(dates[1], '%Y') != format(dates[2], '%Y')
+) {
+  stop('Dates must be ordered and within one year for this example')
+}
+if (
+  !all(c('site_id', 'lon', 'lat') %in% names(locations)) ||
+    nrow(locations) == 0 ||
+    anyNA(locations[, c('site_id', 'lon', 'lat')]) ||
+    anyDuplicated(locations$site_id) ||
+    any(!grepl('^[A-Za-z0-9_.-]+$', locations$site_id))
+) {
+  stop('sites CSV needs unique simple site_id,lon,lat columns')
+}
+if (
+  any(!is.finite(locations$lon)) ||
+    any(!is.finite(locations$lat)) ||
+    any(abs(locations$lon) > 180) ||
+    any(abs(locations$lat) > 90)
+) {
+  stop('Invalid lon/lat')
+}
+if (
+  anyDuplicated(variables) ||
+    !length(variables) ||
+    any(!variables %in% runtime$registry$code)
+) {
+  stop('Variable outside declared16-daily-variable test profile')
+}

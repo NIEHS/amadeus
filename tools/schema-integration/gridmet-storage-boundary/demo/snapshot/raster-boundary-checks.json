@@ -1,0 +1,18 @@
+{
+  "process/tmmx/raleigh": {
+    "path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/processed/002.tif",
+    "finite_cells": [
+      25,
+      25
+    ],
+    "boundary": "post_calculation_serialized_output"
+  },
+  "process/pr/raleigh": {
+    "path": "/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101/processed/004.tif",
+    "finite_cells": [
+      25,
+      25
+    ],
+    "boundary": "post_calculation_serialized_output"
+  }
+}

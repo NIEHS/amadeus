@@ -1,0 +1,657 @@
+id: https://w3id.org/niehs/amadeus/value
+name: amadeus-value
+title: AmadeusDB — Value Layer
+version: "0.1.0"
+description: |-
+  The data rows: individual environmental values with their space, time, quality
+  and provenance. Large, machine-written, and the only part of the model that
+  needs to scale.
+
+  Why four tables and not twenty-four
+  -----------------------------------
+  The obvious reading of "do we need different schemas for different types of
+  source data?" is yes — AQS monitors, MODIS swaths, HUC polygons and NLCD
+  rasters look nothing alike. They are not alike *as files*. As values they
+  differ on exactly one axis: **what geometry identifies the value**. Everything
+  else — variable, unit, time interval, quality, provenance — is shared.
+
+  So: one abstract parent carrying the shared 20 slots, and four concrete
+  children that differ only in how they name their location.
+
+      AmbientValue (abstract)
+        ├── StationObservation   point + persistent instrument identity
+        │       AQS, AirNow, IMPROVE, USGS water
+        ├── GridCellValue        grid + cell index (+ optional level)
+        │       NARR, GEOS-CF, MERRA-2, GridMET, TerraClimate, PRISM, MODIS,
+        │       GOES, HRRR, NLCD, Köppen-Geiger, GMTED, SEDAC population, EDGAR
+        ├── AreaValue            polygon with an identity
+        │       HUC, ecoregions, NEI (county), USDM drought, HMS smoke plumes
+        └── HexCellValue         H3 cell — the harmonization target (O-09)
+
+  Plus `VectorFeature`, which is *not* an AmbientValue: gROADS road segments and
+  similar reference geometries carry no measured value. They are inputs to
+  density and distance calculations, and conflating them with values is a
+  category error the current code makes implicitly.
+
+  Naming: "ambient", not "exposure"
+  ---------------------------------
+  Every class here is an **ambient** value — a property of a place, not a
+  person. The test: swap the person, keep the address; does the number change?
+  It does not. That is true even after extraction to a patient's coordinates,
+  which is why the extraction output in `amadeus_request.yaml` is called
+  `AmbientValueAtLocation` and not `Exposure`. The project lead's scope
+  boundary ("amadeus ends at the geojoin") and EnVar's semantics agree here, and
+  encoding it in the class names is free.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+default_prefix: amadeus
+default_range: string
+
+imports:
+- linkml:types
+- amadeus_common
+- amadeus_catalog
+
+#────────────────────────────────────────────────────────────────
+# CLASSES
+#────────────────────────────────────────────────────────────────
+
+classes:
+
+  AmbientValue:
+    title: Ambient Value
+    abstract: true
+    description: >-
+      One value of one variable, at one place, over one time interval, from one
+      asset, produced by one run. A property of the environment; not an
+      exposure.
+
+      Abstract: no table of its own. The SQL generator flattens these slots into
+      each concrete child, which is the right physical design — a single
+      polymorphic value table with mostly-null geometry columns would defeat
+      both partitioning and spatial indexing.
+    slots:
+    - id
+    - product_variable
+    - canonical_variable
+    - asset
+    - processing_run
+    - value
+    - value_unit_ucum
+    - native_value
+    - native_value_unit_ucum
+    - valid_time_start
+    - valid_time_end
+    - reference_time
+    - retrieval_time_utc
+    - vertical_level
+    - vertical_level_unit
+    - quality_flag
+    - data_status
+    - source_system
+    - source_version
+    - null_semantics
+    - superseded_by
+    slot_usage:
+      product_variable:
+        required: true
+        description: >-
+          Which source delivery this is. Carries the native units, the CF
+          metadata and the aggregation — so the row does not have to.
+      canonical_variable:
+        required: true
+        description: >-
+          Denormalised from `product_variable` on purpose. Cross-source queries
+          ("all daily maximum temperature within this polygon") are the common
+          case, and making them a two-hop join is a performance tax on the
+          query the whole architecture exists to serve.
+      value:
+        description: >-
+          The value in the canonical variable's units. Null when
+          `null_semantics` explains why.
+      valid_time_start:
+        required: true
+      data_status:
+        required: true
+        description: >-
+          Per-row, not per-product. The AQS/AirNow rule requires it: a
+          preliminary AirNow value and a quality-controlled AQS value for the
+          same monitor, parameter and hour must be able to coexist as distinct
+          rows.
+      source_system:
+        required: true
+      null_semantics:
+        required: true
+    rules:
+    - preconditions:
+        slot_conditions:
+          value:
+            value_presence: ABSENT
+      postconditions:
+        slot_conditions:
+          null_semantics:
+            any_of:
+            - equals_string: structural_null
+            - equals_string: derived_null
+      description: >-
+        A missing value must say why it is missing. Prevents the failure mode
+        where nodata and a genuine zero are indistinguishable downstream.
+    - preconditions:
+        slot_conditions:
+          null_semantics:
+            equals_string: true_zero
+      postconditions:
+        slot_conditions:
+          value:
+            required: true
+      description: A true zero is a present value, not an absence.
+    - preconditions:
+        slot_conditions:
+          data_status:
+            equals_string: forecast
+      postconditions:
+        slot_conditions:
+          reference_time:
+            required: true
+      description: >-
+        A forecast is meaningless without its initialisation time. HRRR's
+        "cycle and forecast-hour identity" requirement, enforced.
+    - preconditions:
+        slot_conditions:
+          data_status:
+            equals_string: superseded
+      postconditions:
+        slot_conditions:
+          superseded_by:
+            required: true
+      description: >-
+        A superseded row points at its replacement. Revisions create new
+        records; they never mutate or delete old ones.
+
+  StationObservation:
+    title: Station Observation
+    is_a: AmbientValue
+    description: >-
+      A value from a fixed instrument with a persistent identity: EPA AQS,
+      AirNow, IMPROVE, USGS water sites.
+
+      The distinguishing feature is not the point geometry — it is that the
+      *instrument* is an entity with a history. Monitors move, get replaced, and
+      report the same parameter through several collocated units (the AQS POC).
+      A grid cell has none of that. Collapsing stations into a generic point
+      table loses the keys that make a revision traceable.
+    slots:
+    - station_id
+    - station_name
+    - monitor_id
+    - parameter_code
+    - poc
+    - sampling_duration_iso
+    - station_geom_wkt
+    - srid
+    - elevation_m
+    - station_valid_from
+    - station_valid_to
+    slot_usage:
+      station_id:
+        required: true
+      station_geom_wkt:
+        required: true
+      poc:
+        description: >-
+          Parameter Occurrence Code — which of several collocated monitors
+          measuring the same parameter this is. Part of the AQS primary key and
+          routinely dropped by naive ingests, which then silently pick one
+          monitor per site.
+      station_valid_from:
+        description: >-
+          Station moves are modelled as a validity interval on the observation's
+          station identity rather than by mutating the station. "Station
+          moves/POC changes" is a named edge case in the plan's test matrix.
+
+  GridCellValue:
+    title: Grid Cell Value
+    is_a: AmbientValue
+    description: >-
+      A value at one cell of one grid — the flattened form of a raster layer.
+      This is the class the SedonaDB decision hangs on: Sedona's raster support
+      is thinner than `terra`'s, so the plan's proposal is to flatten raster to
+      point or polygon and persist as GeoParquet.
+
+      The cell is identified *twice*: by integer grid index (`cell_x`, `cell_y`)
+      and by geometry. The index is the cheap, exact, join-stable key and the
+      one to partition and deduplicate on; the geometry is what spatial
+      predicates need. Storing only geometry makes idempotent re-ingestion a
+      floating-point comparison, which is how duplicate rows appear.
+    slots:
+    - grid_definition
+    - cell_x
+    - cell_y
+    - cell_centroid_wkt
+    - cell_polygon_wkt
+    - srid
+    slot_usage:
+      grid_definition:
+        required: true
+      cell_x:
+        required: true
+      cell_y:
+        required: true
+      cell_centroid_wkt:
+        required: true
+      cell_polygon_wkt:
+        description: >-
+          The cell footprint. Optional: needed for area-weighted extraction and
+          for honest polygon intersection, redundant for nearest-cell lookup.
+          Materialising it for a continental hourly grid is expensive, so this
+          is a deliberate per-product choice, not a default.
+    unique_keys:
+      cell_observation:
+        description: >-
+          One value per variable, cell, level and valid time — per source
+          system and status, so an AirNow revision does not collide with the
+          AQS-equivalent row.
+        unique_key_slots:
+        - product_variable
+        - grid_definition
+        - cell_x
+        - cell_y
+        - vertical_level
+        - valid_time_start
+        - source_system
+        - data_status
+
+  AreaValue:
+    title: Area Value
+    is_a: AmbientValue
+    description: >-
+      A value attached to a named or delineated polygon: HUC watersheds, EPA
+      ecoregions, county-level NEI emissions, USDM drought polygons, NOAA HMS
+      smoke plumes.
+
+      Two sub-cases that must not be merged, distinguished by `area_role`:
+      an *administrative* area whose identity is external and stable (a county
+      FIPS), and an *episodic* polygon that exists only because something
+      happened there (a smoke plume on one day). Aggregating across the second
+      as if it were the first produces nonsense.
+    slots:
+    - area_id
+    - area_type
+    - area_role
+    - area_code
+    - area_name
+    - area_geom_wkt
+    - srid
+    - area_km2
+    slot_usage:
+      area_id:
+        required: true
+      area_type:
+        required: true
+      area_role:
+        required: true
+      area_geom_wkt:
+        required: true
+      area_km2:
+        description: >-
+          Materialised area. Needed to make extensive values (an emission mass)
+          convertible to intensive ones (a flux density) without recomputing
+          geodesic area per query.
+
+  HexCellValue:
+    title: Hex Cell Value
+    is_a: AmbientValue
+    description: >-
+      A value aggregated to an H3 cell — the harmonization target for the C-HER
+      collaboration (objective O-09).
+
+      Hexification is lossy and the loss must be recorded, not assumed. Three
+      slots do that: `source_support_type` (what was aggregated), `coverage_fraction`
+      (how much of the hex the source actually covered) and
+      `hexification_method` (how). A hex value whose provenance says
+      "area_weighted_mean from raster_grid_cell at 0.62 coverage" is usable;
+      the same number without them is not.
+    slots:
+    - h3_cell
+    - h3_resolution
+    - hex_centroid_wkt
+    - srid
+    - source_support_type
+    - hexification_method
+    - coverage_fraction
+    - contributing_cell_count
+    slot_usage:
+      h3_cell:
+        required: true
+      h3_resolution:
+        required: true
+      hexification_method:
+        required: true
+      source_support_type:
+        required: true
+      coverage_fraction:
+        required: true
+    rules:
+    - preconditions:
+        slot_conditions:
+          coverage_fraction:
+            maximum_value: 0.5
+      postconditions:
+        slot_conditions:
+          quality_flag:
+            required: true
+      description: >-
+        A hex covered less than half by its source must be flagged. Partial
+        coverage at the edge of a product's extent is the standard way a
+        plausible-looking hex value turns out to be mostly nothing.
+
+  VectorFeature:
+    title: Vector Feature
+    description: >-
+      A reference geometry with attributes but no measured value over time:
+      SEDAC gROADS road segments, hydrography lines, building footprints.
+
+      Deliberately **not** an `AmbientValue`. These are inputs to density and
+      distance covariates, not observations, and they have no valid-time
+      interval in any meaningful sense. The distinction matters because the
+      legal operations differ: you compute a length or a distance from these,
+      never a mean.
+    slots:
+    - id
+    - product
+    - feature_id
+    - feature_type
+    - geometry_type
+    - feature_geom_wkt
+    - srid
+    - feature_attributes
+    - length_m
+    - asset
+    - processing_run
+    slot_usage:
+      product:
+        required: true
+      feature_geom_wkt:
+        required: true
+      geometry_type:
+        required: true
+
+#────────────────────────────────────────────────────────────────
+# SLOTS
+#────────────────────────────────────────────────────────────────
+
+slots:
+
+  # ── shared value slots ────────────────────────────────────────
+  product_variable:
+    range: ProductVariable
+
+  asset:
+    range: Asset
+    description: >-
+      The byte stream this value came from. Every number resolves to a file and
+      a hash — half of objective O-02's "every derived output resolves to source
+      assets and processing runs".
+
+  processing_run:
+    range: string
+    description: >-
+      Identifier of the `ToolRun` that produced this value. The other half of
+      O-02. A plain string rather than an object reference so the value and
+      provenance modules stay independently loadable; the SQL post-processor
+      adds the foreign key.
+
+  value:
+    range: float
+    description: The value in canonical units.
+
+  value_unit_ucum:
+    range: string
+    description: >-
+      Units of `value`, denormalised from the canonical variable. Redundant by
+      design: a value row that travels out of the database as CSV or Parquet
+      must not lose its units on the way.
+
+  native_value:
+    range: float
+    description: >-
+      The value exactly as the source shipped it, before scale, offset and unit
+      conversion. Kept so a conversion bug is discoverable after the fact
+      instead of being baked in irreversibly.
+
+  native_value_unit_ucum:
+    range: string
+
+  vertical_level:
+    range: float
+    description: >-
+      Pressure or height level for multi-level products (NARR, MERRA-2,
+      GEOS-CF). Part of the value's identity, not an attribute of it.
+
+  quality_flag:
+    range: string
+    description: >-
+      The source's quality flag, verbatim, interpreted against the
+      `quality_flag_vocabulary` on the product variable. Never normalised on
+      ingest — normalising discards information, and the vocabularies do not
+      align.
+
+  data_status:
+    range: DataStatusEnum
+
+  source_system:
+    range: string
+    description: >-
+      Which system supplied this row (`aqs`, `airnow`). Required on every row
+      by the harmonization rule so preliminary and quality-controlled values
+      for the same monitor-hour coexist rather than overwrite.
+    examples:
+    - value: "aqs"
+    - value: "airnow"
+
+  source_version:
+    range: string
+    description: >-
+      The source's own version or revision identifier for this value, where it
+      publishes one.
+
+  null_semantics:
+    range: NullSemanticsEnum
+
+  superseded_by:
+    range: string
+    description: >-
+      Identifier of the row that replaces this one. Revisions append; they do
+      not mutate.
+
+  # ── StationObservation ────────────────────────────────────────
+  station_id:
+    range: string
+    description: >-
+      The source's site identifier — an AQS state+county+site key, an IMPROVE
+      site code, a USGS gauge number.
+    examples:
+    - value: "37-063-0015"
+
+  station_name:
+    range: string
+
+  monitor_id:
+    range: string
+    description: Instrument identity, where distinct from the site.
+
+  parameter_code:
+    range: string
+    description: >-
+      The source's parameter code, retained verbatim alongside the canonical
+      variable because it is part of the source's primary key.
+    examples:
+    - value: "88101"
+
+  poc:
+    range: integer
+    description: AQS Parameter Occurrence Code.
+
+  sampling_duration_iso:
+    range: Iso8601Duration
+    description: >-
+      The instrument's integration time — distinct from the reporting
+      resolution. A 1-hour reported value from a 24-hour filter sample is not
+      an hourly measurement.
+
+  station_geom_wkt:
+    range: WktLiteral
+
+  elevation_m:
+    range: float
+
+  station_valid_from:
+    range: date
+  station_valid_to:
+    range: date
+
+  # ── GridCellValue ─────────────────────────────────────────────
+  cell_x:
+    range: integer
+    description: Zero-based column index in the grid.
+
+  cell_y:
+    range: integer
+    description: Zero-based row index in the grid.
+
+  cell_centroid_wkt:
+    range: WktLiteral
+
+  cell_polygon_wkt:
+    range: WktLiteral
+
+  # ── AreaValue ─────────────────────────────────────────────────
+  area_id:
+    range: string
+
+  area_type:
+    range: AreaTypeEnum
+
+  area_role:
+    range: AreaRoleEnum
+
+  area_code:
+    range: string
+    description: The external code identifying the area.
+    examples:
+    - value: "37063"
+    - value: "030202"
+
+  area_name:
+    range: string
+
+  area_geom_wkt:
+    range: WktLiteral
+
+  area_km2:
+    range: float
+
+  # ── HexCellValue ──────────────────────────────────────────────
+  h3_cell:
+    range: H3CellIndex
+
+  h3_resolution:
+    range: integer
+    minimum_value: 0
+    maximum_value: 15
+
+  hex_centroid_wkt:
+    range: WktLiteral
+
+  source_support_type:
+    range: SpatialSupportTypeEnum
+    description: The support type that was aggregated into this hex.
+
+  hexification_method:
+    range: AggregationMethodEnum
+    description: >-
+      How source supports were combined into the hex value. Must be legal for
+      the canonical variable's extensivity — a population count hexifies by
+      `sum`, a temperature by `area_weighted_mean`, and swapping them is a
+      silent error.
+
+  coverage_fraction:
+    range: float
+    minimum_value: 0.0
+    maximum_value: 1.0
+    description: >-
+      Fraction of the hex actually covered by contributing source support.
+
+  contributing_cell_count:
+    range: integer
+
+  # ── VectorFeature ─────────────────────────────────────────────
+  feature_id:
+    range: string
+
+  feature_type:
+    range: string
+    examples:
+    - value: "road_segment"
+
+  geometry_type:
+    range: GeometryTypeEnum
+
+  feature_geom_wkt:
+    range: WktLiteral
+
+  feature_attributes:
+    range: string
+    description: >-
+      Source attributes as a JSON object string. Deliberately opaque: road
+      classifications and similar source-specific schemas should not be forced
+      into the core model, and promoting one to a first-class slot is a decision
+      to take when a real query needs it.
+
+  length_m:
+    range: float
+
+  grid_definition_ref:
+    range: GridDefinition
+
+#────────────────────────────────────────────────────────────────
+# ENUMS
+#────────────────────────────────────────────────────────────────
+
+enums:
+
+  AreaTypeEnum:
+    title: Area Type
+    permissible_values:
+      county:
+      state:
+      census_tract:
+      census_block_group:
+      zcta:
+      hydrologic_unit:
+      ecoregion:
+      smoke_plume:
+      drought_area:
+      public_water_system:
+      custom:
+
+  AreaRoleEnum:
+    title: Area Role
+    description: >-
+      Whether an area's identity is externally stable or episodic. Determines
+      whether cross-time aggregation over the area is meaningful.
+    permissible_values:
+      administrative:
+        description: >-
+          Externally defined and stable across time (a county FIPS). Safe to
+          aggregate over time; still subject to boundary revisions, which are
+          handled as new areas rather than mutated ones.
+      episodic:
+        description: >-
+          The polygon exists because an event occurred (a smoke plume on one
+          day). Aggregating across time is meaningless; the correct operation
+          is intersection with a location.

@@ -1,0 +1,201 @@
+{
+  "mapping_revision": "parquet-value-table-v1",
+  "class": "AmbientValueAtLocation",
+  "schema_sha256": "cb8a1481cf4604aad68e05ffd599a39c85bd021784a8e10adaac8420e7de119e",
+  "SQL_sha256": "263d1658f61e85f7d14fb4edd103bcd3633a5411658bcef549d8276a5432edb2",
+  "note": "Build-derived physical mapping; retain accepted numeric values as DOUBLE in Parquet even where target SQL uses FLOAT. No scientific conversion.",
+  "columns": [
+    {
+      "column_name": "location",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "extraction_request",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "buffer_radius_m",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "extraction_method",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "aggregation_method",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "contributing_value_count",
+      "data_type": "INTEGER",
+      "is_nullable": "YES",
+      "parquet_stage_type": "INTEGER"
+    },
+    {
+      "column_name": "coverage_fraction",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "distance_to_source_m",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "lag_days_applied",
+      "data_type": "INTEGER",
+      "is_nullable": "YES",
+      "parquet_stage_type": "INTEGER"
+    },
+    {
+      "column_name": "temporal_grouping",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "output_column_name",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "id",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "product_variable",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "canonical_variable",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "asset",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "processing_run",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "value",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "value_unit_ucum",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "native_value",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "native_value_unit_ucum",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "valid_time_start",
+      "data_type": "TIMESTAMP",
+      "is_nullable": "NO",
+      "parquet_stage_type": "TIMESTAMP"
+    },
+    {
+      "column_name": "valid_time_end",
+      "data_type": "TIMESTAMP",
+      "is_nullable": "YES",
+      "parquet_stage_type": "TIMESTAMP"
+    },
+    {
+      "column_name": "reference_time",
+      "data_type": "TIMESTAMP",
+      "is_nullable": "YES",
+      "parquet_stage_type": "TIMESTAMP"
+    },
+    {
+      "column_name": "retrieval_time_utc",
+      "data_type": "TIMESTAMP",
+      "is_nullable": "YES",
+      "parquet_stage_type": "TIMESTAMP"
+    },
+    {
+      "column_name": "vertical_level",
+      "data_type": "FLOAT",
+      "is_nullable": "YES",
+      "parquet_stage_type": "DOUBLE"
+    },
+    {
+      "column_name": "vertical_level_unit",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "quality_flag",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "data_status",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "source_system",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "source_version",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "null_semantics",
+      "data_type": "VARCHAR",
+      "is_nullable": "NO",
+      "parquet_stage_type": "VARCHAR"
+    },
+    {
+      "column_name": "superseded_by",
+      "data_type": "VARCHAR",
+      "is_nullable": "YES",
+      "parquet_stage_type": "VARCHAR"
+    }
+  ]
+}

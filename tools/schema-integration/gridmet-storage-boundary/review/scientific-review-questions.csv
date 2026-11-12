@@ -1,0 +1,9 @@
+Area,Question,Decision,Evidence,Reviewer,Date
+Quantity and binding,"Do source variable, description, code and canonical binding represent the intended quantity (including temperature maximum versus minimum)?",pending,,,
+Units and scale,"Are aliases scientifically equivalent to the native unit? Is identity valid, including packed scale/offset decoding and percent versus fraction?",pending,,,
+Physical time,"What actual period does each daily label represent? Is a source time coordinate an instant, anchor or interval boundary? Are time bounds/provider definitions sufficient?",pending,,,
+Missingness,Is all-finite acceptance suitable for this tested scope? How should legitimate provider missingness be represented in future profiles?,pending,,,
+Spatial method,"Is nearest source cell appropriate for these point/radius0 requests? Are CRS, coordinate order and grid-cell selection valid?",pending,,,
+Qualification,"Do codes link to actual per-variable tests and the tested dates/sites/methods, rather than recognition alone?",pending,,,
+Historical truth,Which provenance claims are observed versus supplied? Are cached acquisition history and unsigned recording limitations clear?,pending,,,
+Approval,"What scope is approved, by whom and against which version/hash? What remains excluded before production?",pending,,,

@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-12",
+  "target_repository": "NIEHS/amadeus",
+  "proposed_branch": "amadeus-schema-storage-boundary-review",
+  "target_folder": "tools/schema-integration/gridmet-storage-boundary",
+  "runtime_manifest_sha256": "730f7bf63d0ea58001aec1868f23dcb1cded73c0ac843b8afaaa210ca5d5e59d",
+  "runtime_pinned_files_unchanged": 22,
+  "relocated_saved_query_records": 4,
+  "portable_publication_tests_passed": 26,
+  "R_sources_parse_passed": 22,
+  "replay_shell_syntax_passed": true,
+  "live_scientific_run_during_packaging": false,
+  "fresh_provider_download": false,
+  "independent_environment_replay": "pending",
+  "scientific_approval": "pending",
+  "production_approved": false,
+  "core_amadeus_changed": false,
+  "original_repo_or_branch_changed": false,
+  "git_push_performed": false,
+  "historical_demo_included": true,
+  "raw_NetCDF_files_included": false,
+  "new_runtime_dependencies": false
+}

@@ -1,0 +1,44 @@
+12 NOVEMBER 2026 — AI/HUMAN TRACEABILITY UPDATE
+Start with AI-AND-HUMAN-TRACEABILITY.txt and stage-traceability.csv. Deterministic execution; no AI model at runtime. Human scientific approval is pending. This revision changes documentation/presentations only.
+
+AMADEUS SCHEMA INTEGRATION AT THE STORAGE BOUNDARY — REVIEW GUIDE
+
+NAME AND PURPOSE
+Ordinary Amadeus workflows, explicit provenance recording, and schema enforcement during export/loading. The package retains scientific dispatch and computation. Optional external support maps actual outputs into model records and verified storage. It does not patch Amadeus; the caller still supplies scientific arguments/order, while export/query gates can reject publication or access.
+
+READ THE VISUALS
+workflow-visual.html is an offline vector visual with overview and detailed stages; no CDN is needed. workflow-complete.svg is editable vector text/shapes. workflow-complete.mmd is editable Mermaid. editable-workflow.pptx provides overview/validation/publication slides as native shapes; workflow-complete.pptx supplies the full tall stage map. Editing one format does not automatically synchronize the others; rebuild from build_review.py or maintain changes deliberately.
+workflow-stages.csv supplies the13 detailed stages with inputs/outputs/code/checks/limits. Presenter notes explain each slide and evidence path.
+
+FLOW
+Build LinkML definitions/approval catalog once per changed release -> compile/pin JSON/SQL/catalog/registry.
+Ordinary request -> Amadeus download/process/calculate, with explicit call/source/output recording alongside science.
+Already calculated outputs + recorded context -> export mapping and actual data/schema/semantic checks.
+Typed Parquet/readback -> database load/SQL/fidelity/reopen.
+Manifest binds published files and receipts -> readonly critical files -> completed workflow bound to manifest -> final pointer.
+Verified store open -> read-only saved query. Source data are not reread for saved queries; source reproduction/scientific QA requires the actual bytes.
+Separate source QA/human scientific review/independent replay -> approval decisions. This is not an automatic production promotion.
+
+SOURCES OF AUTHORITY
+LinkML defines record/approval structures. Amadeus helpers provide recognized codes/labels; policy provides approved-candidate unit/qualification declarations; source NetCDF provides observed file facts; caller/recording provides observed execution context. Matching strings/IDs do not establish scientific truth.33 recognized codes do not mean33onboarded;16 native daily codes are tested. No scientific conversion or new monthly aggregation is introduced.
+LinkML module names are not database namespaces. Current generated class tables and objects differ from future proposed operational schemas; migration/full-model implementation is not proven.11 of 17 collections were populated in the comparative fixture scope;102 SQL queries include empty-table checks.
+
+PILOT VS CURRENT RELEASE
+Read comparison-for-decision.csv. The optimized pilot uses workflow/raster/generated-R checks. The measured candidate moved checks to post-calculation shared storage with recording. The latest corrected release adds a successful-build guard and published-store integrity checks. Both integration copies had the same frozen build unit/code policy in the controlled comparison, but metadata publication differs intentionally: candidate package labels/catalog hashes enrich the original mapping.
+Both preserve tested native science. Neither proves universal scientific suitability, all datasets/backends/calendars or production readiness. The current candidate has fewer workflow gates but adds a publication protocol; do not infer lower total maintenance effort just from file count.
+
+PERFORMANCE
+The 45-run study is historical:5 repetitions x3 arms x3 request sizes (4,32,336 results), same cached bytes/calls/TIFF handoff, randomized arm order. Native values matched all15 blocks. One interrupted partial run was excluded and retried; N4 sensitivity omits the split block. Whole-process elapsed includes each arm's actual deliverables, not isolated validation. Ordinary Amadeus lacks the extra metadata/provenance/database outputs. Candidate was slower and had higher main-process memory in the measured larger workloads.
+The corrected publication release was not rebenchmarked in a new N5 full-workflow study. Its store-open check had ~0.13 second median for ~15-16MB in3 warm-cache samples per size; this excludes interpreter startup, query/connection and science. Do not substitute that number for full-workflow time. Process-tree sampled RSS can double count shared pages/miss peaks and is not main-process HWM or unique RAM.
+
+CURRENT EVIDENCE
+Fresh4/336/4cases,102 SQLeach, native regression difference0;26 publication checks;336 direct ncdf4 comparisons; actual retained-source asset/call/RDS/recording/database audits. Source-copy removal/query independence and schema-only export tested. Controlled blocked load/retry tested. Historic504 schema-gate outcomes and18 focused semantic observations are explicitly labeled as comparative-version evidence, not a new full rerun on the latest release. Arbitrary descriptive text and valid-shaped false record claims still need evidence/curation; recorder verification is distinct from record validation.
+
+EXTERNAL METADATA
+Not imported in this release. Proposed modes are Amadeus-derived baseline, reviewed external catalog baseline, or keyed combination. Compile one effective catalog at build with stable IDs, version/hash/source references, required fields, explicit field authority, scientific unit/coverage semantics, conflict resolution and qualification evidence. External-only concerns catalog properties; it cannot replace Amadeus route support, actual file observations or execution history. No runtime spreadsheet/merge dependency is proposed. Human review worksheets are not operational metadata import.
+
+REMAINING DECISIONS
+Scientific/native-unit/physical-time/scope sign-off; independent environment replay; actual deployment immutable/access-control/authentication/concurrency policy; multi-file power-loss durability; historical store requalification/migration; larger-snapshot cost; broader classes/calendars/geometry; Sedona/amadeusdb/other dataset qualification. Read-only bits and unsigned hashes do not stop coordinated privileged rewrites. Direct DBI/IDE/unrelated external-file SQL bypasses snapshot guarantees. Follow the matching release when querying old snapshots.
+
+REVIEW BEFORE PUSH
+Review the deck/diagrams, current code and tests, version distinctions, gaps and cost. Have a domain reviewer complete scientific decisions and a colleague replay ordinary requests on an independent/affected stack. Agree supported scope and publication guarantees. If approved for a review branch, include current integration code/build artifacts/tests/docs and small scoped evidence, exclude raw annual caches, local libraries, fault/tamper copies and user outputs. No files are staged/committed/pushed by this review pack.

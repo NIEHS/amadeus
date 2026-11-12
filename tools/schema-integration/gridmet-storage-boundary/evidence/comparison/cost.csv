@@ -1,0 +1,7 @@
+"workload","repetition","files","bytes","verification_seconds","scope"
+"final-small",1,11,15254112,0.130000000000001,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"
+"final-small",2,11,15254112,0.157999999999999,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"
+"final-small",3,11,15254112,0.123000000000001,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"
+"final-full",1,11,15893341,0.129999999999999,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"
+"final-full",2,11,15893341,0.129,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"
+"final-full",3,11,15893341,0.130000000000001,"Warm-file-cache integrity verification only; excludes R startup, DB connect/query and science; no claim of full-workflow speed"

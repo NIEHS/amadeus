@@ -1,0 +1,11 @@
+{
+  "review_status": "candidate pending human sign-off",
+  "trust": "local unsigned integrity seal; not independent attestation",
+  "files": {
+    "catalog.yaml": "8961f358e18567ab875621921ba0509173627b64ee5517a9b621ceaa17c57e48",
+    "approval_schema.yaml": "b6e1ccc6304d6cd75c5ee4a0947ff8e2cdca97e395eb2a402572f834fca13e18",
+    "evidence/VERIFICATION.json": "481880da45a636b79422acdc1b27661af54aa152dfb49e79d512366bffdfef9b",
+    "evidence/case-audits.csv": "8a8a08e11818e9df666e539a08c3b7725971b690f4b4b79fd5675042d7c49412",
+    "evidence/pair-equivalence.csv": "6e8ff4ea55d98db85a81180b8a2511e0f79d69b617610de24c9e7f2396b8c168"
+  }
+}

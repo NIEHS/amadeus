@@ -1,0 +1,28 @@
+{
+  "completed": true,
+  "integration_revision": "direct-output-option-A-v1",
+  "schema_accepted": true,
+  "selected_engine": "duckdb",
+  "selected_storage": "parquet",
+  "publication_manifest_sha256": "3ad348fd30ec7e4b0b830bcbcba18121b1d19f6253a1299bd32b30564be65b21",
+  "publication_policy": "verify bytes at each store open; no trusted stat-only cache",
+  "direct_output_context": {
+    "recorded_context_integrity_verified": true,
+    "recording_seal_sha256": "b2d0953fbf0b276b544f10c2d32ded212ca66ead09742cff7b1f7c3073dbc302",
+    "observer_trust": "Unkeyed local evidence; not independent execution attestation",
+    "interface": "recorded-direct-output-v1",
+    "execution_context": "explicit start/finish brackets; not independently attested",
+    "source_identity_scope": "recorded_before_processing; not independently attested",
+    "source_unchanged_during_science_established": false,
+    "scientific_calls_performed_by_writer": false,
+    "serialization_performed_after_calculation": true,
+    "call_package_version": "2.0.4",
+    "provenance_complete": false,
+    "production_approved": false
+  },
+  "dataset_catalog_sha256": "c449d18be83564f7cd0a5b6a9ff8e70b67d6da17fc581eb73efe70b52f36e55c",
+  "accepted_records": 4,
+  "instance_sha256": "594f55ed2312ee4cad80d04bbc8b972a114289ee9480a3edf1d4796f1b101d32",
+  "runtime_contract_sha256": "730f7bf63d0ea58001aec1868f23dcb1cded73c0ac843b8afaaa210ca5d5e59d",
+  "production_approved": false
+}

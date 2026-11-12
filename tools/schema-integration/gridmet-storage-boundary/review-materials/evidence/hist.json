@@ -1,0 +1,38 @@
+{
+  "cases": 45,
+  "interrupted_attempts_excluded": 1,
+  "resumed_after_session_interruption": true,
+  "repetitions_per_arm_workload": 5,
+  "arms": [
+    "ordinary",
+    "pilot",
+    "candidate"
+  ],
+  "paired_blocks": 15,
+  "all_three_native_values_identical": true,
+  "source_and_code_unchanged": true,
+  "integrated_runs": 30,
+  "SQL_checks_per_integrated_run": 102,
+  "policy_equal": true,
+  "checks": {
+    "approval_pilot": 15,
+    "approval_candidate": 15,
+    "release_status_unexpected_acceptances": 2,
+    "schema_gate_observations": 504,
+    "unexpected_schema_gate_outcomes": 0,
+    "focused_semantic_observations": 18,
+    "focused_semantic_unexpected_acceptances": 0,
+    "candidate_recording_checks": 16,
+    "candidate_failure_checks": 5,
+    "post_accept_load_failure_and_retry": 2,
+    "isolated_release_guard_tests": 3,
+    "remediation_fresh_scientific_records": 4
+  },
+  "candidate_recording_verified": true,
+  "new_provider_download": false,
+  "independent_environment_replay": false,
+  "core_amadeus_modified": false,
+  "original_pilots_or_schema_repository_modified": false,
+  "production_approved": false,
+  "performance_claim_scope": "Observed local whole-process request costs only"
+}

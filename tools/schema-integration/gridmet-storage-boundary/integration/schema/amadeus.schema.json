@@ -1,0 +1,4304 @@
+{
+    "$defs": {
+        "AccessProtocolEnum": {
+            "description": "How amadeus reaches a source. Determines whether subsetting can be pushed to the provider, which is the whole point of the \"subset early\" principle.",
+            "enum": [
+                "https_bulk_file",
+                "ftp",
+                "s3_object_store",
+                "stac_api",
+                "opendap",
+                "thredds",
+                "rest_api",
+                "harmony",
+                "arcgis_service"
+            ],
+            "title": "AccessProtocolEnum",
+            "type": "string"
+        },
+        "AggregationMethodEnum": {
+            "description": "How many values became one. Which members are *legal* for a given variable is determined by `VariableExtensivityEnum` \u2014 see the rules on `ExtractionRequest`.",
+            "enum": [
+                "instantaneous",
+                "mean",
+                "minimum",
+                "maximum",
+                "median",
+                "sum",
+                "count",
+                "percentile",
+                "cumulative",
+                "area_weighted_mean",
+                "population_weighted_mean",
+                "mode",
+                "class_proportion",
+                "density",
+                "nearest",
+                "other"
+            ],
+            "title": "AggregationMethodEnum",
+            "type": "string"
+        },
+        "AmadeusDatabase": {
+            "additionalProperties": false,
+            "description": "Container for a complete or partial AmadeusDB instance. Exists so a catalog snapshot, a sample dataset or an import bundle can be validated as one document with `linkml-validate`, and so the SQL generator has a root from which to reach every table.\nAll collections are optional: a catalog-only bundle (the normal shape of a curation pull request) is as valid as a full instance.",
+            "properties": {
+                "ambient_values_at_location": {
+                    "items": {
+                        "$ref": "#/$defs/AmbientValueAtLocation"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "area_values": {
+                    "items": {
+                        "$ref": "#/$defs/AreaValue"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "assets": {
+                    "items": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "canonical_variables": {
+                    "items": {
+                        "$ref": "#/$defs/CanonicalVariable"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "data_sources": {
+                    "items": {
+                        "$ref": "#/$defs/DataSource"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "extraction_requests": {
+                    "items": {
+                        "$ref": "#/$defs/ExtractionRequest"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "grid_cell_values": {
+                    "items": {
+                        "$ref": "#/$defs/GridCellValue"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "grid_definitions": {
+                    "items": {
+                        "$ref": "#/$defs/GridDefinition"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "hex_cell_values": {
+                    "items": {
+                        "$ref": "#/$defs/HexCellValue"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "location_sets": {
+                    "items": {
+                        "$ref": "#/$defs/LocationSet"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "locations": {
+                    "items": {
+                        "$ref": "#/$defs/Location"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "product_variables": {
+                    "items": {
+                        "$ref": "#/$defs/ProductVariable"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "products": {
+                    "items": {
+                        "$ref": "#/$defs/Product"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "provenance_chains": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceChain"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "schema_version": {
+                    "description": "Version of the AmadeusDB schema a record conforms to, so consumers can branch on schema evolution rather than guess.",
+                    "type": "string"
+                },
+                "station_observations": {
+                    "items": {
+                        "$ref": "#/$defs/StationObservation"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "tool_runs": {
+                    "items": {
+                        "$ref": "#/$defs/ToolRun"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "vector_features": {
+                    "items": {
+                        "$ref": "#/$defs/VectorFeature"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "schema_version"
+            ],
+            "title": "AmadeusDatabase",
+            "type": "object"
+        },
+        "AmbientValue": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "One value of one variable, at one place, over one time interval, from one asset, produced by one run. A property of the environment; not an exposure.\nAbstract: no table of its own. The SQL generator flattens these slots into each concrete child, which is the right physical design \u2014 a single polymorphic value table with mostly-null geometry columns would defeat both partitioning and spatial indexing.",
+            "properties": {
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "AmbientValue",
+            "type": "object"
+        },
+        "AmbientValueAtLocation": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "The output row: an ambient value assigned to a user location for a time interval, with the extraction that produced it recorded alongside. This is what `calculate_covariates()` returns today, plus the metadata it currently drops.\nNot an exposure. The location may be a person's address and the row may carry a cohort key, but the value is a property of the place: swap the person, keep the address, and it does not change.\nWhat today's output has, that this keeps: location key, time, value. What today's output lacks, that this adds: which product variable and which canonical variable (today encoded positionally in a column name like `weasd_0`), the extraction method and buffer actually used, how many source values contributed, coverage, distance to the contributing station, the quality and status of the inputs, and the run that produced it.",
+            "properties": {
+                "aggregation_method": {
+                    "$ref": "#/$defs/AggregationMethodEnum"
+                },
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "buffer_radius_m": {
+                    "description": "Buffer radius in metres. Metres, explicitly \u2014 amadeus currently interprets `radius` in the units of the *projected* geometry's CRS, which for a geographic CRS means degrees, and the docs describe it as metres. Declaring the unit in the schema removes the ambiguity.",
+                    "minimum": 0.0,
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "contributing_value_count": {
+                    "description": "How many source values went into this one. A buffer mean over one cell and over four hundred cells are different claims; today both come back as an undistinguished number.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "coverage_fraction": {
+                    "description": "Fraction of the hex actually covered by contributing source support.",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "distance_to_source_m": {
+                    "description": "Distance to the contributing station, for nearest-station extraction. Paired with the request's max-distance setting, this is what makes a nearest-station assignment defensible.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "extraction_method": {
+                    "$ref": "#/$defs/ExtractionMethodEnum"
+                },
+                "extraction_request": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "lag_days_applied": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "location": {
+                    "type": "string"
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "output_column_name": {
+                    "description": "The wide-format column name this value would occupy, for backward compatibility with existing amadeus and beethoven consumers (`weasd_0`, `tmmx_10000`). Generated from the request, not parsed back out of it \u2014 the long form is canonical and the wide form is a projection.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "temporal_grouping": {
+                    "$ref": "#/$defs/TemporalGroupingEnum",
+                    "description": "The `.by_time` argument."
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "location",
+                "extraction_request",
+                "extraction_method",
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "AmbientValueAtLocation",
+            "type": "object"
+        },
+        "AreaRoleEnum": {
+            "description": "Whether an area's identity is externally stable or episodic. Determines whether cross-time aggregation over the area is meaningful.",
+            "enum": [
+                "administrative",
+                "episodic"
+            ],
+            "title": "AreaRoleEnum",
+            "type": "string"
+        },
+        "AreaTypeEnum": {
+            "description": "",
+            "enum": [
+                "county",
+                "state",
+                "census_tract",
+                "census_block_group",
+                "zcta",
+                "hydrologic_unit",
+                "ecoregion",
+                "smoke_plume",
+                "drought_area",
+                "public_water_system",
+                "custom"
+            ],
+            "title": "AreaTypeEnum",
+            "type": "string"
+        },
+        "AreaValue": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "A value attached to a named or delineated polygon: HUC watersheds, EPA ecoregions, county-level NEI emissions, USDM drought polygons, NOAA HMS smoke plumes.\nTwo sub-cases that must not be merged, distinguished by `area_role`: an *administrative* area whose identity is external and stable (a county FIPS), and an *episodic* polygon that exists only because something happened there (a smoke plume on one day). Aggregating across the second as if it were the first produces nonsense.",
+            "properties": {
+                "area_code": {
+                    "description": "The external code identifying the area.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "area_geom_wkt": {
+                    "type": "string"
+                },
+                "area_id": {
+                    "type": "string"
+                },
+                "area_km2": {
+                    "description": "Materialised area. Needed to make extensive values (an emission mass) convertible to intensive ones (a flux density) without recomputing geodesic area per query.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "area_name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "area_role": {
+                    "$ref": "#/$defs/AreaRoleEnum"
+                },
+                "area_type": {
+                    "$ref": "#/$defs/AreaTypeEnum"
+                },
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "area_id",
+                "area_type",
+                "area_role",
+                "area_geom_wkt",
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "AreaValue",
+            "type": "object"
+        },
+        "Asset": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "materialization_mode": {
+                                "anyOf": [
+                                    {
+                                        "const": "bounded_cache"
+                                    },
+                                    {
+                                        "const": "full_materialization"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "materialization_mode"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "local_path": {},
+                            "sha256": {}
+                        },
+                        "required": [
+                            "local_path",
+                            "sha256"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "value_state": {
+                                "const": "materialized"
+                            }
+                        },
+                        "required": [
+                            "value_state"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "produced_by_run": {}
+                        },
+                        "required": [
+                            "produced_by_run"
+                        ]
+                    }
+                }
+            ],
+            "description": "A concrete byte stream: a file on disk, an object in a bucket, a STAC asset, or a provider API response. The unit of download, caching, integrity checking and idempotency.\n**Asset-centric by design.** The modernization plan's own instruction is \"adopt an asset-centric schema; avoid mandatory cell-row ingestion\". An asset can be registered \u2014 catalogued, discoverable, queryable by extent and time \u2014 without any of its values ever being materialised into a value table. `materialization_mode` records how much was actually read, so the four streaming modes of plan \u00a74.7.2 become auditable properties of the catalog rather than an ungoverned side path.",
+            "properties": {
+                "asset_key": {
+                    "description": "STAC asset key or other within-item key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "bbox_wkt": {
+                    "description": "Bounding geometry as WKT.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "cache_expires_at": {
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "download_timestamp_utc": {
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "local_path": {
+                    "description": "Present only when bytes were actually written locally. Absent for `direct_remote_scan` and `server_side_subset`.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "materialization_mode": {
+                    "$ref": "#/$defs/MaterializationModeEnum"
+                },
+                "media_type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "native_format": {
+                    "$ref": "#/$defs/NativeFormatEnum"
+                },
+                "produced_by_run": {
+                    "description": "Identifier of the tool run that registered or materialised this asset. Typed as a string rather than an object reference to keep the catalog and provenance modules independently loadable; the FK is added by the SQL post-processor.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product": {
+                    "type": "string"
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "sha256": {
+                    "description": "SHA-256 of the byte stream, for integrity and idempotency.",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "size_bytes": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "source_last_modified": {
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "stac_collection_id": {
+                    "description": "STAC collection identifier, where the product is STAC-published.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "stac_item_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "url": {
+                    "description": "Where the bytes live upstream. Retained even after local caching so a result can be re-derived from source.",
+                    "format": "uri",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "value_state": {
+                    "$ref": "#/$defs/ValueMaterializationEnum",
+                    "description": "Whether rows for this asset exist in a value table. `registered_only` is the normal case for the asset-centric discovery path."
+                },
+                "variables_present": {
+                    "description": "Which variables this asset actually contains. Lets a request skip assets that cannot satisfy it without opening them.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "vertical_levels_present": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "product",
+                "materialization_mode",
+                "value_state"
+            ],
+            "title": "Asset",
+            "type": "object"
+        },
+        "CalendarEnum": {
+            "description": "",
+            "enum": [
+                "gregorian",
+                "proleptic_gregorian",
+                "noleap",
+                "daymet_365",
+                "all_leap",
+                "day_360",
+                "julian"
+            ],
+            "title": "CalendarEnum",
+            "type": "string"
+        },
+        "CanonicalVariable": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "value_data_type": {
+                                "const": "categorical"
+                            }
+                        },
+                        "required": [
+                            "value_data_type"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "extensivity": {
+                                "const": "categorical"
+                            }
+                        },
+                        "required": [
+                            "extensivity"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "extensivity": {
+                                "const": "categorical"
+                            }
+                        },
+                        "required": [
+                            "extensivity"
+                        ]
+                    },
+                    "then": {
+                        "not": {
+                            "required": [
+                                "plausible_min"
+                            ]
+                        },
+                        "properties": {
+                            "plausible_min": {}
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "extensivity": {
+                                "const": "categorical"
+                            }
+                        },
+                        "required": [
+                            "extensivity"
+                        ]
+                    },
+                    "then": {
+                        "not": {
+                            "required": [
+                                "plausible_max"
+                            ]
+                        },
+                        "properties": {
+                            "plausible_max": {}
+                        }
+                    }
+                }
+            ],
+            "description": "A harmonised environmental quantity, independent of who publishes it. The cross-source identity anchor: `gridmet.tmmx`, `prism.tmax` and `daymet.tmax` are three `ProductVariable`s over *one* `CanonicalVariable`, and that is what makes \"is it the same variable?\" answerable by a join rather than by a conversation.\nCarries the semantics that must be identical across sources (`standard_name`, canonical units, extensivity, plausible range, concept bindings). Everything that legitimately differs per source lives on `ProductVariable`.",
+            "properties": {
+                "concept_mappings": {
+                    "description": "Mappings to any target vocabulary. One generic list rather than a slot per standard, so adding a vocabulary is a new prefix, not a schema change. EnVar and HEW arrived at this identical design independently.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "default_aggregation_method": {
+                    "$ref": "#/$defs/AggregationMethodEnum",
+                    "description": "The aggregation applied when a request does not name one. Must be legal for the declared extensivity."
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "envar_variable_family": {
+                    "description": "Which EnVar variable family this belongs to, and therefore which variable-specific extension block an emitted EnVar record must carry (`derived_heat_metric` for the heat family).",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "extensivity": {
+                    "$ref": "#/$defs/VariableExtensivityEnum",
+                    "description": "Intensive, extensive or categorical. Determines which aggregation methods are legal for this variable \u2014 see `ExtractionRequest`."
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A human-readable display label.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": "string"
+                },
+                "omop_concept_binding": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/OmopConceptBinding"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "plausible_max": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "plausible_min": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "standard_name": {
+                    "description": "The standard-name identifier for the physical quantity, as a CURIE so no single naming authority is privileged. Prefer a CF standard name where one exists; fall back to ECTO/ENVO or a minted `AMADEUS:` term. The prefix carries the authority; the slot name does not.",
+                    "type": "string"
+                },
+                "standard_name_authority": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "units_display": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "units_ucum": {
+                    "description": "Canonical units in UCUM notation, bare (not CURIE-prefixed). HEW prefixes (`UCUM:Cel`), EnVar does not (`Cel`); we follow EnVar and note the difference, because it is exactly the kind of thing a mechanical mapper gets wrong silently.",
+                    "type": "string"
+                },
+                "value_data_type": {
+                    "$ref": "#/$defs/ValueDataTypeEnum"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "standard_name",
+                "units_ucum",
+                "value_data_type",
+                "extensivity"
+            ],
+            "title": "CanonicalVariable",
+            "type": "object"
+        },
+        "ConceptStatusEnum": {
+            "description": "State of the mapping from a variable to a target vocabulary. HEW's value set, which is strictly better than EnVar's three-valued one: it keeps standard/non-standard apart (OMOP-critical) and \"nobody looked\" apart from \"we looked and there is nothing\".",
+            "enum": [
+                "mapped_standard",
+                "mapped_nonstandard",
+                "candidate_mapping",
+                "vocabulary_gap",
+                "not_evaluated"
+            ],
+            "title": "ConceptStatusEnum",
+            "type": "string"
+        },
+        "DataGenreEnum": {
+            "description": "The thematic classification already used in the amadeus README's source table. Promoted from prose to an enum so it can drive discovery.",
+            "enum": [
+                "meteorology",
+                "climate",
+                "climate_classification",
+                "air_pollution",
+                "aerosols",
+                "atmosphere",
+                "emissions",
+                "chemicals",
+                "land_use",
+                "agriculture",
+                "population",
+                "hydrology",
+                "water",
+                "elevation",
+                "roadways",
+                "wildfire_smoke",
+                "drought",
+                "satellite",
+                "built_environment"
+            ],
+            "title": "DataGenreEnum",
+            "type": "string"
+        },
+        "DataSource": {
+            "additionalProperties": false,
+            "description": "A provider programme that publishes one or more products: EPA AQS, NASA MODIS, NOAA NARR, Climatology Lab. One row per row of the amadeus README source table.",
+            "properties": {
+                "access_protocol": {
+                    "$ref": "#/$defs/AccessProtocolEnum",
+                    "description": "Primary access mechanism. Determines whether \"subset early\" is achievable at all for this source."
+                },
+                "amadeus_function_suffix": {
+                    "description": "The suffix amadeus uses for this source's functions (`_narr` \u2192 `download_narr`, `process_narr`, `calculate_narr`). Recorded so the catalog and the R API can be checked against each other mechanically \u2014 a catalog entry with no implementing function, or a function with no catalog entry, is a test failure.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "auth_mechanism": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "citation_apa": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "doi": {
+                    "pattern": "^10\\.[0-9]{4,9}/.+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "homepage": {
+                    "format": "uri",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A human-readable display label.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "license_spdx": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": "string"
+                },
+                "producer_institution": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "rate_limit_requests_per_second": {
+                    "description": "Provider rate limit, as `download_data(rate_limit=)` already takes. In the catalog so a query planner can respect it without hard-coding.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "requires_authentication": {
+                    "description": "Whether a credential is needed. True for all NASA Earthdata sources (`modis`, `merra2`, `geos`, SEDAC `population`).",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ],
+            "title": "DataSource",
+            "type": "object"
+        },
+        "DataStatusEnum": {
+            "description": "The quality state of a value *as the source declares it*. Load-bearing for the AQS/AirNow harmonization rule (plan \u00a74.6.1): an AirNow preliminary value must never overwrite an AQS quality-controlled value in place, so status has to be carried on every row, not on the dataset.",
+            "enum": [
+                "preliminary",
+                "provisional",
+                "quality_controlled",
+                "final",
+                "forecast",
+                "reanalysis",
+                "superseded",
+                "unknown"
+            ],
+            "title": "DataStatusEnum",
+            "type": "string"
+        },
+        "DayBoundaryConventionEnum": {
+            "description": "Where a \"day\" starts for a daily product. This is the slot behind the Daymet/GridMET 1.26 \u00b0C discrepancy: same variable, same place, same date, different day boundary.",
+            "enum": [
+                "local_midnight",
+                "utc_midnight",
+                "ending_1200_gmt",
+                "solar_noon_centered",
+                "observation_dependent",
+                "not_applicable"
+            ],
+            "title": "DayBoundaryConventionEnum",
+            "type": "string"
+        },
+        "ExtractionMethodEnum": {
+            "description": "How a value was pulled out of its source support at a location.",
+            "enum": [
+                "nearest_cell",
+                "bilinear",
+                "inverse_distance_weighted_4_nearest_cells",
+                "area_weighted_polygon_mean",
+                "population_weighted_mean",
+                "point_station_lookup",
+                "nearest_station",
+                "intersection_area_proportion",
+                "raster_zonal_sum",
+                "feature_density",
+                "exact_extract"
+            ],
+            "title": "ExtractionMethodEnum",
+            "type": "string"
+        },
+        "ExtractionRequest": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "buffer_radius_m": {
+                                "minimum": 1e-06
+                            }
+                        },
+                        "required": [
+                            "buffer_radius_m"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "aggregation_method": {}
+                        },
+                        "required": [
+                            "aggregation_method"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "aggregation_method": {
+                                "anyOf": [
+                                    {
+                                        "const": "population_weighted_mean"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "aggregation_method"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "weighting_product_variable": {}
+                        },
+                        "required": [
+                            "weighting_product_variable"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "status_mixing_policy": {
+                                "const": "allow_with_policy"
+                            }
+                        },
+                        "required": [
+                            "status_mixing_policy"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "source_priority_policy": {}
+                        },
+                        "required": [
+                            "source_priority_policy"
+                        ]
+                    }
+                }
+            ],
+            "description": "A declarative, reproducible specification of an extraction: which variables, over which locations, for which time window, with which buffer, aggregation, weighting and lags.\nThe rules below are the ones that make the request *checkable before it runs*, which is the point. The extensivity rule in particular turns the project lead's \"intensive vs extensive should be explicit\" from documentation into a validation error.",
+            "properties": {
+                "aggregation_method": {
+                    "$ref": "#/$defs/AggregationMethodEnum"
+                },
+                "buffer_radius_m": {
+                    "description": "Buffer radius in metres. Metres, explicitly \u2014 amadeus currently interprets `radius` in the units of the *projected* geometry's CRS, which for a geographic CRS means degrees, and the docs describe it as metres. Declaring the unit in the schema removes the ambiguity.",
+                    "minimum": 0.0,
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "extraction_method": {
+                    "$ref": "#/$defs/ExtractionMethodEnum"
+                },
+                "generated_sql": {
+                    "description": "The SQL actually issued. Stored so the result is auditable against the plan the optimiser chose, and so a user can take the query away and run it themselves \u2014 which is the \"same contract in R, SQL, Python or a container\" promise, made concrete.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "lag_days": {
+                    "description": "Lags to compute, in days. `calculate_lagged()` already does this; naming them in the request is what lets the result carry which lag it is.",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "location_set": {
+                    "type": "string"
+                },
+                "materialization_mode": {
+                    "$ref": "#/$defs/MaterializationModeEnum"
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "output_orientation": {
+                    "$ref": "#/$defs/TableOrientationEnum"
+                },
+                "request_hash": {
+                    "description": "Hash over the normalised request. The idempotency key: the same request re-submitted resolves to the existing result set instead of recomputing it, and a changed request is visibly a different request.",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                },
+                "request_timestamp_utc": {
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "requested_by": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "requested_canonical_variables": {
+                    "description": "Request by canonical variable to let the planner choose a source. The preferred form: the user asks for daily maximum temperature, not for `gridmet.tmmx`.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "requested_product_variables": {
+                    "description": "Request a specific source delivery, pinning the answer. Required when reproducing a published result, since the planner's choice may change.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "source_priority_policy": {
+                    "description": "Ordered source preference for reconciliation, e.g. `aqs > airnow`. Required whenever `status_mixing_policy` is `allow_with_policy`.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "status_mixing_policy": {
+                    "$ref": "#/$defs/StatusMixingPolicyEnum",
+                    "description": "Whether preliminary and quality-controlled values may appear in one result. Defaults to refusing."
+                },
+                "strict_extensivity_check": {
+                    "$ref": "#/$defs/StrictnessEnum",
+                    "description": "Whether to reject a request whose aggregation is illegal for the variable's extensivity, or whose variable declares `extensivity: unknown`. Defaults to on: an aggregation that cannot be justified should fail loudly at request time, not produce a plausible number."
+                },
+                "target_geography_type": {
+                    "$ref": "#/$defs/TargetGeographyTypeEnum"
+                },
+                "temporal_grouping": {
+                    "$ref": "#/$defs/TemporalGroupingEnum",
+                    "description": "The `.by_time` argument."
+                },
+                "time_window_end": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "time_window_start": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "weighting_product_variable": {
+                    "description": "The product variable used as weights (a population density grid).",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "location_set",
+                "time_window_start",
+                "time_window_end",
+                "extraction_method",
+                "request_hash"
+            ],
+            "title": "ExtractionRequest",
+            "type": "object"
+        },
+        "GeometryTypeEnum": {
+            "description": "",
+            "enum": [
+                "point",
+                "multipoint",
+                "linestring",
+                "multilinestring",
+                "polygon",
+                "multipolygon",
+                "geometrycollection"
+            ],
+            "title": "GeometryTypeEnum",
+            "type": "string"
+        },
+        "GridCellValue": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "A value at one cell of one grid \u2014 the flattened form of a raster layer. This is the class the SedonaDB decision hangs on: Sedona's raster support is thinner than `terra`'s, so the plan's proposal is to flatten raster to point or polygon and persist as GeoParquet.\nThe cell is identified *twice*: by integer grid index (`cell_x`, `cell_y`) and by geometry. The index is the cheap, exact, join-stable key and the one to partition and deduplicate on; the geometry is what spatial predicates need. Storing only geometry makes idempotent re-ingestion a floating-point comparison, which is how duplicate rows appear.",
+            "properties": {
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "cell_centroid_wkt": {
+                    "type": "string"
+                },
+                "cell_polygon_wkt": {
+                    "description": "The cell footprint. Optional: needed for area-weighted extraction and for honest polygon intersection, redundant for nearest-cell lookup. Materialising it for a continental hourly grid is expensive, so this is a deliberate per-product choice, not a default.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "cell_x": {
+                    "description": "Zero-based column index in the grid.",
+                    "type": "integer"
+                },
+                "cell_y": {
+                    "description": "Zero-based row index in the grid.",
+                    "type": "integer"
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "grid_definition": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "grid_definition",
+                "cell_x",
+                "cell_y",
+                "cell_centroid_wkt",
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "GridCellValue",
+            "type": "object"
+        },
+        "GridDefinition": {
+            "additionalProperties": false,
+            "description": "A reusable description of a raster or model grid. Its own entity because several products share one grid (all NARR monolevel variables) and because resolution, projection and vertical levels must be computable, not prose.",
+            "properties": {
+                "crs": {
+                    "description": "Coordinate reference system as an authority code. Stored as the string form (`EPSG:4326`) because that is what both `terra` and the SQL engines accept; the numeric SRID is derived for `ST_SetSRID`.",
+                    "pattern": "^[A-Za-z]+:[0-9]+$",
+                    "type": "string"
+                },
+                "grid_mapping_name": {
+                    "description": "CF grid mapping name.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A human-readable display label.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "n_columns": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "n_rows": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "origin_x": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "origin_y": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "proj_string": {
+                    "description": "Full PROJ or WKT2 CRS definition, for grids with no authority code.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "resolution_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "resolution_x": {
+                    "type": "number"
+                },
+                "resolution_y": {
+                    "type": "number"
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "vertical_level_type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_levels": {
+                    "description": "The pressure or height levels present, when the product is multi-level. NARR and MERRA-2/GEOS pressure-level products encode the level in the `terra` layer name (`variable_level_YYYYMMDD`); recording the level set here is what lets that be parsed reliably instead of positionally.",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "crs",
+                "resolution_x",
+                "resolution_y"
+            ],
+            "title": "GridDefinition",
+            "type": "object"
+        },
+        "HexCellValue": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "coverage_fraction": {
+                                "maximum": 0.5
+                            }
+                        },
+                        "required": [
+                            "coverage_fraction"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "quality_flag": {}
+                        },
+                        "required": [
+                            "quality_flag"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "A value aggregated to an H3 cell \u2014 the harmonization target for the C-HER collaboration (objective O-09).\nHexification is lossy and the loss must be recorded, not assumed. Three slots do that: `source_support_type` (what was aggregated), `coverage_fraction` (how much of the hex the source actually covered) and `hexification_method` (how). A hex value whose provenance says \"area_weighted_mean from raster_grid_cell at 0.62 coverage\" is usable; the same number without them is not.",
+            "properties": {
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "contributing_cell_count": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "coverage_fraction": {
+                    "description": "Fraction of the hex actually covered by contributing source support.",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "type": "number"
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "h3_cell": {
+                    "pattern": "^[0-9a-f]{15}$",
+                    "type": "string"
+                },
+                "h3_resolution": {
+                    "maximum": 15,
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "hex_centroid_wkt": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "hexification_method": {
+                    "$ref": "#/$defs/AggregationMethodEnum",
+                    "description": "How source supports were combined into the hex value. Must be legal for the canonical variable's extensivity \u2014 a population count hexifies by `sum`, a temperature by `area_weighted_mean`, and swapping them is a silent error."
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_support_type": {
+                    "$ref": "#/$defs/SpatialSupportTypeEnum",
+                    "description": "The support type that was aggregated into this hex."
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "h3_cell",
+                "h3_resolution",
+                "source_support_type",
+                "hexification_method",
+                "coverage_fraction",
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "HexCellValue",
+            "type": "object"
+        },
+        "HomogenisationStatusEnum": {
+            "description": "",
+            "enum": [
+                "homogenised",
+                "not_homogenised",
+                "partial"
+            ],
+            "title": "HomogenisationStatusEnum",
+            "type": "string"
+        },
+        "Location": {
+            "additionalProperties": false,
+            "description": "One location in a set, with an optional validity interval.\n`valid_from` / `valid_to` exist because a residential address is not timeless. Address histories, known travel intervals and synthetic residence periods all need them, and without them a value is joined to a place the subject may not have occupied on that date. amadeus does not need to model *why* the interval exists \u2014 that is the health layer's business \u2014 only to honour it in the join.",
+            "properties": {
+                "buffer_radius_m": {
+                    "description": "Buffer radius in metres. Metres, explicitly \u2014 amadeus currently interprets `radius` in the units of the *projected* geometry's CRS, which for a geographic CRS means degrees, and the docs describe it as metres. Declaring the unit in the schema removes the ambiguity.",
+                    "minimum": 0.0,
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "location_geom_wkt": {
+                    "type": "string"
+                },
+                "location_key": {
+                    "description": "The user's own identifier value, preserved verbatim.",
+                    "type": "string"
+                },
+                "location_set": {
+                    "type": "string"
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "target_geography_type": {
+                    "$ref": "#/$defs/TargetGeographyTypeEnum"
+                },
+                "valid_from": {
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_to": {
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "location_set",
+                "location_key",
+                "location_geom_wkt"
+            ],
+            "title": "Location",
+            "type": "object"
+        },
+        "LocationSet": {
+            "additionalProperties": false,
+            "description": "A user-supplied collection of locations \u2014 the `locs` argument, promoted to an entity. Carries the identifier field name (`locs_id`), the CRS the user supplied, and a PHI declaration.\n`phi_status` defaults to `no_phi` and is the gate on everything else: if a location set is flagged, results derived from it must not be written to shared catalog tables or embedded in an exported EnVar record, whose `phi_status` is a required field precisely so this cannot be left implicit.",
+            "properties": {
+                "created_at": {
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "crs": {
+                    "description": "Declared, never assumed. `calculate_covariates()` currently reprojects `locs` to `crs(from)` silently; an undeclared input CRS is the most common way a spatial join goes quietly wrong.",
+                    "pattern": "^[A-Za-z]+:[0-9]+$",
+                    "type": "string"
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "geometry_type": {
+                    "$ref": "#/$defs/GeometryTypeEnum"
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "location_count": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "locs_id_field": {
+                    "description": "Name of the user's identifier column. amadeus already takes this as `locs_id`; recording it means the output column names are derivable rather than conventional.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "phi_status": {
+                    "$ref": "#/$defs/PhiStatusEnum",
+                    "description": "Whether these locations are or derive from protected health information. Gates persistence and export. Same slot name, range and value set as EnVar's required `phi_status`, so an exported record carries it verbatim."
+                },
+                "provided_by": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "locs_id_field",
+                "crs",
+                "phi_status"
+            ],
+            "title": "LocationSet",
+            "type": "object"
+        },
+        "MaterializationModeEnum": {
+            "description": "How much of a source asset had to be brought local to answer a request. Taken verbatim from the modernization plan \u00a74.7.2 so \"streaming\" is a recorded, auditable property of a run rather than an ungoverned side path.",
+            "enum": [
+                "direct_remote_scan",
+                "server_side_subset",
+                "bounded_cache",
+                "full_materialization"
+            ],
+            "title": "MaterializationModeEnum",
+            "type": "string"
+        },
+        "MissingReasonEnum": {
+            "description": "Why a *metadata* field is empty. Distinguishes \"the source does not provide this\" from \"nobody has looked yet\" \u2014 the difference that decides whether a gap is someone's task.",
+            "enum": [
+                "not_provided_by_source",
+                "available_but_not_extracted",
+                "upstream_data_not_propagated",
+                "under_investigation",
+                "not_applicable"
+            ],
+            "title": "MissingReasonEnum",
+            "type": "string"
+        },
+        "NativeFormatEnum": {
+            "description": "The format the source actually ships.",
+            "enum": [
+                "netcdf4_cf",
+                "netcdf3",
+                "hdf4",
+                "hdf5",
+                "geotiff",
+                "cloud_optimized_geotiff",
+                "ascii_grid",
+                "grib1",
+                "grib2",
+                "bil",
+                "shapefile",
+                "geodatabase",
+                "kml",
+                "csv_station_observations",
+                "pipe_delimited_text",
+                "fixed_width_text",
+                "zarr",
+                "parquet",
+                "geoparquet"
+            ],
+            "title": "NativeFormatEnum",
+            "type": "string"
+        },
+        "NullSemanticsEnum": {
+            "description": "Why a value is absent, or why a zero is a zero.",
+            "enum": [
+                "present",
+                "structural_null",
+                "derived_null",
+                "true_zero"
+            ],
+            "title": "NullSemanticsEnum",
+            "type": "string"
+        },
+        "OmopConceptBinding": {
+            "additionalProperties": false,
+            "description": "Binding of a canonical variable to an OMOP concept. Taken structurally from HEW so the two schemas exchange bindings without an adapter.",
+            "properties": {
+                "concept_status": {
+                    "$ref": "#/$defs/ConceptStatusEnum"
+                },
+                "omop_concept_id": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "omop_concept_name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "omop_domain_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "omop_standard_concept": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "omop_vocabulary_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "concept_status"
+            ],
+            "title": "OmopConceptBinding",
+            "type": "object"
+        },
+        "PhiStatusEnum": {
+            "description": "Whether a location set, and anything derived from it, is protected health information. An enum rather than a boolean for two reasons: it matches EnVar's `phi_status` exactly, and \u2014 see `ValueMaterializationEnum` \u2014 a boolean cannot be used as a LinkML rule precondition.",
+            "enum": [
+                "no_phi",
+                "aggregated_no_phi",
+                "phi_present"
+            ],
+            "title": "PhiStatusEnum",
+            "type": "string"
+        },
+        "Product": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "spatial_support_type": {
+                                "anyOf": [
+                                    {
+                                        "const": "raster_grid_cell"
+                                    },
+                                    {
+                                        "const": "model_grid_cell"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "spatial_support_type"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "grid_definition": {}
+                        },
+                        "required": [
+                            "grid_definition"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "temporal_resolution": {
+                                "const": "daily"
+                            }
+                        },
+                        "required": [
+                            "temporal_resolution"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "day_boundary_convention": {}
+                        },
+                        "required": [
+                            "day_boundary_convention"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "temporal_resolution": {
+                                "const": "timeless"
+                            }
+                        },
+                        "required": [
+                            "temporal_resolution"
+                        ]
+                    },
+                    "then": {
+                        "not": {
+                            "required": [
+                                "temporal_coverage_start"
+                            ]
+                        },
+                        "properties": {
+                            "temporal_coverage_start": {}
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "temporal_resolution": {
+                                "const": "timeless"
+                            }
+                        },
+                        "required": [
+                            "temporal_resolution"
+                        ]
+                    },
+                    "then": {
+                        "not": {
+                            "required": [
+                                "temporal_coverage_end"
+                            ]
+                        },
+                        "properties": {
+                            "temporal_coverage_end": {}
+                        }
+                    }
+                }
+            ],
+            "description": "A specific, versioned data product from a source \u2014 the unit a user actually requests, and the unit that carries the *profile*: spatial support, temporal support, format, calendar, day boundary.\nThis is where the answer to \"do we need different schemas for different types of source data?\" lives. We do not. The variation across the amadeus catalog decomposes into five orthogonal axes recorded here (`spatial_support_type`, `temporal_resolution`, `value` kind via the variables, `native_format`, and extensivity via the variables). One schema, one product table; a MODIS swath and an AQS monitor differ in their *values on these axes*, not in their structure.",
+            "properties": {
+                "access_url": {
+                    "format": "uri",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "amadeus_calculate_covariate": {
+                    "description": "The string accepted by `calculate_covariates(covariate=)`. Distinct from the process name \u2014 `modis_swath`/`modis_merge` both calculate as `modis`, and `aqs` processes but does not calculate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "amadeus_dataset_name": {
+                    "description": "The exact string accepted by `download_data(dataset_name=)`. The bridge between the catalog and the existing R API.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "amadeus_process_covariate": {
+                    "description": "The string accepted by `process_covariates(covariate=)`.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "calendar": {
+                    "$ref": "#/$defs/CalendarEnum"
+                },
+                "citation_apa": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "crs": {
+                    "description": "Coordinate reference system as an authority code. Stored as the string form (`EPSG:4326`) because that is what both `terra` and the SQL engines accept; the numeric SRID is derived for `ST_SetSRID`.",
+                    "pattern": "^[A-Za-z]+:[0-9]+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "data_genre": {
+                    "description": "Thematic classification, from the README source table.",
+                    "items": {
+                        "$ref": "#/$defs/DataGenreEnum"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "data_source": {
+                    "description": "The publishing programme.",
+                    "type": "string"
+                },
+                "day_boundary_convention": {
+                    "$ref": "#/$defs/DayBoundaryConventionEnum"
+                },
+                "default_data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "The status values from this product carry unless a row says otherwise."
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "doi": {
+                    "pattern": "^10\\.[0-9]{4,9}/.+$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "grid_definition": {
+                    "description": "Required when `spatial_support_type` is a grid cell type, forbidden otherwise. Enforced by the rules below rather than by two separate classes \u2014 the project lead's \"grid size is a dataset-level property\" becomes a foreign key, not a copied field.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "homogenisation_status": {
+                    "$ref": "#/$defs/HomogenisationStatusEnum"
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A human-readable display label.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "license_spdx": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "description": "A short machine-friendly name.",
+                    "type": "string"
+                },
+                "native_format": {
+                    "$ref": "#/$defs/NativeFormatEnum"
+                },
+                "native_spatial_resolution_descriptor": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "native_spatial_resolution_m": {
+                    "description": "Nominal resolution in metres. Computable, and therefore the one a query planner uses \u2014 but meaningless for non-grid supports, hence the descriptor alongside it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "product_version": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "spatial_extent_bbox_wkt": {
+                    "description": "Coverage footprint as WKT, so extent is a spatial predicate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "spatial_extent_descriptor": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "spatial_support_type": {
+                    "$ref": "#/$defs/SpatialSupportTypeEnum"
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "stac_collection_id": {
+                    "description": "STAC collection identifier, where the product is STAC-published.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "supports_server_side_subset": {
+                    "description": "Whether the provider will return a geometry/time/variable subset. Drives the achievable `MaterializationModeEnum`.",
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "temporal_alignment": {
+                    "$ref": "#/$defs/TemporalAlignmentEnum"
+                },
+                "temporal_coverage_end": {
+                    "description": "Absent means \"ongoing\".",
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "temporal_coverage_start": {
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "temporal_resolution": {
+                    "$ref": "#/$defs/TemporalResolutionEnum"
+                },
+                "temporal_resolution_iso": {
+                    "description": "The same fact as `temporal_resolution`, as an ISO 8601 duration. Both are kept because the enum is validatable and the duration is expressive (`P3D` has no enum member). HEW uses the duration, EnVar the enum; this is the reconciliation, and it is generated, not hand-maintained.",
+                    "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "typical_latency_iso": {
+                    "description": "Typical delay between observation and availability. The field that makes the AQS-versus-AirNow trade-off explicit: AQS is quality-controlled and months late, AirNow is preliminary and hourly.",
+                    "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "update_cadence_iso": {
+                    "description": "How often the source publishes new data.",
+                    "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "data_source",
+                "spatial_support_type",
+                "temporal_resolution"
+            ],
+            "title": "Product",
+            "type": "object"
+        },
+        "ProductVariable": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "native_value_scale_factor": {}
+                        },
+                        "required": [
+                            "native_value_scale_factor"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "native_units_ucum": {}
+                        },
+                        "required": [
+                            "native_units_ucum"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "vertical_level_type": {}
+                        },
+                        "required": [
+                            "vertical_level_type"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "layer_name_template": {
+                                "pattern": ".*\\{level\\}.*"
+                            }
+                        },
+                        "required": [
+                            "layer_name_template"
+                        ]
+                    }
+                }
+            ],
+            "description": "One source's delivery of one canonical variable: the native name, the native units and conversion, the CF metadata, the aggregation actually applied, and the layer-name template amadeus parses.\nEvery slot here exists because it is a reason two sources of \"the same\" variable are not interchangeable. `native_units_ucum` + `native_value_scale_factor` + `native_value_offset` are the gridMET Kelvin\u2192Celsius case, where the conversion happened at render time and was recorded nowhere.",
+            "properties": {
+                "aggregation_method": {
+                    "$ref": "#/$defs/AggregationMethodEnum"
+                },
+                "aggregation_window_iso": {
+                    "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "amadeus_variable_code": {
+                    "description": "The string a user passes as `variable=` to the amadeus download/process functions, where it differs from `native_name`.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "type": "string"
+                },
+                "cf_cell_methods": {
+                    "description": "The CF `cell_methods` attribute verbatim. CF already has a standard way to say \"daily maximum\" and it is sitting unread in the file.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "cf_standard_name": {
+                    "description": "The CF `standard_name` attribute as it appears in the source file. A Tier 1 field: already in the netCDF, currently discarded on conversion to `terra`.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "extensivity": {
+                    "$ref": "#/$defs/VariableExtensivityEnum",
+                    "description": "Optional override, same semantics as `value_data_type`. Overriding it is a strong signal something is wrong and should be reviewed."
+                },
+                "harmonization_note": {
+                    "description": "Free text on why this delivery is not interchangeable with a sibling delivery of the same canonical variable. Deliberately unstructured: it is the intake queue for future first-class slots, not a permanent home.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A human-readable display label.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "layer_name_template": {
+                    "description": "How amadeus composes `terra` layer names for this variable. Recorded because `calc_worker()` currently recovers variable, level and time by splitting the layer name on `_` and indexing by position; a declared template turns that from an implicit convention into a checkable one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "metadata_gaps": {
+                    "description": "Which metadata this delivery is missing, and why. Makes the Tier 1 backlog (\"in the file, discarded by amadeus\") countable and therefore reportable as progress.",
+                    "items": {
+                        "$ref": "#/$defs/MissingReasonEnum"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "missing_value_sentinel": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "native_name": {
+                    "description": "The variable's name in the source: a netCDF variable name, a MODIS subdataset, an AQS parameter code.",
+                    "type": "string"
+                },
+                "native_units_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "native_value_offset": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_scale_factor": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "product": {
+                    "type": "string"
+                },
+                "quality_flag_vocabulary": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "temporal_alignment": {
+                    "$ref": "#/$defs/TemporalAlignmentEnum"
+                },
+                "unit_conversion_formula": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "value_data_type": {
+                    "$ref": "#/$defs/ValueDataTypeEnum",
+                    "description": "Optional override. Absent means \"as the canonical variable declares\". Present means this source genuinely differs \u2014 e.g. a source that publishes a binary exceedance flag for a quantity that is continuous elsewhere."
+                },
+                "vertical_level_type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "product",
+                "canonical_variable",
+                "native_name"
+            ],
+            "title": "ProductVariable",
+            "type": "object"
+        },
+        "ProvenanceChain": {
+            "additionalProperties": false,
+            "description": "A materialised walk of `upstream_runs` from a derived value back to its terminus, plus what the terminus is. Stored rather than always recomputed because it is what an exported EnVar record carries, and because the recursive query is expensive to run per row at export time.",
+            "properties": {
+                "chain_steps": {
+                    "description": "Run identifiers, ordered from the derived value back to the terminus.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "compatibility_assertions": {
+                    "description": "Assertions that consecutive steps were compatible \u2014 matching CRS, units, calendar, day boundary. The seam between two steps belongs to neither step, and this is where a mismatch gets recorded instead of silently absorbed.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "terminus_type": {
+                    "$ref": "#/$defs/ProvenanceChainTerminusEnum"
+                }
+            },
+            "required": [
+                "id",
+                "terminus_type"
+            ],
+            "title": "ProvenanceChain",
+            "type": "object"
+        },
+        "ProvenanceChainTerminusEnum": {
+            "description": "",
+            "enum": [
+                "raw_source_download",
+                "remote_asset_scan",
+                "pre_existing_curated_dataset",
+                "externally_imported_dataset",
+                "synthetic_data"
+            ],
+            "title": "ProvenanceChainTerminusEnum",
+            "type": "string"
+        },
+        "RunRoleEnum": {
+            "description": "Which amadeus verb a tool run represents. The three public verbs plus the database-era additions.",
+            "enum": [
+                "download",
+                "process",
+                "calculate",
+                "register",
+                "harmonize",
+                "import",
+                "export"
+            ],
+            "title": "RunRoleEnum",
+            "type": "string"
+        },
+        "RunStatusEnum": {
+            "description": "",
+            "enum": [
+                "succeeded",
+                "failed",
+                "partial",
+                "cancelled"
+            ],
+            "title": "RunStatusEnum",
+            "type": "string"
+        },
+        "SpatialSupportTypeEnum": {
+            "description": "What a single value spatially *is* \u2014 the source-side question. Distinct from `TargetGeographyTypeEnum`, which says what a value gets attached to. Both are needed; neither replaces the other.",
+            "enum": [
+                "point",
+                "monitoring_station",
+                "raster_grid_cell",
+                "model_grid_cell",
+                "polygon",
+                "administrative_area",
+                "statistical_area",
+                "hex_cell",
+                "line_feature",
+                "other"
+            ],
+            "title": "SpatialSupportTypeEnum",
+            "type": "string"
+        },
+        "StationObservation": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "not": {
+                            "required": [
+                                "value"
+                            ]
+                        },
+                        "properties": {
+                            "value": {}
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "null_semantics": {
+                                "anyOf": [
+                                    {
+                                        "const": "structural_null"
+                                    },
+                                    {
+                                        "const": "derived_null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "null_semantics": {
+                                "const": "true_zero"
+                            }
+                        },
+                        "required": [
+                            "null_semantics"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "value": {}
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "forecast"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "reference_time": {}
+                        },
+                        "required": [
+                            "reference_time"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "data_status": {
+                                "const": "superseded"
+                            }
+                        },
+                        "required": [
+                            "data_status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "superseded_by": {}
+                        },
+                        "required": [
+                            "superseded_by"
+                        ]
+                    }
+                }
+            ],
+            "description": "A value from a fixed instrument with a persistent identity: EPA AQS, AirNow, IMPROVE, USGS water sites.\nThe distinguishing feature is not the point geometry \u2014 it is that the *instrument* is an entity with a history. Monitors move, get replaced, and report the same parameter through several collocated units (the AQS POC). A grid cell has none of that. Collapsing stations into a generic point table loses the keys that make a revision traceable.",
+            "properties": {
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "canonical_variable": {
+                    "description": "Denormalised from `product_variable` on purpose. Cross-source queries (\"all daily maximum temperature within this polygon\") are the common case, and making them a two-hop join is a performance tax on the query the whole architecture exists to serve.",
+                    "type": "string"
+                },
+                "data_status": {
+                    "$ref": "#/$defs/DataStatusEnum",
+                    "description": "Per-row, not per-product. The AQS/AirNow rule requires it: a preliminary AirNow value and a quality-controlled AQS value for the same monitor, parameter and hour must be able to coexist as distinct rows."
+                },
+                "elevation_m": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "monitor_id": {
+                    "description": "Instrument identity, where distinct from the site.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "native_value": {
+                    "description": "The value exactly as the source shipped it, before scale, offset and unit conversion. Kept so a conversion bug is discoverable after the fact instead of being baked in irreversibly.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "native_value_unit_ucum": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "null_semantics": {
+                    "$ref": "#/$defs/NullSemanticsEnum"
+                },
+                "parameter_code": {
+                    "description": "The source's parameter code, retained verbatim alongside the canonical variable because it is part of the source's primary key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "poc": {
+                    "description": "Parameter Occurrence Code \u2014 which of several collocated monitors measuring the same parameter this is. Part of the AQS primary key and routinely dropped by naive ingests, which then silently pick one monitor per site.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product_variable": {
+                    "description": "Which source delivery this is. Carries the native units, the CF metadata and the aggregation \u2014 so the row does not have to.",
+                    "type": "string"
+                },
+                "quality_flag": {
+                    "description": "The source's quality flag, verbatim, interpreted against the `quality_flag_vocabulary` on the product variable. Never normalised on ingest \u2014 normalising discards information, and the vocabularies do not align.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "reference_time": {
+                    "description": "Model initialisation / cycle time, distinct from valid time. Required for HRRR and any forecast product: \"valid versus reference time\" is called out explicitly in the P0 subdaily work.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "retrieval_time_utc": {
+                    "description": "When amadeus obtained the value. Required by the AQS/AirNow rule: with revisable sources, \"when we asked\" is part of the value's identity.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "sampling_duration_iso": {
+                    "description": "The instrument's integration time \u2014 distinct from the reporting resolution. A 1-hour reported value from a 24-hour filter sample is not an hourly measurement.",
+                    "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "source_system": {
+                    "description": "Which system supplied this row (`aqs`, `airnow`). Required on every row by the harmonization rule so preliminary and quality-controlled values for the same monitor-hour coexist rather than overwrite.",
+                    "type": "string"
+                },
+                "source_version": {
+                    "description": "The source's own version or revision identifier for this value, where it publishes one.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "station_geom_wkt": {
+                    "type": "string"
+                },
+                "station_id": {
+                    "description": "The source's site identifier \u2014 an AQS state+county+site key, an IMPROVE site code, a USGS gauge number.",
+                    "type": "string"
+                },
+                "station_name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "station_valid_from": {
+                    "description": "Station moves are modelled as a validity interval on the observation's station identity rather than by mutating the station. \"Station moves/POC changes\" is a named edge case in the plan's test matrix.",
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "station_valid_to": {
+                    "format": "date",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "superseded_by": {
+                    "description": "Identifier of the row that replaces this one. Revisions append; they do not mutate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_end": {
+                    "description": "Exclusive end of the validity interval.",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "valid_time_start": {
+                    "description": "Inclusive start of the interval the value is valid for. Left-closed, right-open by default (`[start, end)`) \u2014 declared here once so no individual dataset has to litigate it.",
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value in the canonical variable's units. Null when `null_semantics` explains why.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "value_unit_ucum": {
+                    "description": "Units of `value`, denormalised from the canonical variable. Redundant by design: a value row that travels out of the database as CSV or Parquet must not lose its units on the way.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "vertical_level": {
+                    "description": "Pressure or height level for multi-level products (NARR, MERRA-2, GEOS-CF). Part of the value's identity, not an attribute of it.",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "vertical_level_unit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "station_id",
+                "station_geom_wkt",
+                "id",
+                "product_variable",
+                "canonical_variable",
+                "valid_time_start",
+                "data_status",
+                "source_system",
+                "null_semantics"
+            ],
+            "title": "StationObservation",
+            "type": "object"
+        },
+        "StatusMixingPolicyEnum": {
+            "description": "Whether a request may combine values of different `data_status` \u2014 in practice, AirNow preliminary alongside AQS quality-controlled. Defaults to refusing. An enum for the same reason as `ValueMaterializationEnum`: it is a rule precondition, and booleans cannot be.",
+            "enum": [
+                "refuse",
+                "allow_with_policy"
+            ],
+            "title": "StatusMixingPolicyEnum",
+            "type": "string"
+        },
+        "StrictnessEnum": {
+            "description": "",
+            "enum": [
+                "strict",
+                "permissive"
+            ],
+            "title": "StrictnessEnum",
+            "type": "string"
+        },
+        "TableOrientationEnum": {
+            "description": "",
+            "enum": [
+                "wide",
+                "long"
+            ],
+            "title": "TableOrientationEnum",
+            "type": "string"
+        },
+        "TargetGeographyTypeEnum": {
+            "description": "The geography a value is delivered against, after extraction.",
+            "enum": [
+                "point_location",
+                "buffered_point",
+                "census_block_group",
+                "census_tract",
+                "zcta",
+                "county",
+                "state",
+                "hydrologic_unit",
+                "h3_hex",
+                "grid_cell",
+                "public_water_system"
+            ],
+            "title": "TargetGeographyTypeEnum",
+            "type": "string"
+        },
+        "TemporalAlignmentEnum": {
+            "description": "Where in the aggregation window the timestamp sits. Taken from HEW, which has it and EnVar does not \u2014 a genuine gap EnVar should close.",
+            "enum": [
+                "start",
+                "center",
+                "end",
+                "interval",
+                "unknown"
+            ],
+            "title": "TemporalAlignmentEnum",
+            "type": "string"
+        },
+        "TemporalGroupingEnum": {
+            "description": "The `.by_time` argument of `calculate_covariates()`, made declarative.",
+            "enum": [
+                "none",
+                "hour",
+                "day",
+                "month",
+                "year"
+            ],
+            "title": "TemporalGroupingEnum",
+            "type": "string"
+        },
+        "TemporalResolutionEnum": {
+            "description": "",
+            "enum": [
+                "instantaneous",
+                "subhourly",
+                "hourly",
+                "three_hourly",
+                "daily",
+                "monthly",
+                "seasonal",
+                "annual",
+                "multi_year_epoch",
+                "timeless"
+            ],
+            "title": "TemporalResolutionEnum",
+            "type": "string"
+        },
+        "ToolRun": {
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "run_role": {
+                                "anyOf": [
+                                    {
+                                        "const": "process"
+                                    },
+                                    {
+                                        "const": "calculate"
+                                    }
+                                ]
+                            },
+                            "status": {
+                                "const": "succeeded"
+                            }
+                        },
+                        "required": [
+                            "status",
+                            "run_role"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "output_row_count": {}
+                        },
+                        "required": [
+                            "output_row_count"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "run_role": {
+                                "anyOf": [
+                                    {
+                                        "const": "process"
+                                    },
+                                    {
+                                        "const": "calculate"
+                                    },
+                                    {
+                                        "const": "harmonize"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "run_role"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "upstream_runs": {
+                                "items": {},
+                                "type": "array"
+                            }
+                        },
+                        "required": [
+                            "upstream_runs"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "status": {
+                                "const": "failed"
+                            }
+                        },
+                        "required": [
+                            "status"
+                        ]
+                    },
+                    "then": {
+                        "properties": {
+                            "log_excerpt": {}
+                        },
+                        "required": [
+                            "log_excerpt"
+                        ]
+                    }
+                }
+            ],
+            "description": "One execution of one amadeus operation, with everything needed to decide whether it can be trusted and whether it can be skipped.\n\"Whether it can be skipped\" is the idempotency requirement: re-running a workflow with the same inputs and configuration should reuse valid outputs and recover from partial failures without silent duplication. That needs `input_file_sha256`, `output_file_sha256`, `run_arguments` and `status` \u2014 not a timestamp and a log line.",
+            "properties": {
+                "bytes_transferred": {
+                    "description": "Network bytes for this run. The benchmark plan's acceptance target is \"at least 75% fewer bytes transferred for a remote subset request where the upstream format/API supports pushdown\" \u2014 which requires this to be measured per run rather than estimated.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "container_image_digest": {
+                    "description": "Immutable image digest, not a tag. Tags move; a digest is the only thing that makes \"the same container\" a checkable claim, and the plan requires digest references in run manifests.",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "container_image_repository": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "function_name": {
+                    "description": "The specific amadeus function called (`download_narr`, `process_narr`, `calculate_narr`). More useful than `tool_name` alone, since one package version contains many operations with different failure modes.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "input_asset_ids": {
+                    "description": "Assets consumed by this run.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "input_file_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "input_row_count": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "log_excerpt": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "materialization_mode": {
+                    "$ref": "#/$defs/MaterializationModeEnum"
+                },
+                "output_file_sha256": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "output_row_count": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "request_count": {
+                    "description": "Number of HTTP or API requests issued, for rate-limit accounting.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "run_arguments": {
+                    "description": "The call's arguments as a JSON object string. The single field that decides whether a result is reproducible. Kept opaque because the argument sets differ per function and per source; validating them is the `ExtractionRequest`'s job for the calculate path, and an adapter contract test's job for the download path.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "run_duration_seconds": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "run_environment": {
+                    "description": "Runtime environment as a JSON object string \u2014 R version, platform, key package versions (`terra`, `sf`, `exactextractr`), and the database engine and version. The engine matters: a SedonaDB result and a DuckDB result of the same request are not guaranteed identical, and the capability matrix the plan calls for is only auditable if each run says which engine ran it.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "run_role": {
+                    "$ref": "#/$defs/RunRoleEnum"
+                },
+                "run_timestamp_utc": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/$defs/RunStatusEnum"
+                },
+                "tool_name": {
+                    "type": "string"
+                },
+                "tool_version": {
+                    "type": "string"
+                },
+                "upstream_runs": {
+                    "description": "Identifiers of the runs this one consumed. The DAG edge. Typed as strings rather than object references so the table is self-contained and loadable before its own foreign keys resolve \u2014 a run may be recorded before its parents are fully written.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "run_role",
+                "tool_name",
+                "tool_version",
+                "run_timestamp_utc",
+                "status"
+            ],
+            "title": "ToolRun",
+            "type": "object"
+        },
+        "ValueDataTypeEnum": {
+            "description": "The measurement kind, not the storage type.",
+            "enum": [
+                "continuous_numeric",
+                "categorical",
+                "binary_flag",
+                "count",
+                "event_marker",
+                "proportion"
+            ],
+            "title": "ValueDataTypeEnum",
+            "type": "string"
+        },
+        "ValueMaterializationEnum": {
+            "description": "Whether an asset's values exist as rows in a value table, or the asset is catalogued for discovery only.\n**This was a boolean and had to stop being one.** LinkML's only equality construct in a rule precondition is `equals_string`, which generates `{\"const\": \"true\"}` \u2014 the JSON *string* `\"true\"` \u2014 and therefore never matches the JSON boolean `true`. A rule keyed on a boolean silently never fires. Verified 2026-09-18 on linkml 1.9.x; see REPORT.md.",
+            "enum": [
+                "registered_only",
+                "materialized"
+            ],
+            "title": "ValueMaterializationEnum",
+            "type": "string"
+        },
+        "VariableExtensivityEnum": {
+            "description": "Whether a quantity is intensive (independent of the size of its support \u2014 a temperature) or extensive (scales with it \u2014 a population count, an emission mass). **This is the slot that makes aggregation checkable.** Averaging an extensive variable over a buffer is a silent, plausible-looking error; summing an intensive one is worse. Requested explicitly by the project lead and tracked as amadeus issue #249.",
+            "enum": [
+                "intensive",
+                "extensive",
+                "categorical",
+                "unknown"
+            ],
+            "title": "VariableExtensivityEnum",
+            "type": "string"
+        },
+        "VectorFeature": {
+            "additionalProperties": false,
+            "description": "A reference geometry with attributes but no measured value over time: SEDAC gROADS road segments, hydrography lines, building footprints.\nDeliberately **not** an `AmbientValue`. These are inputs to density and distance covariates, not observations, and they have no valid-time interval in any meaningful sense. The distinction matters because the legal operations differ: you compute a length or a distance from these, never a mean.",
+            "properties": {
+                "asset": {
+                    "description": "The byte stream this value came from. Every number resolves to a file and a hash \u2014 half of objective O-02's \"every derived output resolves to source assets and processing runs\".",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "feature_attributes": {
+                    "description": "Source attributes as a JSON object string. Deliberately opaque: road classifications and similar source-specific schemas should not be forced into the core model, and promoting one to a first-class slot is a decision to take when a real query needs it.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "feature_geom_wkt": {
+                    "type": "string"
+                },
+                "feature_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "feature_type": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "geometry_type": {
+                    "$ref": "#/$defs/GeometryTypeEnum"
+                },
+                "id": {
+                    "description": "Stable identifier for this entity within an AmadeusDB instance.",
+                    "type": "string"
+                },
+                "length_m": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "processing_run": {
+                    "description": "Identifier of the `ToolRun` that produced this value. The other half of O-02. A plain string rather than an object reference so the value and provenance modules stay independently loadable; the SQL post-processor adds the foreign key.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "product": {
+                    "type": "string"
+                },
+                "srid": {
+                    "description": "Numeric spatial reference identifier, derived from `crs`. Materialised because `ST_SetSRID` takes an integer and the geometry views need it without a lookup.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "product",
+                "geometry_type",
+                "feature_geom_wkt"
+            ],
+            "title": "VectorFeature",
+            "type": "object"
+        }
+    },
+    "$id": "https://w3id.org/niehs/amadeus",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Container for a complete or partial AmadeusDB instance. Exists so a catalog snapshot, a sample dataset or an import bundle can be validated as one document with `linkml-validate`, and so the SQL generator has a root from which to reach every table.\nAll collections are optional: a catalog-only bundle (the normal shape of a curation pull request) is as valid as a full instance.",
+    "metamodel_version": "1.11.0",
+    "properties": {
+        "ambient_values_at_location": {
+            "items": {
+                "$ref": "#/$defs/AmbientValueAtLocation"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "area_values": {
+            "items": {
+                "$ref": "#/$defs/AreaValue"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "assets": {
+            "items": {
+                "$ref": "#/$defs/Asset"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "canonical_variables": {
+            "items": {
+                "$ref": "#/$defs/CanonicalVariable"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "data_sources": {
+            "items": {
+                "$ref": "#/$defs/DataSource"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "extraction_requests": {
+            "items": {
+                "$ref": "#/$defs/ExtractionRequest"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "grid_cell_values": {
+            "items": {
+                "$ref": "#/$defs/GridCellValue"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "grid_definitions": {
+            "items": {
+                "$ref": "#/$defs/GridDefinition"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "hex_cell_values": {
+            "items": {
+                "$ref": "#/$defs/HexCellValue"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "location_sets": {
+            "items": {
+                "$ref": "#/$defs/LocationSet"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "locations": {
+            "items": {
+                "$ref": "#/$defs/Location"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "product_variables": {
+            "items": {
+                "$ref": "#/$defs/ProductVariable"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "products": {
+            "items": {
+                "$ref": "#/$defs/Product"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "provenance_chains": {
+            "items": {
+                "$ref": "#/$defs/ProvenanceChain"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "schema_version": {
+            "description": "Version of the AmadeusDB schema a record conforms to, so consumers can branch on schema evolution rather than guess.",
+            "type": "string"
+        },
+        "station_observations": {
+            "items": {
+                "$ref": "#/$defs/StationObservation"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "tool_runs": {
+            "items": {
+                "$ref": "#/$defs/ToolRun"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        },
+        "vector_features": {
+            "items": {
+                "$ref": "#/$defs/VectorFeature"
+            },
+            "type": [
+                "array",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "schema_version"
+    ],
+    "title": "amadeus-schema",
+    "type": "object",
+    "version": "0.1.0"
+}
+

@@ -1,0 +1,35 @@
+arm,collection,model_class,records,populated,note
+pilot,data_sources,DataSource,1,True,Bounded representative populated instance
+pilot,products,Product,1,True,Bounded representative populated instance
+pilot,grid_definitions,GridDefinition,1,True,Bounded representative populated instance
+pilot,canonical_variables,CanonicalVariable,16,True,Bounded representative populated instance
+pilot,product_variables,ProductVariable,16,True,Bounded representative populated instance
+pilot,assets,Asset,112,True,Bounded representative populated instance
+pilot,station_observations,StationObservation,0,False,Empty-table SQL checks do not qualify populated behavior
+pilot,grid_cell_values,GridCellValue,0,False,Empty-table SQL checks do not qualify populated behavior
+pilot,area_values,AreaValue,0,False,Empty-table SQL checks do not qualify populated behavior
+pilot,hex_cell_values,HexCellValue,0,False,Empty-table SQL checks do not qualify populated behavior
+pilot,vector_features,VectorFeature,0,False,Empty-table SQL checks do not qualify populated behavior
+pilot,location_sets,LocationSet,1,True,Bounded representative populated instance
+pilot,locations,Location,3,True,Bounded representative populated instance
+pilot,extraction_requests,ExtractionRequest,1,True,Bounded representative populated instance
+pilot,ambient_values_at_location,AmbientValueAtLocation,336,True,Bounded representative populated instance
+pilot,tool_runs,ToolRun,97,True,Bounded representative populated instance
+pilot,provenance_chains,ProvenanceChain,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,data_sources,DataSource,1,True,Bounded representative populated instance
+candidate,products,Product,1,True,Bounded representative populated instance
+candidate,grid_definitions,GridDefinition,1,True,Bounded representative populated instance
+candidate,canonical_variables,CanonicalVariable,16,True,Bounded representative populated instance
+candidate,product_variables,ProductVariable,16,True,Bounded representative populated instance
+candidate,assets,Asset,112,True,Bounded representative populated instance
+candidate,station_observations,StationObservation,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,grid_cell_values,GridCellValue,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,area_values,AreaValue,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,hex_cell_values,HexCellValue,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,vector_features,VectorFeature,0,False,Empty-table SQL checks do not qualify populated behavior
+candidate,location_sets,LocationSet,1,True,Bounded representative populated instance
+candidate,locations,Location,3,True,Bounded representative populated instance
+candidate,extraction_requests,ExtractionRequest,1,True,Bounded representative populated instance
+candidate,ambient_values_at_location,AmbientValueAtLocation,336,True,Bounded representative populated instance
+candidate,tool_runs,ToolRun,97,True,Bounded representative populated instance
+candidate,provenance_chains,ProvenanceChain,0,False,Empty-table SQL checks do not qualify populated behavior

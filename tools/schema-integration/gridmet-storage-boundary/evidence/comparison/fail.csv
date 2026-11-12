@@ -1,0 +1,3 @@
+"test","passed","schema_acceptance_present","workflow_completion_present","error","scope"
+"blocked-load",TRUE,TRUE,FALSE,"Optional database hand-off failed; scientific/schema outputs preserved","Lower writer fixture: intentional path conflict then fresh-directory retry; no scientific rerun or recorder attestation claim"
+"fresh-retry",TRUE,TRUE,TRUE,"","Lower writer fixture: intentional path conflict then fresh-directory retry; no scientific rerun or recorder attestation claim"

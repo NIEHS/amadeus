@@ -1,0 +1,14 @@
+area,status,limit
+Scientific approval,Pending,Machine unit/value agreement is not physical meaning or provider-truth approval
+Independent replay,Not run,Local replay-runner success is not an independent colleague/environment test
+Trust,Unsigned local chain,Coordinated rewrite of data/receipts/release can forge the local record; read-only bits are not privileged tamper protection
+Concurrency,Unsupported external mutation,No guarantee against concurrent privileged/path replacement; choose deployment immutable publication policy
+Durability,Bounded failed-load/retry only,Same-filesystem pointer rename does not make all files atomically durable or cover power loss; completion and discovery are separate
+Source lifecycle,Historical identity only at query,Saved query does not require original raw/processed files and does not prove their continued availability; source QA/reproduction requires recorded bytes
+Provenance,"Recorded observation, not independent attestation",Raster fingerprint is metadata-only; continuous input immutability not established; acquisition prior to cached reuse not observed
+Scope,"16 native daily gridMET codes, point/radius0/mean","Not all33 codes, calendars, missingness modes, geometry classes, other datasets or Sedona"
+Historical snapshots,No silent certification,Old stores without manifest/matching release are rejected by the new saved-query entry point; explicit requalification/migration needed
+Query entry point,Automatic only through supported path,Direct DBI/IDE access bypasses guards; SQL reading unrelated external data is outside snapshot certification
+Filesystem,Explicit new behavior,Requires appropriate chmod/pointer-replacement capabilities; ACL/NFS/Windows deployment semantics need qualification
+Performance,Component sample only,"Warm-cache3 verification samples per size, no new full-workflow N5 runtime/memory comparison; previous timings remain historical"
+Metadata,External import deferred,Review worksheets are not external metadata ingestion; package-derived baseline plus reviewed policy remains current

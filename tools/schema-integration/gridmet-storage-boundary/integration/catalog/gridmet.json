@@ -1,0 +1,446 @@
+{
+  "revision": "amadeus-package-metadata-v1",
+  "dataset": "gridmet",
+  "approval_catalog_sha256": "abc6c44fd8c1177211d18b4564d7d0f0288da8ebbb176293add6f539ead3a953",
+  "approval_policy": "LinkML-defined catalog; bounded test qualification; scientific review pending; production false",
+  "reviewed_profile_sha256": "e2769decf53477f26ecbaf4bfb40bf0540f2a8d9186ecf2221c650557cfe5b72",
+  "package_version": "2.0.4",
+  "schema_sha256": "cb8a1481cf4604aad68e05ffd599a39c85bd021784a8e10adaac8420e7de119e",
+  "extraction": {
+    "functions": [
+      "process_gridmet_codes",
+      "process_variable_codes",
+      "download_gridmet",
+      "process_gridmet",
+      "calculate_gridmet"
+    ],
+    "function_body_sha256": {
+      "process_gridmet_codes": "756e14ab468046a2038b8aea61f0c2fd2a874b99a68f471ea98db4f5c54065ab",
+      "process_variable_codes": "8cde95cda06eccff0c41511fad6d2b4d823102986ae7234a13f75d972cb56cf2",
+      "download_gridmet": "67928051c41d68ce390caf7dd2f2074d243c096807a72c3cdcf9f6356422aa61",
+      "process_gridmet": "3c9df5727e26b2363b4df302b3d5dcb577c990fd1376db2706b7fc5f1ee866c5",
+      "calculate_gridmet": "2673305b0ea3c824ee9dfbc04e5e9942ac03a2f3f40e82d5dc2024d4a313d796"
+    },
+    "provider_data_downloaded": false
+  },
+  "scope": {
+    "package_code_count": 33,
+    "qualified_daily_code_count": 16,
+    "external_spreadsheet_imported": false
+  },
+  "routes": {
+    "download_gridmet": {
+      "exported": true,
+      "argument_names": [
+        "variables",
+        "year",
+        "directory_to_save",
+        "acknowledgement",
+        "download",
+        "remove_command",
+        "show_progress",
+        "hash",
+        "max_tries",
+        "rate_limit"
+      ]
+    },
+    "process_gridmet": {
+      "exported": true,
+      "argument_names": [
+        "date",
+        "variable",
+        "path",
+        "extent",
+        "..."
+      ]
+    },
+    "calculate_gridmet": {
+      "exported": true,
+      "argument_names": [
+        "from",
+        "locs",
+        "locs_id",
+        "radius",
+        "fun",
+        "weights",
+        ".by_time",
+        "geom",
+        "..."
+      ]
+    }
+  },
+  "field_authorities": {
+    "code_and_label": "installed Amadeus public mapping helpers",
+    "route_argument_names": "installed Amadeus exported function formals",
+    "units_and_numeric_tolerances": "reviewed existing pilot registry",
+    "source_native_name_units_grid": "observed in actual NetCDF at runtime",
+    "product_CRS_cadence_and_descriptions": "existing exporter profile; not newly derived from package",
+    "coverage_and_license": "not extracted; do not infer"
+  },
+  "variables": [
+    {
+      "code": "eddi14d",
+      "label": "evaporative demand drought index (14 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi30d",
+      "label": "evaporative demand drought index (30 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi90d",
+      "label": "evaporative demand drought index (90 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi180d",
+      "label": "evaporative demand drought index (180 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi270d",
+      "label": "evaporative demand drought index (270 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi1y",
+      "label": "evaporative demand drought index (1 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi2y",
+      "label": "evaporative demand drought index (2 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "eddi5y",
+      "label": "evaporative demand drought index (5 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei14d",
+      "label": "standardized precipitation evapotranspiration index (14 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei30d",
+      "label": "standardized precipitation evapotranspiration index (30 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei90d",
+      "label": "standardized precipitation evapotranspiration index (90 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei180d",
+      "label": "standardized precipitation evapotranspiration index (180 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei270d",
+      "label": "standardized precipitation evapotranspiration index (270 day)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei1y",
+      "label": "standardized precipitation evapotranspiration index (1 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei2y",
+      "label": "standardized precipitation evapotranspiration index (2 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "spei5y",
+      "label": "standardized precipitation evapotranspiration index (5 year)",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "sph",
+      "label": "near-surface specific humidity",
+      "qualified_in_current_profile": true,
+      "units_ucum": "1",
+      "accepted_source_units": "kg/kg|kgkg-1|kgkg^-1|1",
+      "database_tolerance": 1e-08,
+      "previous_pilot_label": "Specific humidity",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "vpd",
+      "label": "mean vapor pressure deficit",
+      "qualified_in_current_profile": true,
+      "units_ucum": "kPa",
+      "accepted_source_units": "kpa",
+      "database_tolerance": 1e-06,
+      "previous_pilot_label": "Vapor pressure deficit",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "pr",
+      "label": "precipitation",
+      "qualified_in_current_profile": true,
+      "units_ucum": "mm",
+      "accepted_source_units": "mm",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Daily precipitation amount",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "rmin",
+      "label": "minimum near-surface relative humidity",
+      "qualified_in_current_profile": true,
+      "units_ucum": "%",
+      "accepted_source_units": "%|percent",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Minimum relative humidity",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "rmax",
+      "label": "maximum near-surface relative humidity",
+      "qualified_in_current_profile": true,
+      "units_ucum": "%",
+      "accepted_source_units": "%|percent",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Maximum relative humidity",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "srad",
+      "label": "surface downwelling solar radiation",
+      "qualified_in_current_profile": true,
+      "units_ucum": "W/m2",
+      "accepted_source_units": "w/m2|w/m^2|wm-2|wm^-2",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Downward shortwave radiation",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "tmmn",
+      "label": "minimum near-surface air temperature",
+      "qualified_in_current_profile": true,
+      "units_ucum": "K",
+      "accepted_source_units": "k|kelvin",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Daily minimum air temperature",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "tmmx",
+      "label": "maximum near-surface air temperature",
+      "qualified_in_current_profile": true,
+      "units_ucum": "K",
+      "accepted_source_units": "k|kelvin",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Daily maximum air temperature",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "vs",
+      "label": "wind speed at 10 m",
+      "qualified_in_current_profile": true,
+      "units_ucum": "m/s",
+      "accepted_source_units": "m/s|ms-1|ms^-1",
+      "database_tolerance": 5e-06,
+      "previous_pilot_label": "Wind speed",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "th",
+      "label": "wind direction at 10 m",
+      "qualified_in_current_profile": true,
+      "units_ucum": "deg",
+      "accepted_source_units": "degrees|degree|degreesclockwisefromnorth|degrees_clockwise_from_north",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Wind direction",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "pdsi",
+      "label": "palmer drought severity index",
+      "qualified_in_current_profile": false,
+      "units_ucum": null,
+      "accepted_source_units": null,
+      "database_tolerance": null,
+      "previous_pilot_label": null,
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "not supplied by this extraction"
+    },
+    {
+      "code": "pet",
+      "label": "reference grass evaportranspiration",
+      "qualified_in_current_profile": true,
+      "units_ucum": "mm",
+      "accepted_source_units": "mm",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Reference grass evapotranspiration",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "etr",
+      "label": "reference alfalfa evaportranspiration",
+      "qualified_in_current_profile": true,
+      "units_ucum": "mm",
+      "accepted_source_units": "mm",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Reference alfalfa evapotranspiration",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "erc",
+      "label": "energy release component",
+      "qualified_in_current_profile": true,
+      "units_ucum": "1",
+      "accepted_source_units": "unitless|1|dimensionless",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Energy release component index",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "bi",
+      "label": "burning index",
+      "qualified_in_current_profile": true,
+      "units_ucum": "1",
+      "accepted_source_units": "unitless|1|dimensionless",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "Burning index",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "fm100",
+      "label": "100-hour dead fuel moisture",
+      "qualified_in_current_profile": true,
+      "units_ucum": "%",
+      "accepted_source_units": "%|percent",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "100-hour dead fuel moisture",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    },
+    {
+      "code": "fm1000",
+      "label": "1000-hour dead fuel moisture",
+      "qualified_in_current_profile": true,
+      "units_ucum": "%",
+      "accepted_source_units": "%|percent",
+      "database_tolerance": 0.0001,
+      "previous_pilot_label": "1000-hour dead fuel moisture",
+      "label_authority": "installed amadeus::process_gridmet_codes(\"all\"); exact returned spelling",
+      "units_and_tolerance_authority": "existing reviewed pilot profile; not extracted from Amadeus"
+    }
+  ],
+  "note": "Catalog instances/properties, not a replacement schema. Full package inventory is not onboarding qualification. Labels remain lowercase and retain package spelling. No source coverage, scientific ontology or drought-class interpretation is inferred."
+}

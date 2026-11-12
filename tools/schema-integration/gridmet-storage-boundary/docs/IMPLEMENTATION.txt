@@ -1,0 +1,44 @@
+AMADEUS SCHEMA INTEGRATION AT THE STORAGE BOUNDARY
+Corrected publication release,9 November2026. Isolated review; no core Amadeus, schema repository, previous pilot or pushed branch changes.
+
+WHAT IS IMPLEMENTED
+1. The existing schema_release() now explicitly requires a successful build-QA flag. The already qualified guard is consolidated into this release, not left as a proposed patch.
+2. The producer publishes a versioned manifest after schema acceptance and successful database load/fidelity/reopen. The completion receipt binds its SHA. The supported saved-query command verifies release, completion, manifest and published bytes before opening DuckDB read-only. New snapshots use new run directories, read-only critical files and same-directory final pointer replacement. No provider source files are reread for a saved query.
+3. Machine scientific evidence and human/independent review materials are prepared. Direct ncdf4 nearest-coordinate reads with scale/offset decoding are compared with all336 full-request values. Scientific sign-off and independent environment replay are pending; no approval is fabricated.
+
+UNCHANGED SCIENCE AND DEPENDENCY DIRECTION
+The caller still uses amadeus::download_data(), process_covariates() and calculate_covariates() with ordinary variables/dates/sites. The explicit recorder observes calls and source identities. export_gridmet() acts after calculation and does not dispatch science. Amadeus neither imports nor depends on this optional integration. No example_gridmet.R/schema_validator.R runtime dependency is restored. No new R packages or runtime Python are introduced. Python in this pack is authoring/reporting/test orchestration only.
+
+END-TO-END ORDER
+Build: LinkML-defined record/approval contracts + Amadeus-derived catalog + native-unit policy/evidence -> build QA -> pinned runtime contract.
+User request -> unchanged Amadeus download/process/calculate, with explicit provenance observation -> supplied outputs and context -> post-calculation schema/source/unit/result validation -> typed Parquet staging/readback -> DuckDB load,102 SQL checks, fidelity and reopen -> publication manifest -> read-only critical files -> completed workflow receipt bound to manifest -> final LATEST pointer replacement.
+Consumer: R/database.R RUN duckdb SQL -> accepted instance/schema check -> successful current release and completed DuckDB workflow -> manifest digest and required-file coverage -> file sizes/SHA256 and receipt/release/instance/Parquet bindings -> read-only DB connection -> query.
+Schema-only engine=none remains supported. It creates a completed schema publication without a database; DuckDB query verification rejects it as inapplicable.
+
+MANIFEST CONTENTS
+Required owned artifacts: schema-instance.json, acceptance.json, results.csv, source-metadata.json, direct-output-context.json, provenance/execution.rds, events.json and seal.json; for DuckDB, gridmet.duckdb and its receipt; for the Parquet adapter, accepted-values.parquet. Paths are relative, whitelisted and constrained to the run directory, allowing relocation without requiring original source directories. Manifest/schema/acceptance/workflow/database receipt identities must agree with the released runtime contract. A leftover DuckDB WAL blocks publication/verification of a stable snapshot.
+The manifest is a technical storage envelope; it does not redefine scientific entities or replace the LinkML source of truth. Runtime files/metadata remain compiled/pinned. Dataset external metadata import is still deferred. Review worksheets are not runtime metadata inputs.
+
+PUBLICATION VS ACCEPTANCE
+Schema acceptance is distinct from successful database publication. A blocked database load can leave accepted scientific/schema records, but must not leave a completed workflow or advance LATEST. Only successful completion publishes the pointer. Consumers must use the supported query entry point; direct DBI/DuckDB IDE access bypasses these integrity guards. Arbitrary SQL that reads other external files is outside the verified snapshot scope.
+Incomplete artifacts remain available for diagnosis; no automatic deletion hides a failure. Retry uses a NEW directory. Same-filesystem pointer rename is not a claim of multi-file power-loss durability/fsync or transactional filesystem publication.
+
+INTEGRITY AND TRUST LIMITS
+The local manifest/receipt chain detects accidental changes and tested uncoordinated tampering, including edited database values and Parquet bytes. It is unsigned. Someone able to replace data, manifests, receipts and trusted release together can forge the chain. Read-only permission bits do not stop the file owner, privileged users, ACL overrides or directory replacement. Concurrent external writers/path replacement during verification/query are unsupported; production requires an actual immutable publication/access-control policy appropriate to the deployment.
+No provider/raw raster reads occur for saved-store verification. Historical source hashes remain recorded; the query does not prove those source files still exist or were unchanged continuously during science. Recorder trust and raster-metadata-only fingerprint limitations remain. Old stores without a manifest are not silently certified by the new query path. Preserve their release/evidence or perform an explicit requalification/new publication.
+
+EFFICIENCY
+Hash the owned snapshot once per store-open operation, not before every SQL statement on an already managed connection. Current CLI opens once per invocation, so separate CLI invocations each verify. No stat-only cache is trusted. Store-open verification is proportional to published bytes, not original NetCDF volume. Warm-cache verification timing is reported separately; the prior45-run performance study does not measure this release. No new full-workflow speed/memory advantage is claimed.
+
+FILESYSTEM AND ENVIRONMENT
+Publication uses base R chmod and same-directory rename; check_setup.R can probe the intended output parent before a trial. These are new explicit filesystem behaviors, not new package installations. POSIX/ACL/NFS/Windows semantics and storage concurrency need independent deployment qualification. The successful host is recorded in reports/environment.json; it is not a universal minimum version prescription. Independent target-stack testing is pending.
+
+SCIENTIFIC REVIEW
+The direct-source test independently reads original NetCDF values at nearest source longitude/latitude coordinates and CF date labels, using supported Gregorian calendars and ncdf4 scale/offset decoding. Matching within declared tolerances strengthens mapping/decoding evidence. It does not prove provider accuracy, scientific suitability of nearest-cell extraction, physical daily accumulation periods, all missingness cases, or other variables/calendars/CRS/backends.
+review/scientific-unit-review.csv contains16 pending decisions with observed source units/attributes, native/output units, aliases, tolerances, source hashes and numeric evidence. review/scientific-review-questions.csv covers quantity binding, physical time, missingness, spatial method and provenance trust. A human must record the decision/scope/version. The authoritative policy catalog still says scientific_review=pending and production_approved=false. Editing a worksheet does not automatically change the contract. Approved changes must be incorporated explicitly into the versioned policy, evidence and reviewed snapshot, then rebuilt/requalified.
+
+INDEPENDENT REPLAY
+Use docs/TEAM-REPLAY.txt and tests/replay.sh. The command takes ordinary request arguments, records diagnostics, performs automatic export/query enforcement, then runs a separate test-only source comparison. It was tested locally; that is NOT independent environmental reproduction. The external replay worksheet stays not_run until a colleague reports actual evidence. Core science errors or all-NA output remain failures; do not weaken the storage gate or monkeypatch Amadeus to obtain a pass.
+
+REMAINING DECISIONS
+Human scientific/unit and physical-time approval; independent target-environment replay; actual production immutability/authentication and concurrency policy; power-loss durability; historical-store migration; full model coverage; Sedona/amadeusdb and other datasets; large-store integrity cost. Qualification is limited to16 native daily gridMET variables and tested point/radius0/mean/no temporal aggregation requests. Recognition of33 codes is not full onboarding.

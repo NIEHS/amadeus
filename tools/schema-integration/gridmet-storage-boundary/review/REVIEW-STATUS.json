@@ -1,0 +1,8 @@
+{
+  "machine_direct_source_check_passed": true,
+  "source_values_checked": 336,
+  "scientific_human_signoff": "pending",
+  "independent_environment_replay": "not_run",
+  "production_approved": false,
+  "policy_catalog_scientific_review": "pending; not changed by this review form"
+}

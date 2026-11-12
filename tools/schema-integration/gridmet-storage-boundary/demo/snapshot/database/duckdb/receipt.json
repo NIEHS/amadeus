@@ -1,0 +1,18 @@
+{
+  "engine": "duckdb",
+  "engine_version": "v1.1.3-dev165",
+  "records": 4,
+  "inserted_rows": 43,
+  "integrity_queries": 102,
+  "all_within_declared_tolerances": true,
+  "maximum_numeric_storage_difference": 1.22070312613687e-05,
+  "accepted_instance_sha256": "594f55ed2312ee4cad80d04bbc8b972a114289ee9480a3edf1d4796f1b101d32",
+  "persistent_reopen_passed": true,
+  "storage_route": "parquet",
+  "execution_profile": "operational",
+  "parquet_sha256": "66a16ca948f577157078539b2a84e7624f2811239ebd7e8966ee064ce2168b3f",
+  "storage_mapping_revision": "parquet-value-table-v1",
+  "storage_mapping_sha256": "cbedea05a9c2ffcb821e1c182067d1d83b1ed740a12a1e66abe3dc9d3bf7c20d",
+  "profile": "Core SQL/WKT",
+  "production_approved": false
+}

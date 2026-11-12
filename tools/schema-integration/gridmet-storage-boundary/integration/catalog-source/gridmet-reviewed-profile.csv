@@ -1,0 +1,17 @@
+code,label,native_ucum,accepted_source_units,database_tolerance
+tmmx,Daily maximum air temperature,K,k|kelvin,0.0001
+tmmn,Daily minimum air temperature,K,k|kelvin,0.0001
+pr,Daily precipitation amount,mm,mm,0.0001
+pet,Reference grass evapotranspiration,mm,mm,0.0001
+etr,Reference alfalfa evapotranspiration,mm,mm,0.0001
+rmax,Maximum relative humidity,%,%|percent,0.0001
+rmin,Minimum relative humidity,%,%|percent,0.0001
+sph,Specific humidity,1,kg/kg|kgkg-1|kgkg^-1|1,1e-08
+vpd,Vapor pressure deficit,kPa,kpa,1e-06
+srad,Downward shortwave radiation,W/m2,w/m2|w/m^2|wm-2|wm^-2,0.0001
+vs,Wind speed,m/s,m/s|ms-1|ms^-1,5e-06
+th,Wind direction,deg,degrees|degree|degreesclockwisefromnorth|degrees_clockwise_from_north,0.0001
+erc,Energy release component index,1,unitless|1|dimensionless,0.0001
+bi,Burning index,1,unitless|1|dimensionless,0.0001
+fm100,100-hour dead fuel moisture,%,%|percent,0.0001
+fm1000,1000-hour dead fuel moisture,%,%|percent,0.0001

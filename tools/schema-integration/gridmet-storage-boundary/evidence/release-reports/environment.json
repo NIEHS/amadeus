@@ -1,0 +1,53 @@
+{
+  "R": "R version 4.3.2 (2023-10-31)",
+  "platform": "x86_64-pc-linux-gnu",
+  "system": {
+    "sysname": "Linux",
+    "release": "4.18.0-553.123.1.el8_10.x86_64",
+    "version": "#1 SMP Tue May 5 15:46:59 UTC 2026",
+    "nodename": "cn040603",
+    "machine": "x86_64",
+    "login": "gemechunb",
+    "user": "gemechunb",
+    "effective_user": "gemechunb"
+  },
+  "timezone": "",
+  "packages": {
+    "amadeus": "2.0.4",
+    "terra": "1.9.48",
+    "sf": "1.1.3",
+    "ncdf4": "1.22",
+    "jsonvalidate": "1.5.0",
+    "jsonlite": "2.0.0",
+    "yaml": "2.3.12",
+    "digest": "0.6.33",
+    "DBI": "1.3.0",
+    "duckdb": "1.1.3"
+  },
+  "amadeus_install": {
+    "Package": "amadeus",
+    "Version": "2.0.4",
+    "RemoteType": "local",
+    "Built": "R 4.3.2; ; 2026-10-30 20:26:55 UTC; unix"
+  },
+  "public_function_body_sha256": {
+    "download_data": "a6402bf1fefd926782d377b455d4948fe37968743fac2248d0610ed59a09b199",
+    "process_covariates": "f266582ec96702a634c6b1bd9d3e5e86b6d561b799f72d02b2a675141cbc4a63",
+    "calculate_covariates": "c73174e7b43bf6ee1a771ff2a84fa56f7f8535c082e935f2371d4e927388faef",
+    "download_gridmet": "67928051c41d68ce390caf7dd2f2074d243c096807a72c3cdcf9f6356422aa61",
+    "process_gridmet": "3c9df5727e26b2363b4df302b3d5dcb577c990fd1376db2706b7fc5f1ee866c5",
+    "calculate_gridmet": "2673305b0ea3c824ee9dfbc04e5e9942ac03a2f3f40e82d5dc2024d4a313d796",
+    "process_gridmet_codes": "756e14ab468046a2038b8aea61f0c2fd2a874b99a68f471ea98db4f5c54065ab",
+    "process_variable_codes": "8cde95cda06eccff0c41511fad6d2b4d823102986ae7234a13f75d972cb56cf2"
+  },
+  "terra_libraries": [
+    {
+      "gdal": "3.0.4",
+      "proj": "6.3.2",
+      "geos": "3.7.2",
+      "TBB": false
+    }
+  ],
+  "sf_libraries": ["3.7.2", "3.0.4", "6.3.2", "true", "true", "6.3.2"],
+  "scope": "Observed environment; not transitive lockfile or independently reproduced stack"
+}

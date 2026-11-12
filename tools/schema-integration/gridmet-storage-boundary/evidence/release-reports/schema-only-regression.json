@@ -1,0 +1,6 @@
+{
+  "schema_only_still_supported": true,
+  "no_database_created": true,
+  "saved_DB_query_verification_rejected": true,
+  "scope": "Re-export of actual recorded outputs; not new scientific execution"
+}

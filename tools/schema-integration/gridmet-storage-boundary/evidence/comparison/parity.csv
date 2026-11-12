@@ -1,0 +1,1077 @@
+"case","kind","arm","accepted","expected_acceptance","message"
+"valid_control","control","pilot",TRUE,TRUE,""
+"valid_control","control","candidate",TRUE,TRUE,""
+"data_sources.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0 (#/required): must have required property 'id'"
+"data_sources.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0 (#/required): must have required property 'id'"
+"data_sources.name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0 (#/required): must have required property 'name'"
+"data_sources.name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0 (#/required): must have required property 'name'"
+"data_sources.access_protocol.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/type): must be string
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/enum): must be equal to one of the allowed values"
+"data_sources.access_protocol.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/type): must be string
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/enum): must be equal to one of the allowed values"
+"data_sources.access_protocol.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/enum): must be equal to one of the allowed values"
+"data_sources.access_protocol.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/access_protocol (#/$defs/AccessProtocolEnum/enum): must be equal to one of the allowed values"
+"data_sources.doi.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/doi (#/properties/doi/pattern): must match pattern ""^10\.[0-9]{4,9}/.+$"""
+"data_sources.doi.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/doi (#/properties/doi/pattern): must match pattern ""^10\.[0-9]{4,9}/.+$"""
+"data_sources.homepage.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/homepage (#/properties/homepage/type): must be string,null"
+"data_sources.homepage.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/homepage (#/properties/homepage/type): must be string,null"
+"data_sources.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/id (#/properties/id/type): must be string"
+"data_sources.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/id (#/properties/id/type): must be string"
+"data_sources.name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/name (#/properties/name/type): must be string"
+"data_sources.name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /data_sources/0/name (#/properties/name/type): must be string"
+"products.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'id'"
+"products.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'id'"
+"products.name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'name'"
+"products.name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'name'"
+"products.data_source.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'data_source'"
+"products.data_source.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'data_source'"
+"products.spatial_support_type.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'spatial_support_type'"
+"products.spatial_support_type.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'spatial_support_type'"
+"products.temporal_resolution.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'temporal_resolution'"
+"products.temporal_resolution.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0 (#/required): must have required property 'temporal_resolution'"
+"products.amadeus_calculate_covariate.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_calculate_covariate (#/properties/amadeus_calculate_covariate/type): must be string,null"
+"products.amadeus_calculate_covariate.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_calculate_covariate (#/properties/amadeus_calculate_covariate/type): must be string,null"
+"products.amadeus_dataset_name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_dataset_name (#/properties/amadeus_dataset_name/type): must be string,null"
+"products.amadeus_dataset_name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_dataset_name (#/properties/amadeus_dataset_name/type): must be string,null"
+"products.amadeus_process_covariate.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_process_covariate (#/properties/amadeus_process_covariate/type): must be string,null"
+"products.amadeus_process_covariate.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/amadeus_process_covariate (#/properties/amadeus_process_covariate/type): must be string,null"
+"products.calendar.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/calendar (#/$defs/CalendarEnum/enum): must be equal to one of the allowed values"
+"products.calendar.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/calendar (#/$defs/CalendarEnum/enum): must be equal to one of the allowed values"
+"products.crs.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/crs (#/properties/crs/type): must be string,null"
+"products.crs.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/crs (#/properties/crs/type): must be string,null"
+"products.crs.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/crs (#/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"products.crs.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/crs (#/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"products.data_source.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/data_source (#/properties/data_source/type): must be string"
+"products.data_source.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/data_source (#/properties/data_source/type): must be string"
+"products.day_boundary_convention.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/type): must be string
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/enum): must be equal to one of the allowed values"
+"products.day_boundary_convention.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/type): must be string
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/enum): must be equal to one of the allowed values"
+"products.day_boundary_convention.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/enum): must be equal to one of the allowed values"
+"products.day_boundary_convention.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/day_boundary_convention (#/$defs/DayBoundaryConventionEnum/enum): must be equal to one of the allowed values"
+"products.default_data_status.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/default_data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"products.default_data_status.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/default_data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"products.description.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/description (#/properties/description/type): must be string,null"
+"products.description.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/description (#/properties/description/type): must be string,null"
+"products.doi.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/doi (#/properties/doi/pattern): must match pattern ""^10\.[0-9]{4,9}/.+$"""
+"products.doi.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/doi (#/properties/doi/pattern): must match pattern ""^10\.[0-9]{4,9}/.+$"""
+"products.grid_definition.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/grid_definition (#/properties/grid_definition/type): must be string,null"
+"products.grid_definition.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/grid_definition (#/properties/grid_definition/type): must be string,null"
+"products.homogenisation_status.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/homogenisation_status (#/$defs/HomogenisationStatusEnum/enum): must be equal to one of the allowed values"
+"products.homogenisation_status.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/homogenisation_status (#/$defs/HomogenisationStatusEnum/enum): must be equal to one of the allowed values"
+"products.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/id (#/properties/id/type): must be string"
+"products.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/id (#/properties/id/type): must be string"
+"products.name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/name (#/properties/name/type): must be string"
+"products.name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/name (#/properties/name/type): must be string"
+"products.native_format.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"products.native_format.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"products.spatial_support_type.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/type): must be string
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/enum): must be equal to one of the allowed values"
+"products.spatial_support_type.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/type): must be string
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/enum): must be equal to one of the allowed values"
+"products.spatial_support_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/enum): must be equal to one of the allowed values"
+"products.spatial_support_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/spatial_support_type (#/$defs/SpatialSupportTypeEnum/enum): must be equal to one of the allowed values"
+"products.srid.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/srid (#/properties/srid/type): must be integer,null"
+"products.srid.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/srid (#/properties/srid/type): must be integer,null"
+"products.temporal_alignment.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_alignment (#/$defs/TemporalAlignmentEnum/enum): must be equal to one of the allowed values"
+"products.temporal_alignment.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_alignment (#/$defs/TemporalAlignmentEnum/enum): must be equal to one of the allowed values"
+"products.temporal_resolution.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/type): must be string
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/enum): must be equal to one of the allowed values"
+"products.temporal_resolution.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/type): must be string
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/enum): must be equal to one of the allowed values"
+"products.temporal_resolution.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/enum): must be equal to one of the allowed values"
+"products.temporal_resolution.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_resolution (#/$defs/TemporalResolutionEnum/enum): must be equal to one of the allowed values"
+"products.temporal_resolution_iso.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_resolution_iso (#/properties/temporal_resolution_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.temporal_resolution_iso.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/temporal_resolution_iso (#/properties/temporal_resolution_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.typical_latency_iso.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/typical_latency_iso (#/properties/typical_latency_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.typical_latency_iso.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/typical_latency_iso (#/properties/typical_latency_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.update_cadence_iso.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/update_cadence_iso (#/properties/update_cadence_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.update_cadence_iso.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/update_cadence_iso (#/properties/update_cadence_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"products.data_source.reference","reference","pilot",FALSE,FALSE,"Dangling reference: Product.data_source"
+"products.data_source.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_products_data_source (1)"
+"products.grid_definition.reference","reference","pilot",FALSE,FALSE,"Dangling reference: Product.grid_definition"
+"products.grid_definition.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_products_grid_definition (1)"
+"products.data_genre.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /products/0/data_genre (#/properties/data_genre/type): must be array,null"
+"products.data_genre.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /products/0/data_genre (#/properties/data_genre/type): must be array,null"
+"products.grid_definition.conditional_0","conditional_0","pilot",FALSE,FALSE,"2 errors validating json:
+	- /products/0 (#/allOf/0/then/required): must have required property 'grid_definition'
+	- /products/0 (#/allOf/0/if): must match ""then"" schema"
+"products.grid_definition.conditional_0","conditional_0","candidate",FALSE,FALSE,"2 errors validating json:
+	- /products/0 (#/allOf/0/then/required): must have required property 'grid_definition'
+	- /products/0 (#/allOf/0/if): must match ""then"" schema"
+"products.day_boundary_convention.conditional_1","conditional_1","pilot",FALSE,FALSE,"2 errors validating json:
+	- /products/0 (#/allOf/1/then/required): must have required property 'day_boundary_convention'
+	- /products/0 (#/allOf/1/if): must match ""then"" schema"
+"products.day_boundary_convention.conditional_1","conditional_1","candidate",FALSE,FALSE,"2 errors validating json:
+	- /products/0 (#/allOf/1/then/required): must have required property 'day_boundary_convention'
+	- /products/0 (#/allOf/1/if): must match ""then"" schema"
+"products.temporal_coverage_start.conditional_forbidden_2","conditional_forbidden_2","pilot",FALSE,FALSE,"3 errors validating json:
+	- /products/0 (#/allOf/2/then/not): must NOT be valid
+	- /products/0 (#/allOf/2/if): must match ""then"" schema
+	- /products/0/temporal_coverage_start (#/properties/temporal_coverage_start/format): must match format ""date"""
+"products.temporal_coverage_start.conditional_forbidden_2","conditional_forbidden_2","candidate",FALSE,FALSE,"3 errors validating json:
+	- /products/0 (#/allOf/2/then/not): must NOT be valid
+	- /products/0 (#/allOf/2/if): must match ""then"" schema
+	- /products/0/temporal_coverage_start (#/properties/temporal_coverage_start/format): must match format ""date"""
+"products.temporal_coverage_end.conditional_forbidden_3","conditional_forbidden_3","pilot",FALSE,FALSE,"3 errors validating json:
+	- /products/0 (#/allOf/3/then/not): must NOT be valid
+	- /products/0 (#/allOf/3/if): must match ""then"" schema
+	- /products/0/temporal_coverage_end (#/properties/temporal_coverage_end/format): must match format ""date"""
+"products.temporal_coverage_end.conditional_forbidden_3","conditional_forbidden_3","candidate",FALSE,FALSE,"3 errors validating json:
+	- /products/0 (#/allOf/3/then/not): must NOT be valid
+	- /products/0 (#/allOf/3/if): must match ""then"" schema
+	- /products/0/temporal_coverage_end (#/properties/temporal_coverage_end/format): must match format ""date"""
+"grid_definitions.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'id'"
+"grid_definitions.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'id'"
+"grid_definitions.crs.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'crs'"
+"grid_definitions.crs.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'crs'"
+"grid_definitions.resolution_x.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'resolution_x'"
+"grid_definitions.resolution_x.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'resolution_x'"
+"grid_definitions.resolution_y.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'resolution_y'"
+"grid_definitions.resolution_y.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0 (#/$defs/GridDefinition/required): must have required property 'resolution_y'"
+"grid_definitions.crs.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/crs (#/$defs/GridDefinition/properties/crs/type): must be string"
+"grid_definitions.crs.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/crs (#/$defs/GridDefinition/properties/crs/type): must be string"
+"grid_definitions.crs.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/crs (#/$defs/GridDefinition/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"grid_definitions.crs.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/crs (#/$defs/GridDefinition/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"grid_definitions.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/id (#/$defs/GridDefinition/properties/id/type): must be string"
+"grid_definitions.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/id (#/$defs/GridDefinition/properties/id/type): must be string"
+"grid_definitions.resolution_unit.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_unit (#/$defs/GridDefinition/properties/resolution_unit/type): must be string,null"
+"grid_definitions.resolution_unit.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_unit (#/$defs/GridDefinition/properties/resolution_unit/type): must be string,null"
+"grid_definitions.resolution_x.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_x (#/$defs/GridDefinition/properties/resolution_x/type): must be number"
+"grid_definitions.resolution_x.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_x (#/$defs/GridDefinition/properties/resolution_x/type): must be number"
+"grid_definitions.resolution_y.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_y (#/$defs/GridDefinition/properties/resolution_y/type): must be number"
+"grid_definitions.resolution_y.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/resolution_y (#/$defs/GridDefinition/properties/resolution_y/type): must be number"
+"grid_definitions.vertical_levels.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/vertical_levels (#/$defs/GridDefinition/properties/vertical_levels/type): must be array,null"
+"grid_definitions.vertical_levels.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /grid_definitions/0/vertical_levels (#/$defs/GridDefinition/properties/vertical_levels/type): must be array,null"
+"canonical_variables.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'id'"
+"canonical_variables.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'id'"
+"canonical_variables.name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'name'"
+"canonical_variables.name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'name'"
+"canonical_variables.standard_name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'standard_name'"
+"canonical_variables.standard_name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'standard_name'"
+"canonical_variables.units_ucum.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'units_ucum'"
+"canonical_variables.units_ucum.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'units_ucum'"
+"canonical_variables.value_data_type.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'value_data_type'"
+"canonical_variables.value_data_type.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'value_data_type'"
+"canonical_variables.extensivity.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'extensivity'"
+"canonical_variables.extensivity.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0 (#/required): must have required property 'extensivity'"
+"canonical_variables.default_aggregation_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/default_aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.default_aggregation_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/default_aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.description.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/description (#/properties/description/type): must be string,null"
+"canonical_variables.description.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/description (#/properties/description/type): must be string,null"
+"canonical_variables.extensivity.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/type): must be string
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.extensivity.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/type): must be string
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.extensivity.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.extensivity.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/id (#/properties/id/type): must be string"
+"canonical_variables.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/id (#/properties/id/type): must be string"
+"canonical_variables.name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/name (#/properties/name/type): must be string"
+"canonical_variables.name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/name (#/properties/name/type): must be string"
+"canonical_variables.standard_name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/standard_name (#/properties/standard_name/type): must be string"
+"canonical_variables.standard_name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/standard_name (#/properties/standard_name/type): must be string"
+"canonical_variables.units_ucum.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/units_ucum (#/properties/units_ucum/type): must be string"
+"canonical_variables.units_ucum.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/units_ucum (#/properties/units_ucum/type): must be string"
+"canonical_variables.value_data_type.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/type): must be string
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.value_data_type.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/type): must be string
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.value_data_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.value_data_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"canonical_variables.concept_mappings.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/concept_mappings (#/properties/concept_mappings/type): must be array,null"
+"canonical_variables.concept_mappings.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /canonical_variables/0/concept_mappings (#/properties/concept_mappings/type): must be array,null"
+"canonical_variables.extensivity.conditional_0","conditional_0","pilot",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/0/then/required): must have required property 'extensivity'
+	- /canonical_variables/0 (#/allOf/0/if): must match ""then"" schema
+	- /canonical_variables/0 (#/required): must have required property 'extensivity'"
+"canonical_variables.extensivity.conditional_0","conditional_0","candidate",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/0/then/required): must have required property 'extensivity'
+	- /canonical_variables/0 (#/allOf/0/if): must match ""then"" schema
+	- /canonical_variables/0 (#/required): must have required property 'extensivity'"
+"canonical_variables.plausible_min.conditional_forbidden_1","conditional_forbidden_1","pilot",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/1/then/not): must NOT be valid
+	- /canonical_variables/0 (#/allOf/1/if): must match ""then"" schema
+	- /canonical_variables/0/plausible_min (#/properties/plausible_min/type): must be number,null"
+"canonical_variables.plausible_min.conditional_forbidden_1","conditional_forbidden_1","candidate",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/1/then/not): must NOT be valid
+	- /canonical_variables/0 (#/allOf/1/if): must match ""then"" schema
+	- /canonical_variables/0/plausible_min (#/properties/plausible_min/type): must be number,null"
+"canonical_variables.plausible_max.conditional_forbidden_2","conditional_forbidden_2","pilot",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/2/then/not): must NOT be valid
+	- /canonical_variables/0 (#/allOf/2/if): must match ""then"" schema
+	- /canonical_variables/0/plausible_max (#/properties/plausible_max/type): must be number,null"
+"canonical_variables.plausible_max.conditional_forbidden_2","conditional_forbidden_2","candidate",FALSE,FALSE,"3 errors validating json:
+	- /canonical_variables/0 (#/allOf/2/then/not): must NOT be valid
+	- /canonical_variables/0 (#/allOf/2/if): must match ""then"" schema
+	- /canonical_variables/0/plausible_max (#/properties/plausible_max/type): must be number,null"
+"product_variables.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'id'"
+"product_variables.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'id'"
+"product_variables.product.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'product'"
+"product_variables.product.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'product'"
+"product_variables.canonical_variable.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'canonical_variable'"
+"product_variables.canonical_variable.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'canonical_variable'"
+"product_variables.native_name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'native_name'"
+"product_variables.native_name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0 (#/required): must have required property 'native_name'"
+"product_variables.aggregation_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"product_variables.aggregation_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"product_variables.aggregation_window_iso.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/aggregation_window_iso (#/properties/aggregation_window_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"product_variables.aggregation_window_iso.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/aggregation_window_iso (#/properties/aggregation_window_iso/pattern): must match pattern ""^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$"""
+"product_variables.amadeus_variable_code.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/amadeus_variable_code (#/properties/amadeus_variable_code/type): must be string,null"
+"product_variables.amadeus_variable_code.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/amadeus_variable_code (#/properties/amadeus_variable_code/type): must be string,null"
+"product_variables.canonical_variable.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/canonical_variable (#/properties/canonical_variable/type): must be string"
+"product_variables.canonical_variable.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/canonical_variable (#/properties/canonical_variable/type): must be string"
+"product_variables.extensivity.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"product_variables.extensivity.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/extensivity (#/$defs/VariableExtensivityEnum/enum): must be equal to one of the allowed values"
+"product_variables.harmonization_note.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/harmonization_note (#/properties/harmonization_note/type): must be string,null"
+"product_variables.harmonization_note.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/harmonization_note (#/properties/harmonization_note/type): must be string,null"
+"product_variables.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/id (#/properties/id/type): must be string"
+"product_variables.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/id (#/properties/id/type): must be string"
+"product_variables.native_name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/native_name (#/properties/native_name/type): must be string"
+"product_variables.native_name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/native_name (#/properties/native_name/type): must be string"
+"product_variables.native_units_ucum.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/native_units_ucum (#/properties/native_units_ucum/type): must be string,null"
+"product_variables.native_units_ucum.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/native_units_ucum (#/properties/native_units_ucum/type): must be string,null"
+"product_variables.product.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/product (#/properties/product/type): must be string"
+"product_variables.product.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/product (#/properties/product/type): must be string"
+"product_variables.temporal_alignment.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/temporal_alignment (#/$defs/TemporalAlignmentEnum/enum): must be equal to one of the allowed values"
+"product_variables.temporal_alignment.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/temporal_alignment (#/$defs/TemporalAlignmentEnum/enum): must be equal to one of the allowed values"
+"product_variables.value_data_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"product_variables.value_data_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/value_data_type (#/$defs/ValueDataTypeEnum/enum): must be equal to one of the allowed values"
+"product_variables.product.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ProductVariable.product"
+"product_variables.product.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_product_variables_product (1)"
+"product_variables.canonical_variable.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ProductVariable.canonical_variable"
+"product_variables.canonical_variable.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: unit_binding (21)"
+"product_variables.metadata_gaps.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/metadata_gaps (#/properties/metadata_gaps/type): must be array,null"
+"product_variables.metadata_gaps.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /product_variables/0/metadata_gaps (#/properties/metadata_gaps/type): must be array,null"
+"assets.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'id'"
+"assets.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'id'"
+"assets.product.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'product'"
+"assets.product.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'product'"
+"assets.materialization_mode.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'materialization_mode'"
+"assets.materialization_mode.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'materialization_mode'"
+"assets.value_state.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'value_state'"
+"assets.value_state.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0 (#/required): must have required property 'value_state'"
+"assets.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/id (#/properties/id/type): must be string"
+"assets.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/id (#/properties/id/type): must be string"
+"assets.local_path.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/local_path (#/properties/local_path/type): must be string,null"
+"assets.local_path.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/local_path (#/properties/local_path/type): must be string,null"
+"assets.materialization_mode.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/type): must be string
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"assets.materialization_mode.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/type): must be string
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"assets.materialization_mode.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"assets.materialization_mode.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"assets.native_format.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/type): must be string
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"assets.native_format.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/type): must be string
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"assets.native_format.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"assets.native_format.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/native_format (#/$defs/NativeFormatEnum/enum): must be equal to one of the allowed values"
+"assets.produced_by_run.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/produced_by_run (#/properties/produced_by_run/type): must be string,null"
+"assets.produced_by_run.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/produced_by_run (#/properties/produced_by_run/type): must be string,null"
+"assets.product.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/product (#/properties/product/type): must be string"
+"assets.product.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/product (#/properties/product/type): must be string"
+"assets.sha256.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/sha256 (#/properties/sha256/type): must be string,null"
+"assets.sha256.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/sha256 (#/properties/sha256/type): must be string,null"
+"assets.sha256.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/sha256 (#/properties/sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"assets.sha256.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/sha256 (#/properties/sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"assets.size_bytes.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/size_bytes (#/properties/size_bytes/type): must be integer,null"
+"assets.size_bytes.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/size_bytes (#/properties/size_bytes/type): must be integer,null"
+"assets.url.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/url (#/properties/url/type): must be string,null"
+"assets.url.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/url (#/properties/url/type): must be string,null"
+"assets.value_state.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/type): must be string
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/enum): must be equal to one of the allowed values"
+"assets.value_state.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/type): must be string
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/enum): must be equal to one of the allowed values"
+"assets.value_state.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/enum): must be equal to one of the allowed values"
+"assets.value_state.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/value_state (#/$defs/ValueMaterializationEnum/enum): must be equal to one of the allowed values"
+"assets.variables_present.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/variables_present (#/properties/variables_present/type): must be array,null"
+"assets.variables_present.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/variables_present (#/properties/variables_present/type): must be array,null"
+"assets.product.reference","reference","pilot",FALSE,FALSE,"Dangling reference: Asset.product"
+"assets.product.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_assets_product (1)"
+"assets.variables_present.reference","reference","pilot",FALSE,FALSE,"Dangling reference: Asset.variables_present"
+"assets.variables_present.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_assets_variables_present (1)"
+"assets.variables_present.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/variables_present (#/properties/variables_present/type): must be array,null"
+"assets.variables_present.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/variables_present (#/properties/variables_present/type): must be array,null"
+"assets.vertical_levels_present.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /assets/0/vertical_levels_present (#/properties/vertical_levels_present/type): must be array,null"
+"assets.vertical_levels_present.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /assets/0/vertical_levels_present (#/properties/vertical_levels_present/type): must be array,null"
+"assets.local_path.conditional_0","conditional_0","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/0/then/required): must have required property 'local_path'
+	- /assets/0 (#/allOf/0/if): must match ""then"" schema"
+"assets.local_path.conditional_0","conditional_0","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/0/then/required): must have required property 'local_path'
+	- /assets/0 (#/allOf/0/if): must match ""then"" schema"
+"assets.sha256.conditional_0","conditional_0","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/0/then/required): must have required property 'sha256'
+	- /assets/0 (#/allOf/0/if): must match ""then"" schema"
+"assets.sha256.conditional_0","conditional_0","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/0/then/required): must have required property 'sha256'
+	- /assets/0 (#/allOf/0/if): must match ""then"" schema"
+"assets.produced_by_run.conditional_1","conditional_1","pilot",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/1/then/required): must have required property 'produced_by_run'
+	- /assets/0 (#/allOf/1/if): must match ""then"" schema"
+"assets.produced_by_run.conditional_1","conditional_1","candidate",FALSE,FALSE,"2 errors validating json:
+	- /assets/0 (#/allOf/1/then/required): must have required property 'produced_by_run'
+	- /assets/0 (#/allOf/1/if): must match ""then"" schema"
+"location_sets.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'id'"
+"location_sets.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'id'"
+"location_sets.locs_id_field.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'locs_id_field'"
+"location_sets.locs_id_field.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'locs_id_field'"
+"location_sets.crs.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'crs'"
+"location_sets.crs.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'crs'"
+"location_sets.phi_status.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'phi_status'"
+"location_sets.phi_status.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0 (#/required): must have required property 'phi_status'"
+"location_sets.crs.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/crs (#/properties/crs/type): must be string"
+"location_sets.crs.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/crs (#/properties/crs/type): must be string"
+"location_sets.crs.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/crs (#/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"location_sets.crs.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/crs (#/properties/crs/pattern): must match pattern ""^[A-Za-z]+:[0-9]+$"""
+"location_sets.geometry_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/geometry_type (#/$defs/GeometryTypeEnum/enum): must be equal to one of the allowed values"
+"location_sets.geometry_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/geometry_type (#/$defs/GeometryTypeEnum/enum): must be equal to one of the allowed values"
+"location_sets.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/id (#/properties/id/type): must be string"
+"location_sets.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/id (#/properties/id/type): must be string"
+"location_sets.location_count.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/location_count (#/properties/location_count/type): must be integer,null"
+"location_sets.location_count.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/location_count (#/properties/location_count/type): must be integer,null"
+"location_sets.locs_id_field.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/locs_id_field (#/properties/locs_id_field/type): must be string"
+"location_sets.locs_id_field.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/locs_id_field (#/properties/locs_id_field/type): must be string"
+"location_sets.phi_status.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/type): must be string
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/enum): must be equal to one of the allowed values"
+"location_sets.phi_status.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/type): must be string
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/enum): must be equal to one of the allowed values"
+"location_sets.phi_status.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/enum): must be equal to one of the allowed values"
+"location_sets.phi_status.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /location_sets/0/phi_status (#/$defs/PhiStatusEnum/enum): must be equal to one of the allowed values"
+"locations.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'id'"
+"locations.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'id'"
+"locations.location_set.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_set'"
+"locations.location_set.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_set'"
+"locations.location_key.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_key'"
+"locations.location_key.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_key'"
+"locations.location_geom_wkt.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_geom_wkt'"
+"locations.location_geom_wkt.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0 (#/required): must have required property 'location_geom_wkt'"
+"locations.buffer_radius_m.minimum","minimum","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"locations.buffer_radius_m.minimum","minimum","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"locations.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/id (#/properties/id/type): must be string"
+"locations.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/id (#/properties/id/type): must be string"
+"locations.location_geom_wkt.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_geom_wkt (#/properties/location_geom_wkt/type): must be string"
+"locations.location_geom_wkt.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_geom_wkt (#/properties/location_geom_wkt/type): must be string"
+"locations.location_key.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_key (#/properties/location_key/type): must be string"
+"locations.location_key.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_key (#/properties/location_key/type): must be string"
+"locations.location_set.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_set (#/properties/location_set/type): must be string"
+"locations.location_set.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/location_set (#/properties/location_set/type): must be string"
+"locations.srid.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/srid (#/properties/srid/type): must be integer,null"
+"locations.srid.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/srid (#/properties/srid/type): must be integer,null"
+"locations.target_geography_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /locations/0/target_geography_type (#/$defs/TargetGeographyTypeEnum/enum): must be equal to one of the allowed values"
+"locations.target_geography_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /locations/0/target_geography_type (#/$defs/TargetGeographyTypeEnum/enum): must be equal to one of the allowed values"
+"locations.location_set.reference","reference","pilot",FALSE,FALSE,"Dangling reference: Location.location_set"
+"locations.location_set.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: request_membership (112)"
+"extraction_requests.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'id'"
+"extraction_requests.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'id'"
+"extraction_requests.location_set.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'location_set'"
+"extraction_requests.location_set.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'location_set'"
+"extraction_requests.time_window_start.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'time_window_start'"
+"extraction_requests.time_window_start.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'time_window_start'"
+"extraction_requests.time_window_end.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'time_window_end'"
+"extraction_requests.time_window_end.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'time_window_end'"
+"extraction_requests.extraction_method.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'extraction_method'"
+"extraction_requests.extraction_method.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'extraction_method'"
+"extraction_requests.request_hash.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'request_hash'"
+"extraction_requests.request_hash.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0 (#/required): must have required property 'request_hash'"
+"extraction_requests.aggregation_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.aggregation_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.buffer_radius_m.type","type","pilot",FALSE,FALSE,"3 errors validating json:
+	- /extraction_requests/0 (#/allOf/0/then/required): must have required property 'aggregation_method'
+	- /extraction_requests/0 (#/allOf/0/if): must match ""then"" schema
+	- /extraction_requests/0/buffer_radius_m (#/properties/buffer_radius_m/type): must be number,null"
+"extraction_requests.buffer_radius_m.type","type","candidate",FALSE,FALSE,"3 errors validating json:
+	- /extraction_requests/0 (#/allOf/0/then/required): must have required property 'aggregation_method'
+	- /extraction_requests/0 (#/allOf/0/if): must match ""then"" schema
+	- /extraction_requests/0/buffer_radius_m (#/properties/buffer_radius_m/type): must be number,null"
+"extraction_requests.buffer_radius_m.minimum","minimum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"extraction_requests.buffer_radius_m.minimum","minimum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"extraction_requests.extraction_method.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/type): must be string
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.extraction_method.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/type): must be string
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.extraction_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.extraction_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/id (#/properties/id/type): must be string"
+"extraction_requests.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/id (#/properties/id/type): must be string"
+"extraction_requests.location_set.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/location_set (#/properties/location_set/type): must be string"
+"extraction_requests.location_set.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/location_set (#/properties/location_set/type): must be string"
+"extraction_requests.materialization_mode.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.materialization_mode.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.output_orientation.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/output_orientation (#/$defs/TableOrientationEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.output_orientation.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/output_orientation (#/$defs/TableOrientationEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.request_hash.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/request_hash (#/properties/request_hash/type): must be string"
+"extraction_requests.request_hash.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/request_hash (#/properties/request_hash/type): must be string"
+"extraction_requests.request_hash.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/request_hash (#/properties/request_hash/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"extraction_requests.request_hash.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/request_hash (#/properties/request_hash/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"extraction_requests.requested_canonical_variables.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_canonical_variables (#/properties/requested_canonical_variables/type): must be array,null"
+"extraction_requests.requested_canonical_variables.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_canonical_variables (#/properties/requested_canonical_variables/type): must be array,null"
+"extraction_requests.requested_product_variables.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_product_variables (#/properties/requested_product_variables/type): must be array,null"
+"extraction_requests.requested_product_variables.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_product_variables (#/properties/requested_product_variables/type): must be array,null"
+"extraction_requests.status_mixing_policy.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/status_mixing_policy (#/$defs/StatusMixingPolicyEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.status_mixing_policy.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/status_mixing_policy (#/$defs/StatusMixingPolicyEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.strict_extensivity_check.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/strict_extensivity_check (#/$defs/StrictnessEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.strict_extensivity_check.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/strict_extensivity_check (#/$defs/StrictnessEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.target_geography_type.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/target_geography_type (#/$defs/TargetGeographyTypeEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.target_geography_type.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/target_geography_type (#/$defs/TargetGeographyTypeEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.temporal_grouping.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/type): must be string
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.temporal_grouping.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/type): must be string
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.temporal_grouping.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.temporal_grouping.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"extraction_requests.time_window_end.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/time_window_end (#/properties/time_window_end/type): must be string"
+"extraction_requests.time_window_end.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/time_window_end (#/properties/time_window_end/type): must be string"
+"extraction_requests.time_window_start.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/time_window_start (#/properties/time_window_start/type): must be string"
+"extraction_requests.time_window_start.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/time_window_start (#/properties/time_window_start/type): must be string"
+"extraction_requests.location_set.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ExtractionRequest.location_set"
+"extraction_requests.location_set.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: request_membership (336)"
+"extraction_requests.requested_canonical_variables.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ExtractionRequest.requested_canonical_variables"
+"extraction_requests.requested_canonical_variables.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_extraction_requests_requested_canonical_variables (1)"
+"extraction_requests.requested_product_variables.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ExtractionRequest.requested_product_variables"
+"extraction_requests.requested_product_variables.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: request_membership (336)"
+"extraction_requests.weighting_product_variable.reference","reference","pilot",FALSE,FALSE,"Dangling reference: ExtractionRequest.weighting_product_variable"
+"extraction_requests.weighting_product_variable.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: ref_extraction_requests_weighting_product_variable (1)"
+"extraction_requests.requested_canonical_variables.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_canonical_variables (#/properties/requested_canonical_variables/type): must be array,null"
+"extraction_requests.requested_canonical_variables.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_canonical_variables (#/properties/requested_canonical_variables/type): must be array,null"
+"extraction_requests.requested_product_variables.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_product_variables (#/properties/requested_product_variables/type): must be array,null"
+"extraction_requests.requested_product_variables.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/requested_product_variables (#/properties/requested_product_variables/type): must be array,null"
+"extraction_requests.lag_days.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/lag_days (#/properties/lag_days/type): must be array,null"
+"extraction_requests.lag_days.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /extraction_requests/0/lag_days (#/properties/lag_days/type): must be array,null"
+"extraction_requests.weighting_product_variable.conditional_1","conditional_1","pilot",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0 (#/allOf/1/then/required): must have required property 'weighting_product_variable'
+	- /extraction_requests/0 (#/allOf/1/if): must match ""then"" schema"
+"extraction_requests.weighting_product_variable.conditional_1","conditional_1","candidate",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0 (#/allOf/1/then/required): must have required property 'weighting_product_variable'
+	- /extraction_requests/0 (#/allOf/1/if): must match ""then"" schema"
+"extraction_requests.source_priority_policy.conditional_2","conditional_2","pilot",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0 (#/allOf/2/then/required): must have required property 'source_priority_policy'
+	- /extraction_requests/0 (#/allOf/2/if): must match ""then"" schema"
+"extraction_requests.source_priority_policy.conditional_2","conditional_2","candidate",FALSE,FALSE,"2 errors validating json:
+	- /extraction_requests/0 (#/allOf/2/then/required): must have required property 'source_priority_policy'
+	- /extraction_requests/0 (#/allOf/2/if): must match ""then"" schema"
+"ambient_values_at_location.location.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'location'"
+"ambient_values_at_location.location.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'location'"
+"ambient_values_at_location.extraction_request.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'extraction_request'"
+"ambient_values_at_location.extraction_request.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'extraction_request'"
+"ambient_values_at_location.extraction_method.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'extraction_method'"
+"ambient_values_at_location.extraction_method.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'extraction_method'"
+"ambient_values_at_location.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'id'"
+"ambient_values_at_location.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'id'"
+"ambient_values_at_location.product_variable.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'product_variable'"
+"ambient_values_at_location.product_variable.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'product_variable'"
+"ambient_values_at_location.canonical_variable.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'canonical_variable'"
+"ambient_values_at_location.canonical_variable.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'canonical_variable'"
+"ambient_values_at_location.valid_time_start.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'valid_time_start'"
+"ambient_values_at_location.valid_time_start.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'valid_time_start'"
+"ambient_values_at_location.data_status.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'data_status'"
+"ambient_values_at_location.data_status.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'data_status'"
+"ambient_values_at_location.source_system.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'source_system'"
+"ambient_values_at_location.source_system.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'source_system'"
+"ambient_values_at_location.null_semantics.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'null_semantics'"
+"ambient_values_at_location.null_semantics.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0 (#/required): must have required property 'null_semantics'"
+"ambient_values_at_location.aggregation_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.aggregation_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/aggregation_method (#/$defs/AggregationMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.asset.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/asset (#/properties/asset/type): must be string,null"
+"ambient_values_at_location.asset.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/asset (#/properties/asset/type): must be string,null"
+"ambient_values_at_location.buffer_radius_m.minimum","minimum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"ambient_values_at_location.buffer_radius_m.minimum","minimum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/buffer_radius_m (#/properties/buffer_radius_m/minimum): must be >= 0"
+"ambient_values_at_location.canonical_variable.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/canonical_variable (#/properties/canonical_variable/type): must be string"
+"ambient_values_at_location.canonical_variable.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/canonical_variable (#/properties/canonical_variable/type): must be string"
+"ambient_values_at_location.contributing_value_count.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/contributing_value_count (#/properties/contributing_value_count/type): must be integer,null"
+"ambient_values_at_location.contributing_value_count.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/contributing_value_count (#/properties/contributing_value_count/type): must be integer,null"
+"ambient_values_at_location.coverage_fraction.minimum","minimum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/coverage_fraction (#/properties/coverage_fraction/minimum): must be >= 0"
+"ambient_values_at_location.coverage_fraction.minimum","minimum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/coverage_fraction (#/properties/coverage_fraction/minimum): must be >= 0"
+"ambient_values_at_location.coverage_fraction.maximum","maximum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/coverage_fraction (#/properties/coverage_fraction/maximum): must be <= 1"
+"ambient_values_at_location.coverage_fraction.maximum","maximum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/coverage_fraction (#/properties/coverage_fraction/maximum): must be <= 1"
+"ambient_values_at_location.data_status.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/type): must be string
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.data_status.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/type): must be string
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.data_status.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.data_status.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.extraction_method.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/type): must be string
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.extraction_method.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/type): must be string
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.extraction_method.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.extraction_method.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/extraction_method (#/$defs/ExtractionMethodEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.extraction_request.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/extraction_request (#/properties/extraction_request/type): must be string"
+"ambient_values_at_location.extraction_request.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/extraction_request (#/properties/extraction_request/type): must be string"
+"ambient_values_at_location.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/id (#/properties/id/type): must be string"
+"ambient_values_at_location.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/id (#/properties/id/type): must be string"
+"ambient_values_at_location.location.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/location (#/properties/location/type): must be string"
+"ambient_values_at_location.location.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/location (#/properties/location/type): must be string"
+"ambient_values_at_location.native_value.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/native_value (#/properties/native_value/type): must be number,null"
+"ambient_values_at_location.native_value.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/native_value (#/properties/native_value/type): must be number,null"
+"ambient_values_at_location.native_value_unit_ucum.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/native_value_unit_ucum (#/properties/native_value_unit_ucum/type): must be string,null"
+"ambient_values_at_location.native_value_unit_ucum.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/native_value_unit_ucum (#/properties/native_value_unit_ucum/type): must be string,null"
+"ambient_values_at_location.null_semantics.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/type): must be string
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.null_semantics.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/type): must be string
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.null_semantics.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.null_semantics.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/null_semantics (#/$defs/NullSemanticsEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.processing_run.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/processing_run (#/properties/processing_run/type): must be string,null"
+"ambient_values_at_location.processing_run.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/processing_run (#/properties/processing_run/type): must be string,null"
+"ambient_values_at_location.product_variable.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/product_variable (#/properties/product_variable/type): must be string"
+"ambient_values_at_location.product_variable.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/product_variable (#/properties/product_variable/type): must be string"
+"ambient_values_at_location.source_system.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/source_system (#/properties/source_system/type): must be string"
+"ambient_values_at_location.source_system.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/source_system (#/properties/source_system/type): must be string"
+"ambient_values_at_location.temporal_grouping.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/type): must be string
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.temporal_grouping.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/type): must be string
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.temporal_grouping.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.temporal_grouping.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/temporal_grouping (#/$defs/TemporalGroupingEnum/enum): must be equal to one of the allowed values"
+"ambient_values_at_location.valid_time_start.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/valid_time_start (#/properties/valid_time_start/type): must be string"
+"ambient_values_at_location.valid_time_start.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/valid_time_start (#/properties/valid_time_start/type): must be string"
+"ambient_values_at_location.value.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/value (#/properties/value/type): must be number,null"
+"ambient_values_at_location.value.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/value (#/properties/value/type): must be number,null"
+"ambient_values_at_location.value_unit_ucum.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/value_unit_ucum (#/properties/value_unit_ucum/type): must be string,null"
+"ambient_values_at_location.value_unit_ucum.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /ambient_values_at_location/0/value_unit_ucum (#/properties/value_unit_ucum/type): must be string,null"
+"ambient_values_at_location.location.reference","reference","pilot",FALSE,FALSE,"Dangling reference: AmbientValueAtLocation.location"
+"ambient_values_at_location.location.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: request_membership (1)"
+"ambient_values_at_location.extraction_request.reference","reference","pilot",FALSE,FALSE,"Dangling reference: AmbientValueAtLocation.extraction_request"
+"ambient_values_at_location.extraction_request.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: request_membership (1)"
+"ambient_values_at_location.product_variable.reference","reference","pilot",FALSE,FALSE,"Dangling reference: AmbientValueAtLocation.product_variable"
+"ambient_values_at_location.product_variable.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: unit_binding (1)"
+"ambient_values_at_location.canonical_variable.reference","reference","pilot",FALSE,FALSE,"Dangling reference: AmbientValueAtLocation.canonical_variable"
+"ambient_values_at_location.canonical_variable.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: unit_binding (1)"
+"ambient_values_at_location.asset.reference","reference","pilot",FALSE,FALSE,"Dangling reference: AmbientValueAtLocation.asset"
+"ambient_values_at_location.asset.reference","reference","candidate",FALSE,FALSE,"Storage SQL rejected: lineage (1)"
+"ambient_values_at_location.value.conditional_1","conditional_1","pilot",FALSE,FALSE,"6 errors validating json:
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf/0/const): must be equal to constant
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf/1/const): must be equal to constant
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf): must match a schema in anyOf
+	- /ambient_values_at_location/0 (#/allOf/0/if): must match ""then"" schema
+	- /ambient_values_at_location/0 (#/allOf/1/then/required): must have required property 'value'
+	- /ambient_values_at_location/0 (#/allOf/1/if): must match ""then"" schema"
+"ambient_values_at_location.value.conditional_1","conditional_1","candidate",FALSE,FALSE,"6 errors validating json:
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf/0/const): must be equal to constant
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf/1/const): must be equal to constant
+	- /ambient_values_at_location/0/null_semantics (#/allOf/0/then/properties/null_semantics/anyOf): must match a schema in anyOf
+	- /ambient_values_at_location/0 (#/allOf/0/if): must match ""then"" schema
+	- /ambient_values_at_location/0 (#/allOf/1/then/required): must have required property 'value'
+	- /ambient_values_at_location/0 (#/allOf/1/if): must match ""then"" schema"
+"ambient_values_at_location.reference_time.conditional_2","conditional_2","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0 (#/allOf/2/then/required): must have required property 'reference_time'
+	- /ambient_values_at_location/0 (#/allOf/2/if): must match ""then"" schema"
+"ambient_values_at_location.reference_time.conditional_2","conditional_2","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0 (#/allOf/2/then/required): must have required property 'reference_time'
+	- /ambient_values_at_location/0 (#/allOf/2/if): must match ""then"" schema"
+"ambient_values_at_location.superseded_by.conditional_3","conditional_3","pilot",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0 (#/allOf/3/then/required): must have required property 'superseded_by'
+	- /ambient_values_at_location/0 (#/allOf/3/if): must match ""then"" schema"
+"ambient_values_at_location.superseded_by.conditional_3","conditional_3","candidate",FALSE,FALSE,"2 errors validating json:
+	- /ambient_values_at_location/0 (#/allOf/3/then/required): must have required property 'superseded_by'
+	- /ambient_values_at_location/0 (#/allOf/3/if): must match ""then"" schema"
+"tool_runs.id.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'id'"
+"tool_runs.id.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'id'"
+"tool_runs.run_role.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'run_role'"
+"tool_runs.run_role.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'run_role'"
+"tool_runs.tool_name.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'tool_name'"
+"tool_runs.tool_name.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'tool_name'"
+"tool_runs.tool_version.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'tool_version'"
+"tool_runs.tool_version.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'tool_version'"
+"tool_runs.run_timestamp_utc.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'run_timestamp_utc'"
+"tool_runs.run_timestamp_utc.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'run_timestamp_utc'"
+"tool_runs.status.required","required","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'status'"
+"tool_runs.status.required","required","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0 (#/required): must have required property 'status'"
+"tool_runs.container_image_digest.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/container_image_digest (#/properties/container_image_digest/pattern): must match pattern ""^sha256:[0-9a-f]{64}$"""
+"tool_runs.container_image_digest.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/container_image_digest (#/properties/container_image_digest/pattern): must match pattern ""^sha256:[0-9a-f]{64}$"""
+"tool_runs.function_name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/function_name (#/properties/function_name/type): must be string,null"
+"tool_runs.function_name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/function_name (#/properties/function_name/type): must be string,null"
+"tool_runs.id.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/id (#/properties/id/type): must be string"
+"tool_runs.id.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/id (#/properties/id/type): must be string"
+"tool_runs.input_file_sha256.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/input_file_sha256 (#/properties/input_file_sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"tool_runs.input_file_sha256.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/input_file_sha256 (#/properties/input_file_sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"tool_runs.materialization_mode.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"tool_runs.materialization_mode.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/materialization_mode (#/$defs/MaterializationModeEnum/enum): must be equal to one of the allowed values"
+"tool_runs.output_file_sha256.pattern","pattern","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/output_file_sha256 (#/properties/output_file_sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"tool_runs.output_file_sha256.pattern","pattern","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/output_file_sha256 (#/properties/output_file_sha256/pattern): must match pattern ""^[0-9a-f]{64}$"""
+"tool_runs.run_arguments.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_arguments (#/properties/run_arguments/type): must be string,null"
+"tool_runs.run_arguments.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_arguments (#/properties/run_arguments/type): must be string,null"
+"tool_runs.run_duration_seconds.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_duration_seconds (#/properties/run_duration_seconds/type): must be number,null"
+"tool_runs.run_duration_seconds.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_duration_seconds (#/properties/run_duration_seconds/type): must be number,null"
+"tool_runs.run_role.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/type): must be string
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/enum): must be equal to one of the allowed values"
+"tool_runs.run_role.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/type): must be string
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/enum): must be equal to one of the allowed values"
+"tool_runs.run_role.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/enum): must be equal to one of the allowed values"
+"tool_runs.run_role.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_role (#/$defs/RunRoleEnum/enum): must be equal to one of the allowed values"
+"tool_runs.run_timestamp_utc.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_timestamp_utc (#/properties/run_timestamp_utc/type): must be string"
+"tool_runs.run_timestamp_utc.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/run_timestamp_utc (#/properties/run_timestamp_utc/type): must be string"
+"tool_runs.status.type","type","pilot",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/type): must be string
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/enum): must be equal to one of the allowed values"
+"tool_runs.status.type","type","candidate",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/type): must be string
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/enum): must be equal to one of the allowed values"
+"tool_runs.status.enum","enum","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/enum): must be equal to one of the allowed values"
+"tool_runs.status.enum","enum","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/status (#/$defs/RunStatusEnum/enum): must be equal to one of the allowed values"
+"tool_runs.tool_name.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/tool_name (#/properties/tool_name/type): must be string"
+"tool_runs.tool_name.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/tool_name (#/properties/tool_name/type): must be string"
+"tool_runs.tool_version.type","type","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/tool_version (#/properties/tool_version/type): must be string"
+"tool_runs.tool_version.type","type","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/tool_version (#/properties/tool_version/type): must be string"
+"tool_runs.input_asset_ids.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/input_asset_ids (#/properties/input_asset_ids/type): must be array,null"
+"tool_runs.input_asset_ids.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/input_asset_ids (#/properties/input_asset_ids/type): must be array,null"
+"tool_runs.upstream_runs.array_shape","array_shape","pilot",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/upstream_runs (#/properties/upstream_runs/type): must be array,null"
+"tool_runs.upstream_runs.array_shape","array_shape","candidate",FALSE,FALSE,"1 error validating json:
+	- /tool_runs/0/upstream_runs (#/properties/upstream_runs/type): must be array,null"
+"tool_runs.output_row_count.conditional_0","conditional_0","pilot",FALSE,FALSE,"4 errors validating json:
+	- /tool_runs/0 (#/allOf/0/then/required): must have required property 'output_row_count'
+	- /tool_runs/0 (#/allOf/0/if): must match ""then"" schema
+	- /tool_runs/0 (#/allOf/1/then/required): must have required property 'upstream_runs'
+	- /tool_runs/0 (#/allOf/1/if): must match ""then"" schema"
+"tool_runs.output_row_count.conditional_0","conditional_0","candidate",FALSE,FALSE,"4 errors validating json:
+	- /tool_runs/0 (#/allOf/0/then/required): must have required property 'output_row_count'
+	- /tool_runs/0 (#/allOf/0/if): must match ""then"" schema
+	- /tool_runs/0 (#/allOf/1/then/required): must have required property 'upstream_runs'
+	- /tool_runs/0 (#/allOf/1/if): must match ""then"" schema"
+"tool_runs.upstream_runs.conditional_1","conditional_1","pilot",FALSE,FALSE,"4 errors validating json:
+	- /tool_runs/0 (#/allOf/0/then/required): must have required property 'output_row_count'
+	- /tool_runs/0 (#/allOf/0/if): must match ""then"" schema
+	- /tool_runs/0 (#/allOf/1/then/required): must have required property 'upstream_runs'
+	- /tool_runs/0 (#/allOf/1/if): must match ""then"" schema"
+"tool_runs.upstream_runs.conditional_1","conditional_1","candidate",FALSE,FALSE,"4 errors validating json:
+	- /tool_runs/0 (#/allOf/0/then/required): must have required property 'output_row_count'
+	- /tool_runs/0 (#/allOf/0/if): must match ""then"" schema
+	- /tool_runs/0 (#/allOf/1/then/required): must have required property 'upstream_runs'
+	- /tool_runs/0 (#/allOf/1/if): must match ""then"" schema"
+"tool_runs.log_excerpt.conditional_2","conditional_2","pilot",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0 (#/allOf/2/then/required): must have required property 'log_excerpt'
+	- /tool_runs/0 (#/allOf/2/if): must match ""then"" schema"
+"tool_runs.log_excerpt.conditional_2","conditional_2","candidate",FALSE,FALSE,"2 errors validating json:
+	- /tool_runs/0 (#/allOf/2/then/required): must have required property 'log_excerpt'
+	- /tool_runs/0 (#/allOf/2/if): must match ""then"" schema"

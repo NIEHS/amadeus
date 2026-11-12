@@ -1,0 +1,5 @@
+pair,workload,records,native_values_and_bindings_match,max_native_difference,request_match,source_identity_match,scientific_graph_and_arguments_match,source_metadata_match
+all16-1,all16,192,True,0,True,True,True,True
+all16-2,all16,192,True,0,True,True,True,True
+small-1,small,24,True,0,True,True,True,True
+small-2,small,24,True,0,True,True,True,True

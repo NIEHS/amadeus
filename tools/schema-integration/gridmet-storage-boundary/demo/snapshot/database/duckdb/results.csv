@@ -1,0 +1,5 @@
+"id","variable","site_id","date_label","value","value_unit_ucum","native_value","asset","processing_run"
+"gridmetteam:direct-c81f0ec28ed71101/value/pr/raleigh/2025-02-10","pr","raleigh","2025-02-10 00:00:00",0,"mm",0,"gridmetteam:direct-c81f0ec28ed71101/asset/calculate/pr/raleigh","gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh"
+"gridmetteam:direct-c81f0ec28ed71101/value/pr/raleigh/2025-02-11","pr","raleigh","2025-02-11 00:00:00",14.8000001907349,"mm",14.8000001907349,"gridmetteam:direct-c81f0ec28ed71101/asset/calculate/pr/raleigh","gridmetteam:direct-c81f0ec28ed71101/run/calculate/pr/raleigh"
+"gridmetteam:direct-c81f0ec28ed71101/value/tmmx/raleigh/2025-02-10","tmmx","raleigh","2025-02-10 00:00:00",279.100006103516,"K",279.100006103516,"gridmetteam:direct-c81f0ec28ed71101/asset/calculate/tmmx/raleigh","gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh"
+"gridmetteam:direct-c81f0ec28ed71101/value/tmmx/raleigh/2025-02-11","tmmx","raleigh","2025-02-11 00:00:00",274.700012207031,"K",274.700012207031,"gridmetteam:direct-c81f0ec28ed71101/asset/calculate/tmmx/raleigh","gridmetteam:direct-c81f0ec28ed71101/run/calculate/tmmx/raleigh"

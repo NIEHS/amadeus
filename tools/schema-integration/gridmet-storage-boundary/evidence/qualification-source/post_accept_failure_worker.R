@@ -1,0 +1,7 @@
+a<-commandArgs(TRUE);b<-a[1];case<-a[2];root<-file.path(b,'integration')
+e<-new.env(parent=globalenv());sys.source(file.path(root,'R/storage_boundary.R'),e);sys.source(file.path(root,'R/schema_export.R'),e)
+e$.direct_output_context<-jsonlite::read_json(file.path(case,'direct-output-context.json'))
+request<-readRDS(file.path(case,'request.rds'));results<-read.csv(file.path(case,'results.csv'));calls<-readRDS(file.path(case,'calls.rds'));before<-readRDS(file.path(case,'source-existed-before.rds'))
+msg<-'';ok<-tryCatch({e$schema_write_and_load(root,case,request,results,calls,before,list(engine='duckdb',storage='parquet',output=dirname(case)),list(),list(stage=function(...)NULL));TRUE},error=function(x){msg<<-conditionMessage(x);FALSE})
+jsonlite::write_json(list(success=ok,error=msg),file.path(case,'worker-outcome.json'),auto_unbox=TRUE,pretty=TRUE)
+quit(save='no',status=if(ok)0 else 1)

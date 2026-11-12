@@ -1,0 +1,7 @@
+{
+  "revision": "explicit-observer-v1",
+  "execution_sha256": "e2733242aff75f642a54f69296cb9627af98eace7afa73eb196b53acce794e53",
+  "events_sha256": "32f44750ee1375ac571b931800895ae07af5d10120e8c96a033eed3d95f2b2a3",
+  "last_event_sha256": "a166058934829818c853a032c3d9fcdb0b484e5e811cab85a621dae545c4619e",
+  "trust": "Unkeyed local evidence; not independent execution attestation"
+}

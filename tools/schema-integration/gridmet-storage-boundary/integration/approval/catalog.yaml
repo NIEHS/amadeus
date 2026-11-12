@@ -1,0 +1,184 @@
+id: gridmet-native-approval-v1
+dataset: gridmet
+production_approved: false
+policies:
+- code: tmmx
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: K
+  output_unit: K
+  source_unit_aliases: k|kelvin
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: tmmn
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: K
+  output_unit: K
+  source_unit_aliases: k|kelvin
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: pr
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: mm
+  output_unit: mm
+  source_unit_aliases: mm
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: pet
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: mm
+  output_unit: mm
+  source_unit_aliases: mm
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: etr
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: mm
+  output_unit: mm
+  source_unit_aliases: mm
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: rmax
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '%'
+  output_unit: '%'
+  source_unit_aliases: '%|percent'
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: rmin
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '%'
+  output_unit: '%'
+  source_unit_aliases: '%|percent'
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: sph
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '1'
+  output_unit: '1'
+  source_unit_aliases: kg/kg|kgkg-1|kgkg^-1|1
+  conversion: identity
+  database_tolerance: 1.0e-08
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: vpd
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: kPa
+  output_unit: kPa
+  source_unit_aliases: kpa
+  conversion: identity
+  database_tolerance: 1.0e-06
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: srad
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: W/m2
+  output_unit: W/m2
+  source_unit_aliases: w/m2|w/m^2|wm-2|wm^-2
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: vs
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: m/s
+  output_unit: m/s
+  source_unit_aliases: m/s|ms-1|ms^-1
+  conversion: identity
+  database_tolerance: 5.0e-06
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: th
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: deg
+  output_unit: deg
+  source_unit_aliases: degrees|degree|degreesclockwisefromnorth|degrees_clockwise_from_north
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: erc
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '1'
+  output_unit: '1'
+  source_unit_aliases: unitless|1|dimensionless
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: bi
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '1'
+  output_unit: '1'
+  source_unit_aliases: unitless|1|dimensionless
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: fm100
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '%'
+  output_unit: '%'
+  source_unit_aliases: '%|percent'
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+- code: fm1000
+  status: qualified
+  scope: native daily; point; radius 0; mean; no temporal aggregation; cached 2025
+    files; Feb 6-9; three sites
+  native_unit: '%'
+  output_unit: '%'
+  source_unit_aliases: '%|percent'
+  conversion: identity
+  database_tolerance: 0.0001
+  evidence_id: paired-2026-11-09
+  scientific_review: pending
+evidence:
+- id: paired-2026-11-09
+  file: evidence/VERIFICATION.json
+  sha256: 481880da45a636b79422acdc1b27661af54aa152dfb49e79d512366bffdfef9b

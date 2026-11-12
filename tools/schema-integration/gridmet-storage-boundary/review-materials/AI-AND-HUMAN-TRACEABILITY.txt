@@ -1,0 +1,40 @@
+AI ASSISTANCE, HUMAN DECISIONS AND DETERMINISTIC ENFORCEMENT
+Documentation revision: 12 November 2026. Review copy; no runtime/code/repository change or push.
+
+POLICY
+Use AI assistance for development, test design, review and documentation. Trace every maintained rule to its authority, implementation, test evidence and human approval status. Humans establish unit authority, temporal meaning, request-to-result binding, provenance truth and acceptance policies. AI suggestions, deterministic test results and human decisions are distinct evidence types. No live AI model is used to decide acceptance in this implementation.
+
+START HERE
+stage-traceability.csv: 13 stages, inputs/authority, AI assistance, human decisions, code, outputs, evidence and limits.
+sql-rule-register.csv: every current generated storage SQL rule, exact SQL, authority artifact hash, suite references and blank human decision fields.
+boundary-rule-families.csv: non-SQL/schema/geometry/recording/source-unit/readback/publication families.
+human-review-decisions.csv: six explicit decision areas; all pending until an actual reviewer completes them.
+dependency-and-execution-register.csv: required setup packages, optional engine, build/authoring tools and publication filesystem behavior.
+
+WHAT IS KNOWN ABOUT AI USE
+This revision was prepared with AI-assisted inspection, documentation, inventory mapping and presentation changes. There is no complete independently verified historical per-file/per-line AI authorship log. Earlier contributions are not retroactively asserted as human-authored, AI-authored or approved. Stage recommendations describe permitted assistance, not proof of a particular historical action.
+
+HOW THE FLOW WORKS
+1. Humans select authoritative metadata and scientific policy. AI may propose mappings; it cannot establish authority by generating plausible text.
+2. LinkML and build QA compile versioned contracts/catalog/SQL. Code generation is deterministic; correct generation does not establish correct scientific definitions. Successful build status is separate from scientific approval.
+3. Users provide ordinary Amadeus variables, dates, sites and scientific arguments. Existing Amadeus checks and science remain unchanged. The optional explicit recorder observes calls/sources/outputs alongside execution; Amadeus does not depend on it.
+4. After calculate returns, export consumes actual results and recorded context. Deterministic R, JSON Schema and SQL enforce the scoped contract. The pilot example_gridmet.R orchestration and schema_validator.R checks are not used by this current architecture. Existing Amadeus internal checks remain.
+5. Parquet typing and full-column readback support storage fidelity. They cannot alone establish scientific units, physical time, completeness or true history. SQL and shared boundary checks still execute automatically after calculation.
+6. DuckDB load, integrity/fidelity/reopen checks precede completed publication. File manifests bind owned outputs/receipts. Saved query checks bytes and bindings at open; raw sources are not reread. Read-only bits and unsigned hashes are not production immutability/authentication.
+7. Humans review evidence, resolve scientific questions, qualify independent environments and approve a bounded release. Machine acceptance is not human approval; scientific sign-off and independent replay remain pending.
+
+RULE CHANGE PROCEDURE
+Assign a stable rule ID. Record the source/version/hash and why it is authoritative. Distinguish observed source facts from approved policy and assumptions. Identify code/SQL/contract location and exact supported dataset/method scope. Record AI assistance (tool/model/version/date when actually known, prompt or artifact reference where appropriate), human edits and review. Unknown attribution stays unknown.
+Add a valid control, a minimally invalid case expected to fail and relevant edge cases; retain observed outcomes and exact code/input/release identities. Identify evidence as current versus historical and direct rule-level versus suite-level. Human reviewer records name/date/decision/rationale and approved scope/hash. On changes, rebuild affected artifacts, rerun affected tests and invalidate prior approval for changed semantics. Preserve earlier versions and unresolved issues. This is a proposed maintenance procedure documented here, not a newly implemented approval service or automatic runtime blocker.
+
+COVERAGE AND APPROVAL LIMITS
+SQL inventory enumerates current storage-contract/rules.json exactly. Non-SQL entries are rule families, not exhaustive individual JSON Schema keywords, R branches, all generated integrity statements or dependency internals. Suite-level evidence does not prove each rule independently rejects a mutation. Full per-rule test linkage, authoritative scientific citations and completed human approvals remain work to do. This update establishes the tracking structure and exposes those gaps; it does not claim completed universal traceability.
+Existing evidence remains unchanged: historical 504 gate observations, current 26 publication checks, current 336 direct source comparisons and 4/336/4 cases are different suites/versions. No scientific, performance or cross-environment retest was performed for this documentation revision. Historical timings are not the latest corrected release's full-workflow benchmark.
+
+REVIEW NEXT
+Complete six human-review areas; resolve source authority and physical interval questions first. Link negative tests to individual rules and expand beyond populated classes where needed. Run independent/affected-environment replay. Agree supported dependencies and publication guarantees. Review the updated deck/diagrams and then choose a review-branch scope. Do not infer production approval from an acceptance receipt or this documentation.
+
+REGISTER COUNTS AND DEPENDENCY DETAIL
+The rule register contains 60 generated storage-boundary SQL rules, distinct from the adapter's 102 SQL integrity queries. Do not equate either count with full model coverage. The 102-query suite remains aggregate evidence; individual additional integrity statements are not yet represented by separate review rows.
+The current export_gridmet function explicitly requires all ten setup packages, including yaml and ncdf4, even when a specific branch does not call every package. The dependency register describes their roles, not permission to omit a currently required package. No arrow/nanoparquet or AI service is introduced by this update; current Parquet I/O is through DuckDB. Core Amadeus transitive spatial/OS dependencies still apply. Package availability checks do not prove cross-environment equivalence.
+The implementation directory and embedded release ZIP are frozen evidence/reference copies with their original documentation dates. New governance guidance is at this review root. It does not retroactively rewrite archived receipts or attach completed approvals to an earlier build. The new decision records are external review documents and are not cryptographically bound into the runtime approval protocol by this documentation-only revision.

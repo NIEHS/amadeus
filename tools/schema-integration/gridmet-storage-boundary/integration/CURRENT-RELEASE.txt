@@ -1,0 +1,1 @@
+Current storage-boundary publication-v2. Start with ../README.md and ../docs/RUNBOOK.md. Runtime fingerprints unchanged. Archived earlier-iteration guidance is omitted. Scientific approval and independent replay remain pending.

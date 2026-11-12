@@ -1,0 +1,5 @@
+{
+  "export_elapsed_seconds": 9.829,
+  "main_process_high_water_MiB": 976.8047,
+  "scope": "export elapsed only; memory high-water includes earlier work in this R process; not attributable to export alone"
+}

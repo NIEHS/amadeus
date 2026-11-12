@@ -1,0 +1,7 @@
+Decision ID,Review area,Question,Required supporting evidence,Reviewer,Date,Decision,Rationale,Approved scope/version/hash,Follow-up / retest
+H01,Unit authority,"Do quantity, source units, aliases, scale/offset and native output meaning agree?",evidence/sci.csv; approval/catalog.json; source facts,,,pending,,,
+H02,Temporal meaning,"What physical interval does each daily label represent, and what inclusivity/calendar applies?",Source CF documentation; request policy; direct comparison,,,pending,,,
+H03,Request-to-result binding,"Are the exact requested variables, sites, dates and method bound to outputs?",stage-traceability.csv; SQL membership/expected rules; execution evidence,,,pending,,,
+H04,Provenance truth,"Which observations support history, and what cannot be reconstructed or authenticated?",recording/audit/truth evidence; unsigned-trust limitations,,,pending,,,
+H05,Acceptance policy,"When should missingness, nonfinite values or quality flags reject publication?",finite_native/expected rules; dataset-specific scientific justification,,,pending,,,
+H06,Deployment / release,Is independent replay complete and are storage/trust/recovery controls adequate?,evidence/replay.csv; publication tests; filesystem policy,,,pending,,,

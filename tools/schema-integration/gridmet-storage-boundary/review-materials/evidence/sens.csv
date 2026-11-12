@@ -1,0 +1,4 @@
+workload,comparison,paired_repetitions,excluded_block,median_paired_seconds,median_paired_percent
+all16,pilot minus ordinary,4,all16-3; interactive-session pause split arms,51.691593647003195,280.20968852597235
+all16,candidate minus ordinary,4,all16-3; interactive-session pause split arms,67.087328672409,377.3040714621303
+all16,candidate minus pilot,4,all16-3; interactive-session pause split arms,16.5304501056671,23.910858039861793

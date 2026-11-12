@@ -1,0 +1,9 @@
+{
+  "build_passed": true,
+  "package_codes": 33,
+  "qualified_codes": 16,
+  "catalog_sha256": "c449d18be83564f7cd0a5b6a9ff8e70b67d6da17fc581eb73efe70b52f36e55c",
+  "compiled_registry_sha256": "3db4e6467fd400a4927217d14d3d7a2f4dc563d225bdc7d5900800fe089cea5c",
+  "reviewed_profile_sha256": "e2769decf53477f26ecbaf4bfb40bf0540f2a8d9186ecf2221c650557cfe5b72",
+  "external_imported": false
+}

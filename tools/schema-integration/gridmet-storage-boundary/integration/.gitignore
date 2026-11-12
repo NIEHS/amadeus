@@ -1,0 +1,5 @@
+outputs/
+.Rhistory
+.RData
+.Rproj.user/
+local-inputs/

@@ -1,0 +1,22 @@
+IMPLEMENTATION REVIEW — AMADEUS SCHEMA INTEGRATION AT THE STORAGE BOUNDARY
+9 November2026. New isolated corrected publication release; nothing pushed.
+
+STEP1 — CONSOLIDATED CORRECTED RELEASE
+The successful-build guard is in the current runtime, not a deferred patch. Build QA/pins regenerated. Fresh4-result,336-result and4-result source-removal cases each passed102 SQL checks and completed publication. The4/336 native result sets match prior ordinary-Amadeus reference values exactly. Actual source/derived assets, calls, ordinary RDS, recording and saved DB values/units independently audited. Earlier development runs are retained separately; current evidence is outputs/final-*.
+
+STEP2 — SAVED DATABASE INTEGRITY
+The producer binds accepted records, schema/release, Parquet, DB receipt and recording into a publication manifest after load/fidelity/reopen. Critical files are marked readonly. Completion binds manifest SHA and then publishes the final pointer. The saved-query command verifies once per store open and opens DuckDB readonly. It does not reread provider NetCDF files.
+All26 publication tests passed, including edited DB values, corrupted/truncated files, changed/missing receipts, false/missing build status, missing manifest coverage, WAL, relocation and actual query rejection of a changed DB. A controlled blocked load leaves schema acceptance but no workflow completion or pointer advance; fresh-directory retry passes. Query also succeeds after owned copied raw files are removed. The schema-only option remains valid and is not misrepresented as a database publication.
+These are unsigned local integrity guarantees, not privileged adversary attestation, concurrency safety or full power-loss durability. Direct DBI/IDE bypasses the guard. See docs/IMPLEMENTATION.txt and limitations.csv.
+
+STEP3 — SCIENTIFIC AND INDEPENDENT REVIEW
+All336 values match independent ncdf4 nearest-coordinate reads with supported CF calendar/date and scale/offset decoding, within declared tolerances. This strengthens source mapping evidence, not provider accuracy or scientific approval of physical time/units/method.16 unit-review rows and review questions are ready for a domain reviewer. The one-command replay tool passed locally and captures environment diagnostics even after a workflow failure. Independent colleague/target-environment replay remains NOT RUN. Scientific catalog status and production approval remain pending/false.
+
+COST
+Warm-cache verification of11 owned artifacts (about15-16MB) had a median near0.13seconds per store open in3 samples per size. This excludes R startup/DB connect/query/science. It is not a new full-workflow speed/memory benchmark. The prior45-run comparison remains unchanged and does not measure this release. Verification is repeated per open, not per statement on a managed connection; no stat-only integrity cache is trusted.
+
+DEPENDENCIES AND SCIENCE
+No new R packages or runtime Python; core Amadeus is unchanged and does not depend on optional helpers. Publication adds explicit filesystem mode/pointer behavior, with a setup probe. Ordinary calls and point-profile science are preserved. Current coverage is16 native daily gridMET variables, not all33 codes or all datasets/backends. External metadata import is not added. Review forms are not runtime inputs.
+
+NEXT ACTION
+A human completes scientific/unit/physical-time/scope decisions and an independent colleague runs docs/TEAM-REPLAY.txt on a supported environment, preferably including the previously affected stack. Record actual code/source/environment identities and outcomes in review/. Do not clear pending/production flags automatically. Decide actual deployment immutability/access control and durability requirements before production. Archive the release and records in durable storage; /tmp is temporary.

@@ -1,0 +1,4 @@
+case,records,workflow_completed,SQL_checks,persistent_reopen,published_files,manifest_verified,run
+final-small,4,True,102,True,11,True,/tmp/gridmet-storage-release.z6v56_9e/outputs/final-small/direct-c81f0ec28ed71101
+final-full,336,True,102,True,11,True,/tmp/gridmet-storage-release.z6v56_9e/outputs/final-full/direct-759970a5c1d0f90f
+final-portable,4,True,102,True,11,True,/tmp/gridmet-storage-release.z6v56_9e/outputs/final-portable/direct-ac3c8cbc161968cf

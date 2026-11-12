@@ -1,0 +1,68 @@
+{
+  "monitor_revision": "external-telemetry-v1",
+  "variant": "storage-parquet",
+  "status": "succeeded",
+  "error": null,
+  "started_utc": "2026-11-09T19:43:17Z",
+  "finished_utc": "2026-11-09T19:43:20Z",
+  "elapsed_seconds": 2.793,
+  "elapsed_scope": "monitor initialization to finalization; interpreter startup and final summary writing excluded",
+  "stage_elapsed_sum_seconds": 2.771,
+  "main_R_peak_RSS_MiB": 185.3203125,
+  "main_R_peak_method": "Linux VmHWM when available; includes monitoring in main process",
+  "memory_sampling_status": "Linux procfs sampled",
+  "sampling_interval_seconds": 1,
+  "memory_samples": 3,
+  "sampled_main_R_peak_RSS_MiB": 132.488281,
+  "sampled_workload_tree_RSS_sum_peak_MiB": 132.488281,
+  "memory_limitations": "Sampling may miss peaks. Tree sum excludes telemetry subtree and can double-count shared memory. Not unique physical RAM, file size or R object size.",
+  "request": {
+    "variables": [
+      "tmmx",
+      "pr"
+    ],
+    "sites": 1,
+    "start": "2025-02-10",
+    "end": "2025-02-11",
+    "inclusive_days": 2,
+    "expected_values": 4
+  },
+  "acquisition": {
+    "existed_before_call": {
+      "tmmx": null,
+      "pr": null
+    },
+    "selected_source_bytes_after_call": 210925985,
+    "note": "Existence indicates requested reuse; it does not prove freshness, actual network bytes or source integrity"
+  },
+  "schema_accepted": false,
+  "accepted_records": null,
+  "integration_revision": null,
+  "selected_engine": "duckdb",
+  "database": [],
+  "code": {
+    "git_commit": null,
+    "file_SHA256": {
+      "R/schema_export.R": "869560b7d6d9c917d10ce5543d1f4b64a4c80e0a0f242ccd3f16cb6443dd7756",
+      "R/storage_boundary.R": "7311792a24a5821a50c624951e3e192a2e5c8c0bbd9745c5f2f5d97d3d8b0fa0",
+      "R/database.R": "9b43d3565b7a33d9fb42d58b3377e26d03c0a0c01dc3d80a5a1827731781cc9e",
+      "R/performance.R": "b910344125b0ada71294b0770baac57783c480143f772ad6f342252cd665ebd0",
+      "R/performance_sampler.sh": "9c74cc4f716cdf3cc8cde7ffe19528132463c2b5bc2c03b1e3d80d9725403f16"
+    }
+  },
+  "R_version": "R version 4.3.2 (2023-10-31)",
+  "platform": "x86_64-pc-linux-gnu",
+  "packages": {
+    "amadeus": "2.0.4",
+    "terra": "1.9.48",
+    "sf": "1.1.3",
+    "ncdf4": "1.22",
+    "jsonlite": "2.0.0",
+    "jsonvalidate": "1.5.0",
+    "digest": "0.6.33",
+    "duckdb": "1.1.3",
+    "sedonadb": null
+  },
+  "monitoring_issues": [],
+  "production_approved": false
+}

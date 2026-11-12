@@ -1,0 +1,3 @@
+Packaging checks, 12 November 2026
+Saved query executed using this relocated integration and included demo: four results returned after automatic manifest verification. Portable publication_tests.R ran 26 cases; all passed. R sources parsed (22); replay.sh shell syntax passed. A missing-file warning is expected in the deliberately missing workflow test. No live scientific execution, fresh provider download, full benchmark or independent-environment test was performed for packaging.
+The first path adaptation exposed a report-directory assumption; it was corrected in the test script and the complete 26-case suite rerun in new scratch. Only test paths changed, not runtime logic. Original test logic is compared in TEST-PATH-CHANGES.diff.

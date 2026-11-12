@@ -1,0 +1,5 @@
+"variable","site_id","date","value","call_key"
+"tmmx","raleigh","2025-02-10",279.1,"calculate/tmmx/raleigh"
+"tmmx","raleigh","2025-02-11",274.7,"calculate/tmmx/raleigh"
+"pr","raleigh","2025-02-10",0,"calculate/pr/raleigh"
+"pr","raleigh","2025-02-11",14.8,"calculate/pr/raleigh"

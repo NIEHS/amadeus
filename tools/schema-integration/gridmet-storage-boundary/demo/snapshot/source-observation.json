@@ -1,0 +1,10 @@
+{
+  "tmmx": {
+    "path": "/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/tmmx/tmmx_2025.nc",
+    "sha256": "b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746"
+  },
+  "pr": {
+    "path": "/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/pr/pr_2025.nc",
+    "sha256": "d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7"
+  }
+}

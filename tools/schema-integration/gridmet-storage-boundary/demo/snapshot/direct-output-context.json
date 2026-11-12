@@ -1,0 +1,14 @@
+{
+  "recorded_context_integrity_verified": true,
+  "recording_seal_sha256": "b2d0953fbf0b276b544f10c2d32ded212ca66ead09742cff7b1f7c3073dbc302",
+  "observer_trust": "Unkeyed local evidence; not independent execution attestation",
+  "interface": "recorded-direct-output-v1",
+  "execution_context": "explicit start/finish brackets; not independently attested",
+  "source_identity_scope": "recorded_before_processing; not independently attested",
+  "source_unchanged_during_science_established": false,
+  "scientific_calls_performed_by_writer": false,
+  "serialization_performed_after_calculation": true,
+  "call_package_version": "2.0.4",
+  "provenance_complete": false,
+  "production_approved": false
+}

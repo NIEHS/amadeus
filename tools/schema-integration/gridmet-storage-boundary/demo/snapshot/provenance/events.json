@@ -1,0 +1,67 @@
+[
+  {
+    "previous": "GENESIS",
+    "payload_json": "{\"sequence\":1,\"kind\":\"recording_started\",\"observed_epoch\":1794253377.94114,\"data\":{\"package_version\":\"2.0.4\",\"request_sha256\":\"731d053540849d1326a5b0652dbd680a37a4550824f80f17d088665c3dce9e33\"}}",
+    "sha256": "149b874e46f3ab9e0e5a154c38ed87faa9f3f6396cded69e73a5799579e5d5ab"
+  },
+  {
+    "previous": "149b874e46f3ab9e0e5a154c38ed87faa9f3f6396cded69e73a5799579e5d5ab",
+    "payload_json": "{\"sequence\":2,\"kind\":\"call_started\",\"observed_epoch\":1794253377.94612,\"data\":{\"key\":\"download\",\"role\":\"download\",\"function_name\":\"download_data\",\"arguments\":{\"dataset_name\":\"gridmet\",\"variables\":[\"tmmx\",\"pr\"],\"year\":2025},\"body_sha256\":\"a6402bf1fefd926782d377b455d4948fe37968743fac2248d0610ed59a09b199\"}}",
+    "sha256": "b65d2f57ba5ce368cf785bfe07d1eb59807d0670bab0d465a4039fe7949ce98d"
+  },
+  {
+    "previous": "b65d2f57ba5ce368cf785bfe07d1eb59807d0670bab0d465a4039fe7949ce98d",
+    "payload_json": "{\"sequence\":3,\"kind\":\"call_finished\",\"observed_epoch\":1794253388.14834,\"data\":{\"key\":\"download\",\"outcome\":\"succeeded\",\"output_evidence\":{\"kind\":\"R_object\",\"sha256\":\"71557d1c8bac9bbe3cbec8d00bb223a2f372279827064095447e569fbf5a760a\"}}}",
+    "sha256": "7c9961f5407fc2036594584907353d302169d6bdafca34a8b4a374024dc07d9c"
+  },
+  {
+    "previous": "7c9961f5407fc2036594584907353d302169d6bdafca34a8b4a374024dc07d9c",
+    "payload_json": "{\"sequence\":4,\"kind\":\"source_observation\",\"observed_epoch\":1794253389.82565,\"data\":{\"observed_epoch\":1794253388.14981,\"files\":{\"tmmx\":{\"path\":\"/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/tmmx/tmmx_2025.nc\",\"sha256\":\"b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746\"},\"pr\":{\"path\":\"/ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/pr/pr_2025.nc\",\"sha256\":\"d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7\"}}}}",
+    "sha256": "ef194569f9fe0b83537b1fccdacb29fce4573b0882cb09b309084a233a6d56ca"
+  },
+  {
+    "previous": "ef194569f9fe0b83537b1fccdacb29fce4573b0882cb09b309084a233a6d56ca",
+    "payload_json": "{\"sequence\":5,\"kind\":\"call_started\",\"observed_epoch\":1794253389.85591,\"data\":{\"key\":\"process/tmmx/raleigh\",\"role\":\"process\",\"function_name\":\"process_covariates\",\"arguments\":{\"covariate\":\"gridmet\",\"variable\":\"tmmx\",\"site_id\":\"raleigh\",\"dates\":[\"2025-02-10\",\"2025-02-11\"],\"extent\":[-78.7582,-78.5182,35.6596,35.8996]},\"body_sha256\":\"f266582ec96702a634c6b1bd9d3e5e86b6d561b799f72d02b2a675141cbc4a63\"}}",
+    "sha256": "25bbd49ddb985d438683127332d7f8d4581940c172253bbe7ef04020c34bff53"
+  },
+  {
+    "previous": "25bbd49ddb985d438683127332d7f8d4581940c172253bbe7ef04020c34bff53",
+    "payload_json": "{\"sequence\":6,\"kind\":\"call_finished\",\"observed_epoch\":1794253390.09249,\"data\":{\"key\":\"process/tmmx/raleigh\",\"outcome\":\"succeeded\",\"output_evidence\":{\"kind\":\"raster_metadata_only\",\"sha256\":\"d9d851a3e3737abd915ff74cbc45e12e5836537a1cde7653276561bf8887934b\"}}}",
+    "sha256": "100ad44b2bac8e0c3d59fb4986180bf0d6bf9b7ecc7f8f91339f185b3a162c08"
+  },
+  {
+    "previous": "100ad44b2bac8e0c3d59fb4986180bf0d6bf9b7ecc7f8f91339f185b3a162c08",
+    "payload_json": "{\"sequence\":7,\"kind\":\"call_started\",\"observed_epoch\":1794253390.29378,\"data\":{\"key\":\"calculate/tmmx/raleigh\",\"role\":\"calculate\",\"function_name\":\"calculate_covariates\",\"arguments\":{\"covariate\":\"gridmet\",\"variable\":\"tmmx\",\"site_id\":\"raleigh\",\"radius\":0,\"fun\":\"mean\",\"by_time\":\"NULL; existing daily gridMET route\",\"geom\":false},\"body_sha256\":\"c73174e7b43bf6ee1a771ff2a84fa56f7f8535c082e935f2371d4e927388faef\"}}",
+    "sha256": "11c339b5b6d59666e204d4d107925b98ca25e6a84437a7aa4ba9dcf759fc977d"
+  },
+  {
+    "previous": "11c339b5b6d59666e204d4d107925b98ca25e6a84437a7aa4ba9dcf759fc977d",
+    "payload_json": "{\"sequence\":8,\"kind\":\"call_finished\",\"observed_epoch\":1794253390.56781,\"data\":{\"key\":\"calculate/tmmx/raleigh\",\"outcome\":\"succeeded\",\"output_evidence\":{\"kind\":\"R_object\",\"sha256\":\"f1a11726725e33d3e0a7e81cbf7809369f7c9f850a543963b14bb700c1d025e9\"}}}",
+    "sha256": "3a520cf89d6cb000b723cc100556b5d1d2cad8d81a8d459e3f2425000fb2b70a"
+  },
+  {
+    "previous": "3a520cf89d6cb000b723cc100556b5d1d2cad8d81a8d459e3f2425000fb2b70a",
+    "payload_json": "{\"sequence\":9,\"kind\":\"call_started\",\"observed_epoch\":1794253390.56981,\"data\":{\"key\":\"process/pr/raleigh\",\"role\":\"process\",\"function_name\":\"process_covariates\",\"arguments\":{\"covariate\":\"gridmet\",\"variable\":\"pr\",\"site_id\":\"raleigh\",\"dates\":[\"2025-02-10\",\"2025-02-11\"],\"extent\":[-78.7582,-78.5182,35.6596,35.8996]},\"body_sha256\":\"f266582ec96702a634c6b1bd9d3e5e86b6d561b799f72d02b2a675141cbc4a63\"}}",
+    "sha256": "e47ec128dff99750dfaf41f507044dfa3c9884c2b4069bcf4eea07434a91fc8f"
+  },
+  {
+    "previous": "e47ec128dff99750dfaf41f507044dfa3c9884c2b4069bcf4eea07434a91fc8f",
+    "payload_json": "{\"sequence\":10,\"kind\":\"call_finished\",\"observed_epoch\":1794253390.6597,\"data\":{\"key\":\"process/pr/raleigh\",\"outcome\":\"succeeded\",\"output_evidence\":{\"kind\":\"raster_metadata_only\",\"sha256\":\"04c970814b0a5eab707d0146227f6f26156a1bc5f68e1e105286390ee93a5435\"}}}",
+    "sha256": "1bb474599c656a0e7c5ee3b299809dad078d67950ec28b9cd1baf1db664ca212"
+  },
+  {
+    "previous": "1bb474599c656a0e7c5ee3b299809dad078d67950ec28b9cd1baf1db664ca212",
+    "payload_json": "{\"sequence\":11,\"kind\":\"call_started\",\"observed_epoch\":1794253390.70946,\"data\":{\"key\":\"calculate/pr/raleigh\",\"role\":\"calculate\",\"function_name\":\"calculate_covariates\",\"arguments\":{\"covariate\":\"gridmet\",\"variable\":\"pr\",\"site_id\":\"raleigh\",\"radius\":0,\"fun\":\"mean\",\"by_time\":\"NULL; existing daily gridMET route\",\"geom\":false},\"body_sha256\":\"c73174e7b43bf6ee1a771ff2a84fa56f7f8535c082e935f2371d4e927388faef\"}}",
+    "sha256": "55dc52d5573afc031fa7019609738dbb35d7f7609c4bf5e826b24326d295ae0f"
+  },
+  {
+    "previous": "55dc52d5573afc031fa7019609738dbb35d7f7609c4bf5e826b24326d295ae0f",
+    "payload_json": "{\"sequence\":12,\"kind\":\"call_finished\",\"observed_epoch\":1794253390.75249,\"data\":{\"key\":\"calculate/pr/raleigh\",\"outcome\":\"succeeded\",\"output_evidence\":{\"kind\":\"R_object\",\"sha256\":\"35712ec3bae02ecbb55d4c65ccd9fcee60b2a0fa6507749ad5b8e0d9021aa5af\"}}}",
+    "sha256": "c28be58113eaf69d60ac4833cc5825ce71d2fd72ca064afde25fbcb5017f0b25"
+  },
+  {
+    "previous": "c28be58113eaf69d60ac4833cc5825ce71d2fd72ca064afde25fbcb5017f0b25",
+    "payload_json": "{\"sequence\":13,\"kind\":\"recording_sealed\",\"observed_epoch\":1794253390.75418,\"data\":{\"calls\":5}}",
+    "sha256": "a166058934829818c853a032c3d9fcdb0b484e5e811cab85a621dae545c4619e"
+  }
+]

@@ -1,0 +1,20 @@
+area,applies_to,limitation,next_action
+Release build-status guard,Candidate,See runtime-release-metadata-probes.csv; candidate loader may omit explicit successful-build flag check,Require successful build status before artifact use; do not mistake hash consistency for approval
+Scientific unit approval,Both,Identity consistency enforced; scientific sign-off pending,Review source aliases/native units/tolerances before approval
+Source authority,Both,Amadeus labels and supported-code inventory are not provider scientific truth,Maintain reviewed field authorities; preserve observed source metadata
+Qualification scope,Both,16 native daily variables; point/radius0/mean; bounded year/dates/sites; approval links archived summary evidence rather than independently attested per-code executions,Do not call33 codes or all dataset behaviors onboarded
+Record provenance truth,Both record gates,Valid-shaped false historical claims may pass a record-only gate,Use caller evidence audit; candidate recorder checks supplied context separately
+Recorder trust,Candidate,"Hashes/event chain are local, unsigned and editable by a trusted caller",Protected releases/review; external attestation if required
+Acquisition provenance,Both,Cached file observation and download route call do not prove original acquisition history,Record reuse explicitly; do not invent earlier acquisition events
+Raster fingerprint,Candidate,"Recorder hashes raster metadata, not every in-memory pixel",Source/file/output and independent scientific audits remain relevant
+Parquet semantics,Both,Pinned JSON/catalog sidecars and receipts bind the contract; no claim full LinkML semantics are embedded/enforced by the footer. Typing/readback alone do not prove units or scientific truth,Retain generated/shared semantic rules at storage boundary
+Saved database tamper,Both,Probe modifies an owned DB copy after load,Use results below; current saved-query trust may need DB identity verification
+Recovery,Candidate test,Owned-worker SIGTERM test is bounded; not power-loss/atomic-publication proof,Document partial staging and retry; broader recovery qualification
+Cross-environment replay,Both,Fresh processes on this host are not another tester/container,Team replay package; affected environment test remains pending
+Backend coverage,Both,This study runs DuckDB; no new Sedona or amadeusdb equivalence proof,Qualify separately; do not inherit another backend result
+Physical time and full model,Both,Date-label preservation not complete physical interval approval; many classes unpopulated,Keep existing scientific/time/full-model issues visible
+Performance generalization,Both,"N5 paired sequential local cached-source tests; common TIFF handoff, not fastest possible in-memory Amadeus; warm filesystem after source hashing; shared-host/network-preflight variability possible",Report distributions; no universal speed claim or extrapolated production numbers
+Memory meaning,All,Sampled process-tree sum may double count shared pages and miss peaks,Keep HWM and sampled tree metrics separate; not unique physical RAM
+Live download,All,Existing annual files reused; provider preflight may still access network,Separate acquisition benchmark not executed here
+User burden,Both integrations,Optional recording/export or pilot CLI adds work beyond plain Amadeus,Document actual caller steps; no core package dependency implied
+Long-lived contract reload,Candidate,Storage cache keyed by root; tests use fresh R processes,Use fresh process/immutable versioned paths; hot reload not qualified

@@ -1,0 +1,39 @@
+ARCHIVED RELEASE GUIDE. For current clone paths and commands, use RUNBOOK.md in this directory. Historical expected counts/paths below are evidence context.
+
+INDEPENDENT REPLAY — CORRECTED STORAGE-BOUNDARY RELEASE
+
+Save/extract the review ZIP in your own folder. Work from that folder. Use your installed Amadeus and documented integration dependencies; core package code must remain unchanged. The source cache contains variable/variable_2025.nc. Missing files may trigger ordinary provider downloads. No annual NetCDF files are included in the ZIP.
+
+1. Check dependencies and intended output filesystem (parent must already exist):
+Rscript integration/check_setup.R /path/to/output-parent
+Do not interpret the recorded successful-host versions as universal minimums. Capture your actual environment. The previously affected Ubuntu/R4.6/terra1.9.50 stack is a useful independent target, not a requirement for every user.
+
+2. Run a small ordinary request with a NEW output path:
+sh tests/replay.sh /path/to/output-parent/my-small tmmx,pr 2025-02-10 2025-02-11 inputs/small-sites.csv /path/to/raw-cache
+Expected:4 finite values; schema acceptance; completed workflow;102 SQL checks; manifest; verified saved query; direct-source checks. The wrapper is test-only convenience. The actual example calls ordinary Amadeus functions and then the post-calculation writer; no scientific dispatcher or package hook is added.
+
+3. Run all16 qualified native daily variables:
+sh tests/replay.sh /path/to/output-parent/my-full tmmx,tmmn,pr,pet,etr,rmax,rmin,sph,vpd,srad,vs,th,erc,bi,fm100,fm1000 2025-02-10 2025-02-16 inputs/sites.csv /path/to/raw-cache
+Expected:336 finite values for3 locations/7days plus the same acceptance/publication/verification checks. These codes are qualified only within the stated scientific profile; other17 recognized codes are not onboarded by this test.
+
+4. Inspect output:
+replay.log: ordinary scientific calls and export/load outcome.
+environment.json: package versions, source function body hashes, spatial libraries and install provenance where available.
+LATEST.txt: completed publication path.
+query.log: automatic manifest verification plus record count.
+source-checks/: test-only independent ncdf4 comparisons and supported-read coverage.
+replay-summary.txt: qualification exit status. Nonzero can reflect scientific execution, integration, query or separate source QA; inspect the corresponding log. Successful mechanical publication is not human scientific approval.
+The direct source test requires the original bytes to still exist and match their recorded SHA. A verified saved database query alone does not require them. For arbitrary user-selected dates/sites, numeric comparison to owner reference values is meaningful only when the request, code and source identities match.
+
+5. Query records after publication (replace RUN with the path from your LATEST.txt):
+Rscript integration/R/database.R RUN duckdb 'SELECT id,value,value_unit_ucum,processing_run FROM "AmbientValueAtLocation" LIMIT 20'
+This command verifies once at store open. A direct dbConnect/IDE query bypasses the guard. Use the matching archived integration release when querying a historical snapshot. Do not modify published files in place; create a new run.
+
+6. Return evidence to the project through the agreed team process (this pack sends nothing):
+Fill review/independent-replay-results.csv with your request, source/release identities, counts/statuses, environment and run path; attach logs/receipts or a durable location. Leave unknowns explicit. Record any local code/package changes, including process_gridmet modifications. No test success has been prefilled for you.
+
+7. Scientific review:
+A qualified domain reviewer completes scientific-unit-review.csv and scientific-review-questions.csv, including units, aliases, physical time and scope. Machine numeric agreement is supporting evidence only. The source catalog remains pending until a reviewed versioned policy/evidence update is made. No production flag changes automatically.
+
+Failure handling:
+Preserve the full new output folder and automatic environment diagnostics. Do not manually repair NA values, relabel units, rewrite manifests or turn off checks. A failed database load can leave accepted schema outputs but no workflow completion; those are not certified database publications. Retry in a NEW output directory after the cause is understood.

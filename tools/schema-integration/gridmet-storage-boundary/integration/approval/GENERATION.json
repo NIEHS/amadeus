@@ -1,0 +1,6 @@
+{
+  "source_sha256": "b6e1ccc6304d6cd75c5ee4a0947ff8e2cdca97e395eb2a402572f834fca13e18",
+  "json_schema_sha256": "a5e84c3692c9a9a5ca8397a16609daadcded6efae260e6de1485f7af9e06efc6",
+  "generator": "linkml.generators.jsonschemagen.JsonSchemaGenerator",
+  "linkml_version": "1.11.1"
+}

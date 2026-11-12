@@ -1,0 +1,46 @@
+ARCHITECTURE NAME AND OPTIONAL EXTERNAL METADATA
+Documentation amendment,9 November2026. No runtime implementation, measured inputs, test outcomes or scientific behavior changed.
+
+RECOMMENDED NAME
+Amadeus Schema Integration at the Storage Boundary
+Short reference: storage-boundary integration.
+Subtitle: Ordinary Amadeus workflows, explicit provenance recording, and schema enforcement during export and loading.
+The name describes where actual-output contract enforcement occurs. It does not imply that metadata authoring or provenance observation starts after calculation: stable definitions/catalogs are prepared at build time and calls/sources are recorded during execution. Amadeus retains scientific dispatch and execution; optional external integration accepts outputs for publication and storage.
+
+EVIDENCE LABELS
+The historical arm ID candidate and folder roots/candidate remain unchanged so commands, hashes, CSV joins and timing evidence remain traceable. In review prose, candidate means this named architecture's tested version. The separate successful-build guard remediation is qualified but is not part of the45 timed observations. Naming does not grant production approval.
+
+TEXT FOR PLANS AND PRESENTATIONS
+Dataset metadata may be supplied from Amadeus, from a reviewed external catalog, or from an explicitly governed combination of both. Maintainers normalize the selected metadata into one versioned effective catalog, validate it against the LinkML-defined contract and scientific policy, and compile the same runtime artifacts. This keeps metadata preparation out of ordinary user requests and avoids reading spreadsheets or reconciling conflicting authorities during scientific execution. External metadata must have stable dataset/product/variable keys, identifiable sources and versions, field-level authority, required-field completeness, explicit units and temporal/spatial meanings, and review/qualification evidence. Conflicts are resolved explicitly before release. At export/loading, actual source properties and calculated outputs are checked against the released contract. Metadata supplements the workflow; it does not replace observed execution provenance or authorize new scientific routes.
+
+CURRENT VS PROPOSED
+Current tested baseline: installed Amadeus mapping helpers supply recognized codes/labels; the carried-forward reviewed-policy candidate supplies native units/tolerances; NetCDF and actual execution supply observed facts. Scientific sign-off remains pending. External spreadsheet/catalog import and merge are NOT implemented or tested in this release. This amendment specifies future integration requirements, not an operational importer or a new runtime dependency.
+
+THREE METADATA MODES
+1. Amadeus-derived baseline: retain the current package code/label extraction, explicit policy fields and actual-source observations. Amadeus does not currently supply every catalog property, so missing coverage/license/canonical mappings must not be invented.
+2. External catalog baseline: a versioned external source supplies required catalog properties. Build checks still confirm that codes/routes exist in the installed supported Amadeus release and that policy/evidence is valid. Actual file units/grid/time and scientific execution history are observed independently. External metadata cannot claim a completed download/calculation, qualify a new route merely by listing it, or override conflicting physical units.
+3. Combined catalog: retain Amadeus code/label information and add or reconcile external coverage, citations, licenses, canonical mappings or other reviewed properties. Use explicit per-field authority and retain both original claims when they disagree. One effective catalog is released; do not make every runtime reader merge sources independently.
+
+MINIMUM REQUIREMENTS
+Identity: stable dataset_id, product_id/version where known and variable_code; unique composite keys; no matching by free-text label alone.
+Authority: metadata source URI/file, content hash or immutable version, extraction/import date, package version/body identity where relevant, field authority and review status.
+Completeness: required properties present or explicitly marked unknown where the model permits. Missing required units/identity/route support blocks release.
+Meaning: source unit and canonical/output unit distinct; aliases reviewed; conversion identity-only in current candidate. A future conversion needs implementation, lineage and numeric tests. Coverage records CRS and spatial representation; temporal coverage records calendar/time zone, cadence and interval meaning, without inferring coverage from function default years.
+Consistency: reject duplicate keys, unsupported codes, dangling references, incompatible field types, conflicting unit meanings and inconsistent coverage. Cross-source conflicts require a recorded resolution; never use silent last-file-wins behavior.
+Qualification: recognized/available metadata is not evidence-backed onboarding. Link approved scope to actual test artifacts and scientific review. Current local summary evidence/seal is not independent attestation.
+Publication: validate/build once per release or changed metadata input, compile one catalog/registry, pin hashes and record source-to-effective field mappings. A metadata change must identify affected variables/tests and whether schema, policy or output meaning changes.
+Runtime: users continue supplying normal Amadeus arguments. No runtime spreadsheet parsing, source merging or new dispatcher is required by this proposed design. Keep necessary checks on observed file properties and outputs at export/loading; build-time approval cannot prevalidate future data.
+Evolution: retain prior catalog versions for historical runs. Use retire/status fields and migrations where needed; do not silently reinterpret previously published results.
+
+EFFICIENCY AND MAINTAINABILITY
+Use one shared build import/normalization path and one target catalog format. Dataset-specific field mappings are explicit data/config where feasible; add extraction code only where input formats genuinely require it. A shared importer is proposed, not yet qualified across datasets. Rebuild/requalify affected inputs, not every request. Hashes identify content; an optimization that reuses prior validation needs an immutable/trusted input and the same applicable contract/policy, not merely unchanged timestamps. Preserve actual-data validation at the storage boundary. Do not promise zero runtime cost or scientifically valid semantics from Parquet typing alone.
+
+NEXT IMPLEMENTATION ORDER
+1. Consolidate the already qualified successful-build guard into a new reviewed candidate release; retain both timed snapshots. Rerun a small direct-request end-to-end test and targeted release-status/metadata drift cases against that release. Do not relabel old timing results as measurements of the corrected release.
+2. Close the demonstrated saved-database trust gap. Require valid workflow/database completion and a defined published-store identity/integrity policy. Evaluate immutable publication plus a bound manifest/hash checked at store-open or version-change. Benchmark that verification cost; do not silently add a full-file scan to every query. Rerun the owned-copy tamper and failed-load/retry tests.
+3. Complete scientific/native-unit and qualification-scope review. Record review and code-to-test evidence explicitly; keep pending/production=false until requirements are satisfied.
+4. Have an independent colleague replay a small request and all16 active variables on a supported environment, including the previously affected stack where available. Capture package/code/source identities and compare results/units/receipts; report environmental failures rather than weakening acceptance.
+5. When external metadata is ready, build-test a small import using each of the3 modes and explicit conflicts. Check required-field loss, duplicate keys, unit conflicts, unqualified codes, coverage/calendar ambiguity, catalog determinism, prior-version reproducibility and actual-output conformance. Publish one effective catalog and repeat the end-to-end request. This is a separate qualification increment, not a reason to delay the current architecture review.
+
+DECISION
+The immediate next engineering step is the corrected storage-boundary release followed by persisted-database integrity qualification. External metadata design can proceed in parallel as authoring work; importing it is deferred until the source and mappings are ready. Scientific sign-off and independent replay remain required before production adoption.

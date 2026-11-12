@@ -1,0 +1,14 @@
+Stage,Description / inputs / outputs / code / limits
+1,"Build contracts and catalog — Build once per changed release: LinkML modules, Amadeus mapping and frozen code/unit policy/evidence. QA produces pinned JSON/SQL/catalog/registry. dev/check_approval.R; validate_release.R. Scientific approval pending."
+2,"User request — Input: variables, dates, sites and paths. Ordinary Amadeus arguments; no runtime spreadsheet/metadata merge. Integration profile is 16 native daily codes, one-year point extraction."
+3,"Amadeus download — download_data(dataset_name=""gridmet"", ...). Output: source assets or reused cache. Recorder observes source identity; a route call does not prove fresh acquisition."
+4,"Amadeus process — process_covariates(covariate=""gridmet"", ...). Output: processed rasters and common TIFF handoff. Caller supplies extent/dates; no new scientific dispatcher."
+5,"Amadeus calculate — calculate_covariates(covariate=""gridmet"", ...). Output: ordinary R result frames. Native daily, radius 0 / mean, no temporal aggregation in this tested profile."
+6,"Verify recorded context — export_gridmet() after calculation verifies request, function/output and recording consistency. Input: calculated/processed outputs and explicit execution context. Local unsigned evidence."
+7,"Enforce actual-data contract — schema_export()/storage_validate(): source units, expected membership/time labels, finite values, JSON schema, geometry/references/lineage rules. Output: accepted instance or rejection."
+8,Typed Parquet and readback — Storage boundary writes/reads typed staging records; shared semantic checks remain. Adapter also materializes Parquet. No footer-only enforcement or zero-copy claim.
+9,"Load and verify DuckDB — database.R/parquet_experiment.R map/load accepted rows, run 102 SQL queries, check tolerances and reopen. Empty-table checks do not establish full-model coverage."
+10,"Bind the published snapshot — storage_publish_manifest(): hashes schema/acceptance/results/source metadata, recording, DB/receipt and accepted Parquet. Relative whitelisted paths; release and instance bindings."
+11,Complete and publish pointer — Critical files marked readonly; workflow receipt binds manifest SHA; final LATEST replacement. Failed load retains diagnostics but does not complete/advance pointer. Not multi-file crash durability.
+12,"Verify open and query — database.R RUN duckdb SQL invokes storage_verify_publication() once per open, then read-only query. Checks completion/release/file bytes; no source NetCDF reread. Direct IDE/DBI bypasses guards."
+13,Separate scientific/replay review — QA direct NetCDF comparison passed 336 values locally. Human unit/physical-time/scope sign-off and independent colleague/environment replay remain pending. Not production approval.

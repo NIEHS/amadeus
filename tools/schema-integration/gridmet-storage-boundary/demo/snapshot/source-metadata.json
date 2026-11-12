@@ -1,0 +1,54 @@
+{
+  "tmmx": {
+    "source_variable": "air_temperature",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "K",
+      "description": "Daily Maximum Temperature (2m)",
+      "long_name": "tmmx",
+      "standard_name": "tmmx",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 220,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746",
+    "bytes": 151880260,
+    "acquisition": "acquisition history not observed by post-calculation writer",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/tmmx_2025.nc"
+  },
+  "pr": {
+    "source_variable": "precipitation_amount",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "mm",
+      "description": "Daily Accumulated Precipitation",
+      "long_name": "pr",
+      "standard_name": "pr",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7",
+    "bytes": 59045725,
+    "acquisition": "acquisition history not observed by post-calculation writer",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/pr_2025.nc"
+  }
+}

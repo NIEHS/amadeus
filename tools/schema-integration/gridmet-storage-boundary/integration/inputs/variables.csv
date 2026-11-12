@@ -1,0 +1,17 @@
+"code","label","native_ucum","accepted_source_units","database_tolerance"
+"tmmx","maximum near-surface air temperature","K","k|kelvin",1e-04
+"tmmn","minimum near-surface air temperature","K","k|kelvin",1e-04
+"pr","precipitation","mm","mm",1e-04
+"pet","reference grass evaportranspiration","mm","mm",1e-04
+"etr","reference alfalfa evaportranspiration","mm","mm",1e-04
+"rmax","maximum near-surface relative humidity","%","%|percent",1e-04
+"rmin","minimum near-surface relative humidity","%","%|percent",1e-04
+"sph","near-surface specific humidity","1","kg/kg|kgkg-1|kgkg^-1|1",1e-08
+"vpd","mean vapor pressure deficit","kPa","kpa",1e-06
+"srad","surface downwelling solar radiation","W/m2","w/m2|w/m^2|wm-2|wm^-2",1e-04
+"vs","wind speed at 10 m","m/s","m/s|ms-1|ms^-1",5e-06
+"th","wind direction at 10 m","deg","degrees|degree|degreesclockwisefromnorth|degrees_clockwise_from_north",1e-04
+"erc","energy release component","1","unitless|1|dimensionless",1e-04
+"bi","burning index","1","unitless|1|dimensionless",1e-04
+"fm100","100-hour dead fuel moisture","%","%|percent",1e-04
+"fm1000","1000-hour dead fuel moisture","%","%|percent",1e-04
