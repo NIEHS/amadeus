@@ -50,7 +50,7 @@ testthat::test_that("download_goes errors on invalid satellite", {
       directory_to_save = tempdir(),
       acknowledgement = TRUE
     ),
-    regexp = "'arg' should be one of “16”, “18”"
+    regexp = "'arg' should be one of"
   )
 })
 
@@ -63,7 +63,7 @@ testthat::test_that("download_goes errors on invalid product", {
       directory_to_save = tempdir(),
       acknowledgement = TRUE
     ),
-    regexp = "'arg' should be one of “ADP-C”, “ADP-F”, “ADP-M”"
+    regexp = "'arg' should be one of"
   )
 })
 

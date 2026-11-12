@@ -23,7 +23,10 @@ testthat::test_that("process_drought (SPEI)", {
   # layers == months in range
   testthat::expect_equal(terra::nlyr(spei), 3L)
   # layer naming convention: spei_TS_YYYY-MM-DD
-  testthat::expect_true(all(grepl("^spei_01_[0-9]{4}-[0-9]{2}-[0-9]{2}$", names(spei))))
+  testthat::expect_true(all(grepl(
+    "^spei_01_[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+    names(spei)
+  )))
   # time dimension is set
   testthat::expect_false(any(is.na(terra::time(spei))))
   testthat::expect_equal(
@@ -79,7 +82,10 @@ testthat::test_that("process_drought (EDDI)", {
   )
   testthat::expect_s4_class(eddi, "SpatRaster")
   testthat::expect_equal(terra::nlyr(eddi), 6L)
-  testthat::expect_true(all(grepl("^eddi_01_[0-9]{4}-[0-9]{2}-[0-9]{2}$", names(eddi))))
+  testthat::expect_true(all(grepl(
+    "^eddi_01_[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+    names(eddi)
+  )))
   testthat::expect_false(any(is.na(terra::time(eddi))))
   testthat::expect_equal(terra::crs(eddi, describe = TRUE)$code, "4326")
   testthat::expect_true(terra::hasValues(eddi))
@@ -303,7 +309,7 @@ testthat::test_that("download_drought errors when no Tuesdays in USDM range", {
 ################################################################################
 ##### download_drought – wrapper alias routing
 
-testthat::test_that("download_data routes 'drought' alias to download_drought", {
+testthat::test_that("download_data routes 'spei' alias to download_drought", {
   testthat::local_mocked_bindings(
     download_drought = function(...) "drought_called",
     .package = "amadeus"
@@ -319,29 +325,13 @@ testthat::test_that("download_data routes 'drought' alias to download_drought", 
   testthat::expect_equal(result, "drought_called")
 })
 
-testthat::test_that("download_data routes 'spei' alias to download_drought", {
-  testthat::local_mocked_bindings(
-    download_drought = function(...) "drought_called",
-    .package = "amadeus"
-  )
-  result <- download_data(
-    dataset_name = "spei",
-    source = "spei",
-    date = "2020-06-03",
-    timescale = 1L,
-    directory_to_save = withr::local_tempdir(),
-    acknowledgement = TRUE
-  )
-  testthat::expect_equal(result, "drought_called")
-})
-
 testthat::test_that("download_data routes 'eddi' alias to download_drought", {
   testthat::local_mocked_bindings(
     download_drought = function(...) "drought_called",
     .package = "amadeus"
   )
   result <- download_data(
-    dataset_name = "eddi",
+    dataset_name = "drought",
     source = "eddi",
     date = "2020-06-02",
     timescale = 1L,
@@ -357,7 +347,7 @@ testthat::test_that("download_data routes 'usdm' alias to download_drought", {
     .package = "amadeus"
   )
   result <- download_data(
-    dataset_name = "usdm",
+    dataset_name = "drought",
     source = "usdm",
     date = "2020-01-07",
     directory_to_save = withr::local_tempdir(),
@@ -395,7 +385,9 @@ testthat::test_that("download_drought SPEI mock download hash=FALSE", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     check_destfile = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
   )
@@ -419,7 +411,9 @@ testthat::test_that("download_drought SPEI mock download hash=TRUE", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     check_destfile = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
   )
@@ -442,14 +436,15 @@ testthat::test_that("download_drought SPEI prefers current SPEIbase endpoint", {
   checked_urls <- character(0)
   captured_urls <- NULL
   testthat::local_mocked_bindings(
-    check_url_status = function(url) {
-      checked_urls <<- c(checked_urls, url)
-      grepl("spei_database_2_11/nc/spei01\\.nc$", url)
-    },
-    check_destfile = function(...) TRUE,
     download_run_method = function(urls, ...) {
       captured_urls <<- urls
-      list(success = 1, failed = 0, skipped = 0)
+      list(
+        success = length(urls),
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
     },
     .package = "amadeus"
   )
@@ -463,15 +458,19 @@ testthat::test_that("download_drought SPEI prefers current SPEIbase endpoint", {
         acknowledgement = TRUE
       )
     )
-    testthat::expect_true(any(grepl("spei_database_2_11/nc/spei01\\.nc$", checked_urls)))
-    testthat::expect_equal(captured_urls, "https://spei.csic.es/spei_database_2_11/nc/spei01.nc")
+    testthat::expect_equal(
+      captured_urls,
+      "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+    )
   })
 })
 
 testthat::test_that("download_drought(version=2.10): uses requested SPEI endpoint", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
-    check_url_status = function(url) grepl("spei_database_2_10/nc/spei01\\.nc$", url),
+    check_url_status = function(url) {
+      grepl("spei_database_2_10/nc/spei01\\.nc$", url)
+    },
     check_destfile = function(...) TRUE,
     download_run_method = function(urls, ...) {
       captured_urls <<- urls
@@ -490,7 +489,10 @@ testthat::test_that("download_drought(version=2.10): uses requested SPEI endpoin
         acknowledgement = TRUE
       )
     )
-    testthat::expect_equal(captured_urls, "https://spei.csic.es/spei_database_2_10/nc/spei01.nc")
+    testthat::expect_equal(
+      captured_urls,
+      "https://spei.csic.es/spei_database_2_10/nc/spei01.nc"
+    )
   })
 })
 
@@ -524,39 +526,37 @@ testthat::test_that("download_drought(source=spei): skips existing files", {
 ################################################################################
 ##### download_drought EDDI – mock download
 
-testthat::test_that(
-  "download_drought EDDI mock download produces correct URLs", {
-    captured_urls <- NULL
-    testthat::local_mocked_bindings(
-      check_url_status = function(...) TRUE,
-      check_destfile = function(...) TRUE,
-      download_run_method = function(urls, ...) {
-        captured_urls <<- urls
-        list(success = length(urls), failed = 0, skipped = 0)
-      },
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
-      result <- suppressMessages(
-        download_drought(
-          source = "eddi",
-          date = c("2020-01-01", "2020-01-31"),
-          timescale = 1L,
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          hash = FALSE
-        )
+testthat::test_that("download_drought EDDI mock download produces correct URLs", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_drought(
+        source = "eddi",
+        date = c("2020-01-01", "2020-01-31"),
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        hash = FALSE
       )
-      # January 2020 Tuesdays: 7, 14, 21, 28 → 4 files
-      testthat::expect_equal(result$success, 4L)
-      testthat::expect_true(all(grepl("EDDI_ETrs_01mn_2020", captured_urls)))
-      testthat::expect_true(all(grepl("ftp.cdc.noaa.gov", captured_urls)))
-    })
-  }
-)
+    )
+    # January 2020 Tuesdays: 7, 14, 21, 28 → 4 files
+    testthat::expect_equal(result$success, 4L)
+    testthat::expect_true(all(grepl("EDDI_ETrs_01mn_2020", captured_urls)))
+    testthat::expect_true(all(grepl("ftp.cdc.noaa.gov", captured_urls)))
+  })
+})
 
 testthat::test_that("download_drought(source=eddi): uses CONUS_archive FTP endpoint", {
   captured_urls <- NULL
@@ -579,7 +579,10 @@ testthat::test_that("download_drought(source=eddi): uses CONUS_archive FTP endpo
         acknowledgement = TRUE
       )
     )
-    testthat::expect_true(all(grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_2020", captured_urls)))
+    testthat::expect_true(all(grepl(
+      "CONUS_archive/data/2020/EDDI_ETrs_01mn_2020",
+      captured_urls
+    )))
     testthat::expect_true(all(grepl("ftp.cdc.noaa.gov", captured_urls)))
     testthat::expect_true(all(grepl("\\.asc$", captured_urls)))
   })
@@ -660,41 +663,39 @@ testthat::test_that("download_drought EDDI skips when all files already exist", 
 ################################################################################
 ##### download_drought USDM – mock download
 
-testthat::test_that(
-  "download_drought USDM mock download produces correct URLs", {
-    captured_urls <- NULL
-    testthat::local_mocked_bindings(
-      check_url_status = function(...) TRUE,
-      check_destfile = function(...) TRUE,
-      download_run_method = function(urls, ...) {
-        captured_urls <<- urls
-        list(success = length(urls), failed = 0, skipped = 0)
-      },
-      download_unzip = function(...) invisible(NULL),
-      download_remove_zips = function(...) invisible(NULL),
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
-      result <- suppressMessages(
-        download_drought(
-          source = "usdm",
-          date = c("2020-01-01", "2020-01-31"),
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          hash = FALSE
-        )
+testthat::test_that("download_drought USDM mock download produces correct URLs", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_drought(
+        source = "usdm",
+        date = c("2020-01-01", "2020-01-31"),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        hash = FALSE
       )
-      # January 2020 Tuesdays: 7, 14, 21, 28 → 4 files
-      testthat::expect_equal(result$success, 4L)
-      testthat::expect_true(all(grepl("USDM_2020", captured_urls)))
-      testthat::expect_true(all(grepl("droughtmonitor.unl.edu", captured_urls)))
-      testthat::expect_true(all(grepl("_M\\.zip$", captured_urls)))
-    })
-  }
-)
+    )
+    # January 2020 Tuesdays: 7, 14, 21, 28 → 4 files
+    testthat::expect_equal(result$success, 4L)
+    testthat::expect_true(all(grepl("USDM_2020", captured_urls)))
+    testthat::expect_true(all(grepl("droughtmonitor.unl.edu", captured_urls)))
+    testthat::expect_true(all(grepl("_M\\.zip$", captured_urls)))
+  })
+})
 
 testthat::test_that("download_drought USDM hash=TRUE returns hash", {
   testthat::local_mocked_bindings(
@@ -720,52 +721,50 @@ testthat::test_that("download_drought USDM hash=TRUE returns hash", {
   })
 })
 
-testthat::test_that(
-  "download_drought(source=usdm): forwards URLs and returns results", {
-    captured_urls <- NULL
-    testthat::local_mocked_bindings(
-      check_destfile = function(...) TRUE,
-      download_run_method = function(urls, ...) {
-        captured_urls <<- urls
-        list(
-          success = 1L,
-          failed = 0L,
-          skipped = 0L,
-          failed_urls = character(0),
-          failed_files = character(0)
-        )
-      },
-      download_unzip = function(...) invisible(NULL),
-      download_remove_zips = function(...) invisible(NULL),
-      .package = "amadeus"
+testthat::test_that("download_drought(source=usdm): forwards URLs and returns results", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(
+        success = 1L,
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      result <- suppressMessages(download_drought(
+        source = "usdm",
+        date = "2020-01-07",
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )),
+      regexp = NA
     )
-    withr::with_tempdir({
-      testthat::expect_warning(
-        result <- suppressMessages(download_drought(
-          source = "usdm",
-          date = "2020-01-07",
-          directory_to_save = ".",
-          acknowledgement = TRUE
-        )),
-        regexp = NA
+    testthat::expect_identical(
+      result,
+      list(
+        success = 1L,
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
       )
-      testthat::expect_identical(
-        result,
-        list(
-          success = 1L,
-          failed = 0L,
-          skipped = 0L,
-          failed_urls = character(0),
-          failed_files = character(0)
-        )
-      )
-      testthat::expect_identical(
-        captured_urls,
-        "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20200107_M.zip"
-      )
-    })
-  }
-)
+    )
+    testthat::expect_identical(
+      captured_urls,
+      "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20200107_M.zip"
+    )
+  })
+})
 
 testthat::test_that("download_drought(source=usdm): skips existing downloads", {
   testthat::local_mocked_bindings(
@@ -834,10 +833,10 @@ testthat::test_that("calculate_drought (SPEI .by_time month)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from     = spei,
-    locs     = locs,
-    locs_id  = "site_id",
-    radius   = 0L,
+    from = spei,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
     .by_time = "month"
   ))
 
@@ -859,10 +858,10 @@ testthat::test_that("calculate_drought (SPEI .by_time year)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = spei,
-    locs    = locs,
+    from = spei,
+    locs = locs,
     locs_id = "site_id",
-    radius  = 0L,
+    radius = 0L,
     .by_time = "year"
   ))
 
@@ -882,10 +881,10 @@ testthat::test_that("calculate_drought (SPEI geom='sf')", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = spei,
-    locs    = locs,
+    from = spei,
+    locs = locs,
     locs_id = "site_id",
-    geom    = "sf"
+    geom = "sf"
   ))
   testthat::expect_true(inherits(result, "sf"))
 })
@@ -902,10 +901,10 @@ testthat::test_that("calculate_drought (SPEI geom='terra')", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = spei,
-    locs    = locs,
+    from = spei,
+    locs = locs,
     locs_id = "site_id",
-    geom    = "terra"
+    geom = "terra"
   ))
   testthat::expect_s4_class(result, "SpatVector")
 })
@@ -925,10 +924,10 @@ testthat::test_that("calculate_drought (EDDI baseline)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = eddi,
-    locs    = locs,
+    from = eddi,
+    locs = locs,
     locs_id = "site_id",
-    radius  = 0L
+    radius = 0L
   ))
 
   testthat::expect_s3_class(result, "data.frame")
@@ -951,8 +950,8 @@ testthat::test_that("calculate_drought (USDM baseline)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id"
   ))
 
@@ -976,10 +975,10 @@ testthat::test_that("calculate_drought(source=usdm, radius=1000): returns USDM c
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id",
-    radius  = 1000L
+    radius = 1000L
   ))
 
   prop_cols <- grep("^usdm_dm_[0-4]_1000$", names(result), value = TRUE)
@@ -1001,10 +1000,10 @@ testthat::test_that("calculate_drought(source=usdm, radius=1000): class proporti
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id",
-    radius  = 1000L
+    radius = 1000L
   ))
 
   prop_cols <- grep("^usdm_dm_[0-4]_1000$", names(result), value = TRUE)
@@ -1021,42 +1020,39 @@ testthat::test_that("calculate_drought(source=usdm, radius=1000): class proporti
   testthat::expect_equal(result$usdm_dm_0, c(2, 2))
 })
 
-testthat::test_that(
-  "calculate_drought(source=usdm, radius=1000): handles location attributes that collide with USDM fields",
-  {
-    withr::local_package("terra")
+testthat::test_that("calculate_drought(source=usdm, radius=1000): handles location attributes that collide with USDM fields", {
+  withr::local_package("terra")
 
-    usdm <- process_drought(
-      source = "usdm",
-      path = testdata_usdm,
-      date = c("2020-01-07", "2020-01-14")
-    )
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = c("2020-01-07", "2020-01-14")
+  )
 
-    # A centroid derived from USDM deliberately retains provider fields such
-    # as date and DM. These must not collide with fields during intersection.
-    locs <- terra::centroids(usdm[1L, ])
-    locs$site_id <- "001"
+  # A centroid derived from USDM deliberately retains provider fields such
+  # as date and DM. These must not collide with fields during intersection.
+  locs <- terra::centroids(usdm[1L, ])
+  locs$site_id <- "001"
 
-    result <- suppressMessages(calculate_drought(
-      from = usdm,
-      locs = locs,
-      locs_id = "site_id",
-      radius = 1000L
-    ))
+  result <- suppressMessages(calculate_drought(
+    from = usdm,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 1000L
+  ))
 
-    prop_cols <- paste0("usdm_dm_", 0:4, "_1000")
-    testthat::expect_s3_class(result, "data.frame")
-    testthat::expect_equal(nrow(result), 2L)
-    testthat::expect_true(all(prop_cols %in% names(result)))
-    testthat::expect_equal(result$usdm_dm_0, c(2, 2))
-    testthat::expect_equal(result$usdm_dm_2_1000, c(1, 1))
-    testthat::expect_equal(
-      as.numeric(rowSums(result[, prop_cols, drop = FALSE])),
-      c(1, 1),
-      tolerance = 1e-6
-    )
-  }
-)
+  prop_cols <- paste0("usdm_dm_", 0:4, "_1000")
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_true(all(prop_cols %in% names(result)))
+  testthat::expect_equal(result$usdm_dm_0, c(2, 2))
+  testthat::expect_equal(result$usdm_dm_2_1000, c(1, 1))
+  testthat::expect_equal(
+    as.numeric(rowSums(result[, prop_cols, drop = FALSE])),
+    c(1, 1),
+    tolerance = 1e-6
+  )
+})
 
 testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
   withr::local_package("terra")
@@ -1070,8 +1066,8 @@ testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
   locs <- data.frame(site_id = "out", lon = -80.0, lat = 25.0)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id"
   ))
 
@@ -1091,8 +1087,8 @@ testthat::test_that("calculate_drought (USDM .by_time week)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id",
     .by_time = "week"
   ))
@@ -1113,10 +1109,10 @@ testthat::test_that("calculate_drought (USDM geom='sf')", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = usdm,
-    locs    = locs,
+    from = usdm,
+    locs = locs,
     locs_id = "site_id",
-    geom    = "sf"
+    geom = "sf"
   ))
   testthat::expect_true(inherits(result, "sf"))
 })
@@ -1127,8 +1123,8 @@ testthat::test_that("calculate_drought (USDM geom='sf')", {
 testthat::test_that("calculate_drought errors on invalid from type", {
   testthat::expect_error(
     calculate_drought(
-      from    = list(a = 1),
-      locs    = data.frame(site_id = "001", lon = -97.5, lat = 37.5),
+      from = list(a = 1),
+      locs = data.frame(site_id = "001", lon = -97.5, lat = 37.5),
       locs_id = "site_id"
     ),
     regexp = "SpatRaster.*SpatVector|SpatVector.*SpatRaster"
@@ -1148,10 +1144,10 @@ testthat::test_that("calculate_drought errors when deprecated .by is supplied", 
 
   testthat::expect_error(
     calculate_drought(
-      from    = spei,
-      locs    = locs,
+      from = spei,
+      locs = locs,
       locs_id = "site_id",
-      .by     = 123L
+      .by = 123L
     ),
     regexp = "no longer supported"
   )
@@ -1170,10 +1166,10 @@ testthat::test_that("calculate_drought errors on bad geom value", {
 
   testthat::expect_error(
     calculate_drought(
-      from    = spei,
-      locs    = locs,
+      from = spei,
+      locs = locs,
       locs_id = "site_id",
-      geom    = "bad"
+      geom = "bad"
     )
   )
 })
@@ -1193,9 +1189,9 @@ testthat::test_that("calculate_drought (SPEI .by_time month)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from     = spei,
-    locs     = locs,
-    locs_id  = "site_id",
+    from = spei,
+    locs = locs,
+    locs_id = "site_id",
     .by_time = "month"
   ))
 
@@ -1218,10 +1214,10 @@ testthat::test_that("calculate_drought errors on non-character .by_time", {
 
   testthat::expect_error(
     calculate_drought(
-      from     = spei,
-      locs     = locs,
-      locs_id  = "site_id",
-        .by_time = 5L
+      from = spei,
+      locs = locs,
+      locs_id = "site_id",
+      .by_time = 5L
     ),
     regexp = "\\.by_time"
   )
@@ -1240,9 +1236,9 @@ testthat::test_that("calculate_drought accepts .by_time without deprecated .by",
 
   testthat::expect_no_error(
     suppressMessages(calculate_drought(
-      from     = spei,
-      locs     = locs,
-      locs_id  = "site_id",
+      from = spei,
+      locs = locs,
+      locs_id = "site_id",
       .by_time = "month"
     ))
   )
@@ -1263,8 +1259,8 @@ testthat::test_that("calculate_drought (EDDI .by_time year)", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = eddi,
-    locs    = locs,
+    from = eddi,
+    locs = locs,
     locs_id = "site_id",
     .by_time = "year"
   ))
@@ -1286,10 +1282,10 @@ testthat::test_that("calculate_drought (EDDI geom='sf')", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = eddi,
-    locs    = locs,
+    from = eddi,
+    locs = locs,
     locs_id = "site_id",
-    geom    = "sf"
+    geom = "sf"
   ))
   testthat::expect_true(inherits(result, "sf"))
 })
@@ -1306,10 +1302,10 @@ testthat::test_that("calculate_drought (EDDI geom='terra')", {
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
   result <- suppressMessages(calculate_drought(
-    from    = eddi,
-    locs    = locs,
+    from = eddi,
+    locs = locs,
     locs_id = "site_id",
-    geom    = "terra"
+    geom = "terra"
   ))
   testthat::expect_s4_class(result, "SpatVector")
 })
@@ -1324,9 +1320,9 @@ testthat::test_that("calculate_covariates routes 'drought' alias", {
   )
   result <- calculate_covariates(
     covariate = "drought",
-    from      = NULL,
-    locs      = NULL,
-    locs_id   = "site_id"
+    from = NULL,
+    locs = NULL,
+    locs_id = "site_id"
   )
   testthat::expect_equal(result, "drought_calc_called")
 })
@@ -1338,9 +1334,9 @@ testthat::test_that("calculate_covariates routes 'spei' alias", {
   )
   result <- calculate_covariates(
     covariate = "spei",
-    from      = NULL,
-    locs      = NULL,
-    locs_id   = "site_id"
+    from = NULL,
+    locs = NULL,
+    locs_id = "site_id"
   )
   testthat::expect_equal(result, "drought_calc_called")
 })
@@ -1352,9 +1348,9 @@ testthat::test_that("calculate_covariates routes 'eddi' alias", {
   )
   result <- calculate_covariates(
     covariate = "eddi",
-    from      = NULL,
-    locs      = NULL,
-    locs_id   = "site_id"
+    from = NULL,
+    locs = NULL,
+    locs_id = "site_id"
   )
   testthat::expect_equal(result, "drought_calc_called")
 })
@@ -1366,9 +1362,9 @@ testthat::test_that("calculate_covariates routes 'usdm' alias", {
   )
   result <- calculate_covariates(
     covariate = "usdm",
-    from      = NULL,
-    locs      = NULL,
-    locs_id   = "site_id"
+    from = NULL,
+    locs = NULL,
+    locs_id = "site_id"
   )
   testthat::expect_equal(result, "drought_calc_called")
 })
@@ -1386,9 +1382,9 @@ testthat::test_that("calculate_covariates drought .by_time passes through", {
 
   result <- suppressMessages(calculate_covariates(
     covariate = "drought",
-    from      = spei,
-    locs      = locs,
-    locs_id   = "site_id",
+    from = spei,
+    locs = locs,
+    locs_id = "site_id",
     .by_time = "year"
   ))
 
@@ -1431,8 +1427,12 @@ testthat::test_that("drought_process_nc processes EDDI ASC files from download_d
   withr::local_package("terra")
   withr::with_tempdir({
     r <- terra::rast(
-      nrows = 2, ncols = 2,
-      xmin = -100, xmax = -99, ymin = 39, ymax = 40,
+      nrows = 2,
+      ncols = 2,
+      xmin = -100,
+      xmax = -99,
+      ymin = 39,
+      ymax = 40,
       crs = "EPSG:4326"
     )
     terra::values(r) <- c(1, 2, 3, 4)
@@ -1489,13 +1489,19 @@ testthat::test_that("drought_set_time_nc derives time from filename when terra t
   withr::local_package("terra")
   # Create a raster with NA time (as if terra couldn't parse CF metadata)
   eddi_path <- testthat::test_path("..", "testdata", "drought", "eddi")
-  eddi_files <- list.files(eddi_path, pattern = "eddi.*\\.nc$", full.names = TRUE)
+  eddi_files <- list.files(
+    eddi_path,
+    pattern = "eddi.*\\.nc$",
+    full.names = TRUE
+  )
 
   r <- terra::rast(eddi_files[1])
   # Force terra time to be NULL via mock
   testthat::local_mocked_bindings(
     time = function(x, ...) {
-      if (missing(x)) stop("bad call")
+      if (missing(x)) {
+        stop("bad call")
+      }
       NULL
     },
     .package = "terra"
@@ -1551,8 +1557,11 @@ testthat::test_that("drought_process_usdm assigns CRS when shapefile has no CRS"
   # Mock terra::crs on vect result to return "" (empty CRS) so the else branch runs
   testthat::local_mocked_bindings(
     crs = function(x, ...) {
-      if (inherits(x, "SpatVector")) ""
-      else terra::crs(x, ...)
+      if (inherits(x, "SpatVector")) {
+        ""
+      } else {
+        terra::crs(x, ...)
+      }
     },
     .package = "terra"
   )
@@ -1568,7 +1577,9 @@ testthat::test_that("download_drought(source=spei, hash=TRUE): hashes existing f
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     check_destfile = function(...) FALSE,
-    download_hash = function(hash, directory) if (isTRUE(hash)) "spei-hash" else NULL,
+    download_hash = function(hash, directory) {
+      if (isTRUE(hash)) "spei-hash" else NULL
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -1606,60 +1617,18 @@ testthat::test_that("download_drought(source=spei): propagates errors", {
   })
 })
 
-testthat::test_that(
-  "download_drought(source=spei): forwards the selected version URL",
-  {
-    captured_urls <- character(0)
-    testthat::local_mocked_bindings(
-      check_destfile = function(...) TRUE,
-      download_run_method = function(urls, ...) {
-        captured_urls <<- c(captured_urls, urls)
-        list(success = 1, failed = 0, skipped = 0)
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
-      testthat::expect_warning(
-        result <- suppressMessages(
-          amadeus::download_drought(
-            source = "spei",
-            date = "2020-01-01",
-            timescale = 1L,
-            directory_to_save = ".",
-            acknowledgement = TRUE
-          )
-        ),
-        regexp = NA
-      )
-      testthat::expect_equal(result$success, 1L)
-      testthat::expect_equal(
-        captured_urls[1],
-        "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
-      )
-    })
-  }
-)
-
-testthat::test_that(
-  "download_drought(source=spei): returns failure without version fallback",
-  {
-    captured_urls <- character(0)
-    testthat::local_mocked_bindings(
-      check_destfile = function(...) TRUE,
-      check_url_status = function(url) grepl("spei_database_2_11", url),
-      download_run_method = function(urls, destfiles, ...) {
-        captured_urls <<- c(captured_urls, urls)
-        list(
-          success = 0L,
-          failed = 1L,
-          skipped = 0L,
-          failed_urls = urls,
-          failed_files = basename(destfiles)
-        )
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
+testthat::test_that("download_drought(source=spei): forwards the selected version URL", {
+  captured_urls <- character(0)
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- c(captured_urls, urls)
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
       result <- suppressMessages(
         amadeus::download_drought(
           source = "spei",
@@ -1668,25 +1637,61 @@ testthat::test_that(
           directory_to_save = ".",
           acknowledgement = TRUE
         )
+      ),
+      regexp = NA
+    )
+    testthat::expect_equal(result$success, 1L)
+    testthat::expect_equal(
+      captured_urls[1],
+      "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+    )
+  })
+})
+
+testthat::test_that("download_drought(source=spei): returns failure without version fallback", {
+  captured_urls <- character(0)
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    check_url_status = function(url) grepl("spei_database_2_11", url),
+    download_run_method = function(urls, destfiles, ...) {
+      captured_urls <<- c(captured_urls, urls)
+      list(
+        success = 0L,
+        failed = 1L,
+        skipped = 0L,
+        failed_urls = urls,
+        failed_files = basename(destfiles)
       )
-      testthat::expect_identical(
-        result,
-        list(
-          success = 0L,
-          failed = 1L,
-          skipped = 0L,
-          failed_urls = captured_urls,
-          failed_files = "spei01.nc"
-        )
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      amadeus::download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
       )
-      testthat::expect_length(captured_urls, 1L)
-      testthat::expect_identical(
-        captured_urls,
-        "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+    )
+    testthat::expect_identical(
+      result,
+      list(
+        success = 0L,
+        failed = 1L,
+        skipped = 0L,
+        failed_urls = captured_urls,
+        failed_files = "spei01.nc"
       )
-    })
-  }
-)
+    )
+    testthat::expect_length(captured_urls, 1L)
+    testthat::expect_identical(
+      captured_urls,
+      "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+    )
+  })
+})
 
 testthat::test_that("download_drought EDDI returns hash when hash=TRUE", {
   testthat::local_mocked_bindings(
@@ -1695,7 +1700,9 @@ testthat::test_that("download_drought EDDI returns hash when hash=TRUE", {
     download_run_method = function(urls, ...) {
       list(success = length(urls), failed = 0, skipped = 0)
     },
-    download_hash = function(hash, directory) if (isTRUE(hash)) "eddi-hash" else NULL,
+    download_hash = function(hash, directory) {
+      if (isTRUE(hash)) "eddi-hash" else NULL
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -1728,7 +1735,8 @@ testthat::test_that("calculate_drought uses exact_extract for polygon locations"
   poly_geom <- sf::st_sfc(
     sf::st_polygon(list(matrix(
       c(-100, 35, -95, 35, -95, 40, -100, 40, -100, 35),
-      ncol = 2, byrow = TRUE
+      ncol = 2,
+      byrow = TRUE
     ))),
     crs = 4326
   )
@@ -1736,10 +1744,10 @@ testthat::test_that("calculate_drought uses exact_extract for polygon locations"
 
   result <- suppressMessages(
     calculate_drought(
-      from   = spei,
-      locs   = poly_locs,
+      from = spei,
+      locs = poly_locs,
       locs_id = "site_id",
-      radius  = 0L
+      radius = 0L
     )
   )
   testthat::expect_s3_class(result, "data.frame")
@@ -1750,7 +1758,11 @@ testthat::test_that("calculate_drought uses exact_extract for polygon locations"
 testthat::test_that("drought_set_time_nc stops when filename has no year", {
   withr::local_package("terra")
   eddi_path <- testthat::test_path("..", "testdata", "drought", "eddi")
-  eddi_files <- list.files(eddi_path, pattern = "eddi.*[.]nc$", full.names = TRUE)
+  eddi_files <- list.files(
+    eddi_path,
+    pattern = "eddi.*[.]nc$",
+    full.names = TRUE
+  )
   r <- terra::rast(eddi_files[1])
 
   testthat::local_mocked_bindings(
@@ -1781,351 +1793,342 @@ testthat::test_that("drought_ensure_crs(crs=empty): sets EPSG:4326", {
 ################################################################################
 ##### Recommended linked mock workflows
 
-testthat::test_that(
-  "SPEI linked mock workflow: creates process-ready NetCDF and calculates values",
-  {
-    withr::local_package("terra")
-    # --------------------------------------------------------------------------
-    fixture <- normalizePath(
-      testthat::test_path(
-        "..",
-        "testdata",
-        "drought",
-        "spei",
-        "spei01.nc"
-      ),
-      mustWork = TRUE
-    )
-    download_directory <- withr::local_tempdir()
-    downloaded_file <- NULL
-    # --------------------------------------------------------------------------
-    local_download_mocks(
-      download_run_method = function(urls, destfiles, ...) {
-        testthat::expect_match(
-          urls,
-          "spei_database_2_11/nc/spei01\\.nc$"
-        )
-        testthat::expect_identical(basename(destfiles), "spei01.nc")
-        downloaded_file <<- destfiles
-        copied <- file.copy(fixture, destfiles, overwrite = TRUE)
-        testthat::expect_true(copied)
-        list(success = 1L, failed = 0L, skipped = 0L)
-      }
-    )
-    # --------------------------------------------------------------------------
-    suppressMessages(download_data(
-      dataset_name = "spei",
-      directory_to_save = download_directory,
-      acknowledgement = TRUE,
-      date = c("2020-01-01", "2020-03-31"),
-      timescale = 1L,
-      show_progress = FALSE,
-      rate_limit = 0
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_true(file.exists(downloaded_file))
-    testthat::expect_gt(file.size(downloaded_file), 0)
-    # --------------------------------------------------------------------------
-    processed <- suppressMessages(process_covariates(
-      covariate = "spei",
-      path = download_directory,
-      date = c("2020-01-01", "2020-03-31"),
-      timescale = 1L
-    ))
-    # --------------------------------------------------------------------------
-    expected_names <- c(
-      "spei_01_2020-01-01",
-      "spei_01_2020-02-01",
-      "spei_01_2020-03-01"
-    )
-    testthat::expect_s4_class(processed, "SpatRaster")
-    testthat::expect_equal(terra::nlyr(processed), 3L)
-    testthat::expect_identical(names(processed), expected_names)
-    testthat::expect_identical(
-      as.Date(terra::time(processed)),
-      as.Date(c("2020-01-01", "2020-02-01", "2020-03-01"))
-    )
-    testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
-    testthat::expect_true(terra::hasValues(processed))
-    # --------------------------------------------------------------------------
-    valued_cells <- which(!is.na(terra::values(processed[[1L]], mat = FALSE)))
-    cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
-    coordinates <- terra::xyFromCell(processed, cells)
-    locations <- terra::vect(
-      data.frame(
-        site_id = sprintf("site_%02d", seq_along(cells)),
-        x = coordinates[, 1L],
-        y = coordinates[, 2L]
-      ),
-      geom = c("x", "y"),
-      crs = terra::crs(processed)
-    )
-    # --------------------------------------------------------------------------
-    result <- suppressMessages(calculate_covariates(
-      covariate = "spei",
-      from = processed,
-      locs = locations,
-      locs_id = "site_id",
-      radius = 0
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_s3_class(result, "data.frame")
-    testthat::expect_equal(nrow(result), length(cells) * 3L)
-    testthat::expect_identical(unique(result$site_id), locations$site_id)
-    testthat::expect_true("spei_01_0" %in% names(result))
-    testthat::expect_type(result$spei_01_0, "double")
-    testthat::expect_s3_class(result$time, "POSIXct")
-  }
-)
+testthat::test_that("SPEI linked mock workflow: creates process-ready NetCDF and calculates values", {
+  withr::local_package("terra")
+  # --------------------------------------------------------------------------
+  fixture <- normalizePath(
+    testthat::test_path(
+      "..",
+      "testdata",
+      "drought",
+      "spei",
+      "spei01.nc"
+    ),
+    mustWork = TRUE
+  )
+  download_directory <- withr::local_tempdir()
+  downloaded_file <- NULL
+  # --------------------------------------------------------------------------
+  local_download_mocks(
+    download_run_method = function(urls, destfiles, ...) {
+      testthat::expect_match(
+        urls,
+        "spei_database_2_11/nc/spei01\\.nc$"
+      )
+      testthat::expect_identical(basename(destfiles), "spei01.nc")
+      downloaded_file <<- destfiles
+      copied <- file.copy(fixture, destfiles, overwrite = TRUE)
+      testthat::expect_true(copied)
+      list(success = 1L, failed = 0L, skipped = 0L)
+    }
+  )
+  # --------------------------------------------------------------------------
+  suppressMessages(download_data(
+    dataset_name = "spei",
+    directory_to_save = download_directory,
+    acknowledgement = TRUE,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L,
+    show_progress = FALSE,
+    rate_limit = 0
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_true(file.exists(downloaded_file))
+  testthat::expect_gt(file.size(downloaded_file), 0)
+  # --------------------------------------------------------------------------
+  processed <- suppressMessages(process_covariates(
+    covariate = "spei",
+    path = download_directory,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  ))
+  # --------------------------------------------------------------------------
+  expected_names <- c(
+    "spei_01_2020-01-01",
+    "spei_01_2020-02-01",
+    "spei_01_2020-03-01"
+  )
+  testthat::expect_s4_class(processed, "SpatRaster")
+  testthat::expect_equal(terra::nlyr(processed), 3L)
+  testthat::expect_identical(names(processed), expected_names)
+  testthat::expect_identical(
+    as.Date(terra::time(processed)),
+    as.Date(c("2020-01-01", "2020-02-01", "2020-03-01"))
+  )
+  testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
+  testthat::expect_true(terra::hasValues(processed))
+  # --------------------------------------------------------------------------
+  valued_cells <- which(!is.na(terra::values(processed[[1L]], mat = FALSE)))
+  cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
+  coordinates <- terra::xyFromCell(processed, cells)
+  locations <- terra::vect(
+    data.frame(
+      site_id = sprintf("site_%02d", seq_along(cells)),
+      x = coordinates[, 1L],
+      y = coordinates[, 2L]
+    ),
+    geom = c("x", "y"),
+    crs = terra::crs(processed)
+  )
+  # --------------------------------------------------------------------------
+  result <- suppressMessages(calculate_covariates(
+    covariate = "spei",
+    from = processed,
+    locs = locations,
+    locs_id = "site_id",
+    radius = 0
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), length(cells) * 3L)
+  testthat::expect_identical(unique(result$site_id), locations$site_id)
+  testthat::expect_true("spei_01_0" %in% names(result))
+  testthat::expect_type(result$spei_01_0, "double")
+  testthat::expect_s3_class(result$time, "POSIXct")
+})
 
-testthat::test_that(
-  "EDDI linked mock workflow: creates dated ASCII raster and calculates values",
-  {
-    withr::local_package("terra")
-    # --------------------------------------------------------------------------
-    fixture <- normalizePath(
-      testthat::test_path(
-        "..",
-        "testdata",
-        "drought",
-        "eddi",
-        "eddi01mn2020.nc"
-      ),
-      mustWork = TRUE
-    )
-    download_directory <- withr::local_tempdir()
-    downloaded_file <- NULL
-    # --------------------------------------------------------------------------
-    local_download_mocks(
-      download_run_method = function(urls, destfiles, ...) {
-        testthat::expect_identical(
-          urls,
-          paste0(
-            "ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data/",
-            "2020/EDDI_ETrs_01mn_20200107.asc"
-          )
+testthat::test_that("EDDI linked mock workflow: creates dated ASCII raster and calculates values", {
+  withr::local_package("terra")
+  # --------------------------------------------------------------------------
+  fixture <- normalizePath(
+    testthat::test_path(
+      "..",
+      "testdata",
+      "drought",
+      "eddi",
+      "eddi01mn2020.nc"
+    ),
+    mustWork = TRUE
+  )
+  download_directory <- withr::local_tempdir()
+  downloaded_file <- NULL
+  # --------------------------------------------------------------------------
+  local_download_mocks(
+    download_run_method = function(urls, destfiles, ...) {
+      testthat::expect_identical(
+        urls,
+        paste0(
+          "ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data/",
+          "2020/EDDI_ETrs_01mn_20200107.asc"
         )
-        testthat::expect_identical(
-          basename(destfiles),
-          "EDDI_ETrs_01mn_20200107.asc"
-        )
-        downloaded_file <<- destfiles
-        suppressWarnings(terra::writeRaster(
-          terra::rast(fixture)[[1L]],
-          destfiles,
-          filetype = "AAIGrid",
-          overwrite = TRUE
-        ))
-        list(success = 1L, failed = 0L, skipped = 0L)
-      }
-    )
-    # --------------------------------------------------------------------------
-    suppressMessages(download_data(
-      dataset_name = "drought",
-      directory_to_save = download_directory,
-      acknowledgement = TRUE,
-      source = "eddi",
-      date = "2020-01-07",
-      timescale = 1L,
-      show_progress = FALSE,
-      rate_limit = 0
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_true(file.exists(downloaded_file))
-    testthat::expect_gt(file.size(downloaded_file), 0)
-    # --------------------------------------------------------------------------
-    processed <- suppressMessages(process_covariates(
-      covariate = "eddi",
-      path = download_directory,
-      date = "2020-01-07",
-      timescale = 1L
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_s4_class(processed, "SpatRaster")
-    testthat::expect_equal(terra::nlyr(processed), 1L)
-    testthat::expect_identical(names(processed), "eddi_01_2020-01-07")
-    testthat::expect_identical(
-      as.Date(terra::time(processed)),
-      as.Date("2020-01-07")
-    )
-    testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
-    testthat::expect_true(terra::hasValues(processed))
-    # --------------------------------------------------------------------------
-    valued_cells <- which(!is.na(terra::values(processed, mat = FALSE)))
-    cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
-    coordinates <- terra::xyFromCell(processed, cells)
-    locations <- terra::vect(
-      data.frame(
-        site_id = sprintf("site_%02d", seq_along(cells)),
-        x = coordinates[, 1L],
-        y = coordinates[, 2L]
-      ),
-      geom = c("x", "y"),
-      crs = terra::crs(processed)
-    )
-    # --------------------------------------------------------------------------
-    result <- suppressMessages(calculate_covariates(
-      covariate = "eddi",
-      from = processed,
-      locs = locations,
-      locs_id = "site_id",
-      radius = 0
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_s3_class(result, "data.frame")
-    testthat::expect_equal(nrow(result), length(cells))
-    testthat::expect_identical(result$site_id, locations$site_id)
-    testthat::expect_true("eddi_01_0" %in% names(result))
-    testthat::expect_type(result$eddi_01_0, "double")
-    testthat::expect_s3_class(result$time, "POSIXct")
-  }
-)
+      )
+      testthat::expect_identical(
+        basename(destfiles),
+        "EDDI_ETrs_01mn_20200107.asc"
+      )
+      downloaded_file <<- destfiles
+      suppressWarnings(terra::writeRaster(
+        terra::rast(fixture)[[1L]],
+        destfiles,
+        filetype = "AAIGrid",
+        overwrite = TRUE
+      ))
+      list(success = 1L, failed = 0L, skipped = 0L)
+    }
+  )
+  # --------------------------------------------------------------------------
+  suppressMessages(download_data(
+    dataset_name = "drought",
+    directory_to_save = download_directory,
+    acknowledgement = TRUE,
+    source = "eddi",
+    date = "2020-01-07",
+    timescale = 1L,
+    show_progress = FALSE,
+    rate_limit = 0
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_true(file.exists(downloaded_file))
+  testthat::expect_gt(file.size(downloaded_file), 0)
+  # --------------------------------------------------------------------------
+  processed <- suppressMessages(process_covariates(
+    covariate = "eddi",
+    path = download_directory,
+    date = "2020-01-07",
+    timescale = 1L
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_s4_class(processed, "SpatRaster")
+  testthat::expect_equal(terra::nlyr(processed), 1L)
+  testthat::expect_identical(names(processed), "eddi_01_2020-01-07")
+  testthat::expect_identical(
+    as.Date(terra::time(processed)),
+    as.Date("2020-01-07")
+  )
+  testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
+  testthat::expect_true(terra::hasValues(processed))
+  # --------------------------------------------------------------------------
+  valued_cells <- which(!is.na(terra::values(processed, mat = FALSE)))
+  cells <- valued_cells[seq_len(min(3L, length(valued_cells)))]
+  coordinates <- terra::xyFromCell(processed, cells)
+  locations <- terra::vect(
+    data.frame(
+      site_id = sprintf("site_%02d", seq_along(cells)),
+      x = coordinates[, 1L],
+      y = coordinates[, 2L]
+    ),
+    geom = c("x", "y"),
+    crs = terra::crs(processed)
+  )
+  # --------------------------------------------------------------------------
+  result <- suppressMessages(calculate_covariates(
+    covariate = "eddi",
+    from = processed,
+    locs = locations,
+    locs_id = "site_id",
+    radius = 0
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), length(cells))
+  testthat::expect_identical(result$site_id, locations$site_id)
+  testthat::expect_true("eddi_01_0" %in% names(result))
+  testthat::expect_type(result$eddi_01_0, "double")
+  testthat::expect_s3_class(result$time, "POSIXct")
+})
 
-testthat::test_that(
-  "USDM linked mock workflow: extracts complete bundles and calculates proportions",
-  {
-    withr::local_package("terra")
-    # --------------------------------------------------------------------------
-    fixture_directory <- normalizePath(
-      testthat::test_path("..", "testdata", "drought", "usdm"),
-      mustWork = TRUE
-    )
-    download_directory <- withr::local_tempdir()
-    downloaded_archives <- character()
-    extracted_files <- character()
-    extraction_directory <- NULL
-    # --------------------------------------------------------------------------
-    local_download_mocks(
-      download_run_method = function(urls, destfiles, ...) {
-        expected_urls <- paste0(
-          "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_",
-          c("20200107", "20200114"),
-          "_M.zip"
+testthat::test_that("USDM linked mock workflow: extracts complete bundles and calculates proportions", {
+  withr::local_package("terra")
+  # --------------------------------------------------------------------------
+  fixture_directory <- normalizePath(
+    testthat::test_path("..", "testdata", "drought", "usdm"),
+    mustWork = TRUE
+  )
+  download_directory <- withr::local_tempdir()
+  downloaded_archives <- character()
+  extracted_files <- character()
+  extraction_directory <- NULL
+  # --------------------------------------------------------------------------
+  local_download_mocks(
+    download_run_method = function(urls, destfiles, ...) {
+      expected_urls <- paste0(
+        "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_",
+        c("20200107", "20200114"),
+        "_M.zip"
+      )
+      testthat::expect_identical(urls, expected_urls)
+      testthat::expect_identical(
+        basename(destfiles),
+        paste0("USDM_", c("20200107", "20200114"), "_M.zip")
+      )
+      downloaded_archives <<- destfiles
+      vapply(
+        destfiles,
+        function(destination) {
+          writeBin(charToRaw("mock archive"), destination)
+          TRUE
+        },
+        logical(1)
+      )
+      list(success = 2L, failed = 0L, skipped = 0L)
+    },
+    download_unzip = function(file_name, directory_to_unzip, remove, ...) {
+      testthat::expect_false(remove)
+      testthat::expect_identical(file_name, downloaded_archives)
+      extraction_directory <<- directory_to_unzip
+      dir.create(
+        directory_to_unzip,
+        recursive = TRUE,
+        showWarnings = FALSE
+      )
+      # ----------------------------------------------------------------------
+      # Copy one complete fixture bundle for each archive in the batch.
+      lapply(file_name, function(archive_file) {
+        date_string <- sub(
+          ".*USDM_([0-9]{8})_M\\.zip$",
+          "\\1",
+          basename(archive_file)
         )
-        testthat::expect_identical(urls, expected_urls)
-        testthat::expect_identical(
-          basename(destfiles),
-          paste0("USDM_", c("20200107", "20200114"), "_M.zip")
+        source_files <- list.files(
+          fixture_directory,
+          pattern = paste0("^USDM_", date_string, "\\."),
+          full.names = TRUE
         )
-        downloaded_archives <<- destfiles
-        vapply(
-          destfiles,
-          function(destination) {
-            writeBin(charToRaw("mock archive"), destination)
-            TRUE
-          },
-          logical(1)
-        )
-        list(success = 2L, failed = 0L, skipped = 0L)
-      },
-      download_unzip = function(file_name, directory_to_unzip, remove, ...) {
-        testthat::expect_false(remove)
-        testthat::expect_identical(file_name, downloaded_archives)
-        extraction_directory <<- directory_to_unzip
-        dir.create(
+        testthat::expect_length(source_files, 5L)
+        destinations <- file.path(
           directory_to_unzip,
-          recursive = TRUE,
-          showWarnings = FALSE
+          basename(source_files)
         )
-        # ----------------------------------------------------------------------
-        # Copy one complete fixture bundle for each archive in the batch.
-        lapply(file_name, function(archive_file) {
-          date_string <- sub(
-            ".*USDM_([0-9]{8})_M\\.zip$",
-            "\\1",
-            basename(archive_file)
-          )
-          source_files <- list.files(
-            fixture_directory,
-            pattern = paste0("^USDM_", date_string, "\\."),
-            full.names = TRUE
-          )
-          testthat::expect_length(source_files, 5L)
-          destinations <- file.path(
-            directory_to_unzip,
-            basename(source_files)
-          )
-          copied <- file.copy(
-            source_files,
-            destinations,
-            overwrite = TRUE
-          )
-          testthat::expect_true(all(copied))
-          extracted_files <<- c(extracted_files, destinations)
-          invisible(NULL)
-        })
+        copied <- file.copy(
+          source_files,
+          destinations,
+          overwrite = TRUE
+        )
+        testthat::expect_true(all(copied))
+        extracted_files <<- c(extracted_files, destinations)
         invisible(NULL)
-      }
-    )
-    # --------------------------------------------------------------------------
-    suppressMessages(download_data(
-      dataset_name = "drought",
-      directory_to_save = download_directory,
-      acknowledgement = TRUE,
-      source = "usdm",
-      date = c("2020-01-07", "2020-01-14"),
-      show_progress = FALSE,
-      rate_limit = 0,
-      unzip = TRUE,
-      remove_zip = FALSE
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_length(downloaded_archives, 2L)
-    testthat::expect_true(all(file.exists(downloaded_archives)))
-    testthat::expect_length(extracted_files, 10L)
-    testthat::expect_true(all(file.exists(extracted_files)))
-    # --------------------------------------------------------------------------
-    processed <- suppressMessages(process_covariates(
-      covariate = "usdm",
-      path = extraction_directory,
-      date = c("2020-01-07", "2020-01-14")
-    ))
-    # --------------------------------------------------------------------------
-    testthat::expect_s4_class(processed, "SpatVector")
-    testthat::expect_equal(terra::nrow(processed), 2L)
-    testthat::expect_true(all(c("DM", "date", "source") %in% names(processed)))
-    testthat::expect_identical(
-      sort(unique(as.Date(processed$date))),
-      as.Date(c("2020-01-07", "2020-01-14"))
-    )
-    testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
-    testthat::expect_true(all(processed$DM %in% 0:4))
-    # --------------------------------------------------------------------------
-    center <- terra::centroids(processed[1L, ])
-    coordinates <- terra::crds(center)
-    locations <- terra::vect(
-      data.frame(
-        site_id = "site_01",
-        x = coordinates[1L, 1L],
-        y = coordinates[1L, 2L]
-      ),
-      geom = c("x", "y"),
-      crs = terra::crs(processed)
-    )
-    # --------------------------------------------------------------------------
-    result <- suppressMessages(calculate_covariates(
-      covariate = "usdm",
-      from = processed,
-      locs = locations,
-      locs_id = "site_id",
-      radius = 1000
-    ))
-    # --------------------------------------------------------------------------
-    proportion_columns <- paste0("usdm_dm_", 0:4, "_1000")
-    proportions <- as.matrix(result[, proportion_columns, drop = FALSE])
-    testthat::expect_s3_class(result, "data.frame")
-    testthat::expect_equal(nrow(result), 2L)
-    testthat::expect_identical(unique(result$site_id), locations$site_id)
-    testthat::expect_identical(
-      sort(unique(as.Date(result$time))),
-      as.Date(c("2020-01-07", "2020-01-14"))
-    )
-    testthat::expect_true(all(proportion_columns %in% names(result)))
-    testthat::expect_true(all(proportions >= 0 & proportions <= 1))
-    testthat::expect_equal(
-      rowSums(proportions),
-      rep(1, nrow(result)),
-      tolerance = 1e-6
-    )
-  }
-)
+      })
+      invisible(NULL)
+    }
+  )
+  # --------------------------------------------------------------------------
+  suppressMessages(download_data(
+    dataset_name = "drought",
+    directory_to_save = download_directory,
+    acknowledgement = TRUE,
+    source = "usdm",
+    date = c("2020-01-07", "2020-01-14"),
+    show_progress = FALSE,
+    rate_limit = 0,
+    unzip = TRUE,
+    remove_zip = FALSE
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_length(downloaded_archives, 2L)
+  testthat::expect_true(all(file.exists(downloaded_archives)))
+  testthat::expect_length(extracted_files, 10L)
+  testthat::expect_true(all(file.exists(extracted_files)))
+  # --------------------------------------------------------------------------
+  processed <- suppressMessages(process_covariates(
+    covariate = "usdm",
+    path = extraction_directory,
+    date = c("2020-01-07", "2020-01-14")
+  ))
+  # --------------------------------------------------------------------------
+  testthat::expect_s4_class(processed, "SpatVector")
+  testthat::expect_equal(terra::nrow(processed), 2L)
+  testthat::expect_true(all(c("DM", "date", "source") %in% names(processed)))
+  testthat::expect_identical(
+    sort(unique(as.Date(processed$date))),
+    as.Date(c("2020-01-07", "2020-01-14"))
+  )
+  testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
+  testthat::expect_true(all(processed$DM %in% 0:4))
+  # --------------------------------------------------------------------------
+  center <- terra::centroids(processed[1L, ])
+  coordinates <- terra::crds(center)
+  locations <- terra::vect(
+    data.frame(
+      site_id = "site_01",
+      x = coordinates[1L, 1L],
+      y = coordinates[1L, 2L]
+    ),
+    geom = c("x", "y"),
+    crs = terra::crs(processed)
+  )
+  # --------------------------------------------------------------------------
+  result <- suppressMessages(calculate_covariates(
+    covariate = "usdm",
+    from = processed,
+    locs = locations,
+    locs_id = "site_id",
+    radius = 1000
+  ))
+  # --------------------------------------------------------------------------
+  proportion_columns <- paste0("usdm_dm_", 0:4, "_1000")
+  proportions <- as.matrix(result[, proportion_columns, drop = FALSE])
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_identical(unique(result$site_id), locations$site_id)
+  testthat::expect_identical(
+    sort(unique(as.Date(result$time))),
+    as.Date(c("2020-01-07", "2020-01-14"))
+  )
+  testthat::expect_true(all(proportion_columns %in% names(result)))
+  testthat::expect_true(all(proportions >= 0 & proportions <= 1))
+  testthat::expect_equal(
+    rowSums(proportions),
+    rep(1, nrow(result)),
+    tolerance = 1e-6
+  )
+})

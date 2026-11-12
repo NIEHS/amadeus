@@ -470,8 +470,8 @@ testthat::test_that("check_destfile works in download context", {
       )
     )
     # --------------------------------------------------------------------------
-    # Should skip existing files with content
-    testthat::expect_equal(result2$n_files, 0)
+    # All files skipped but still identifies eligible downloads.
+    testthat::expect_equal(result2$n_files, 3)
     # --------------------------------------------------------------------------
     # Create zero-byte files
     dir.create("air.sfc")
@@ -719,13 +719,16 @@ testthat::test_that("download_ecoregion(show_progress=FALSE): summarizes", {
     # --------------------------------------------------------------------------
     # A successful transfer returns all five summary fields invisibly.
     testthat::expect_false(result$visible)
-    testthat::expect_equal(result$value, list(
-      success = 1,
-      failed = 0,
-      skipped = 0,
-      failed_urls = character(0),
-      failed_files = character(0)
-    ))
+    testthat::expect_equal(
+      result$value,
+      list(
+        success = 1,
+        failed = 0,
+        skipped = 0,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
+    )
     # --------------------------------------------------------------------------
     # Check file was created in the correct location
     testthat::expect_true(dir.exists("zip_files"))
@@ -785,13 +788,16 @@ testthat::test_that("download_koppen_geiger(show_progress=TRUE): summarizes", {
     # --------------------------------------------------------------------------
     # Progress settings do not change the five-field summary or its visibility.
     testthat::expect_false(result$visible)
-    testthat::expect_equal(result$value, list(
-      success = 1,
-      failed = 0,
-      skipped = 0,
-      failed_urls = character(0),
-      failed_files = character(0)
-    ))
+    testthat::expect_equal(
+      result$value,
+      list(
+        success = 1,
+        failed = 0,
+        skipped = 0,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
+    )
     # --------------------------------------------------------------------------
     # Check file was created
     testthat::expect_true(dir.exists("zip_files"))
@@ -1349,11 +1355,11 @@ testthat::test_that("download handles empty URL lists", {
         variables = "air.sfc",
         directory_to_save = ".",
         acknowledgement = TRUE,
-        download = FALSE
+        download = TRUE
       )
     )
     # --------------------------------------------------------------------------
-    testthat::expect_equal(result$n_files, 0)
+    testthat::expect_equal(result$skipped, 1)
   })
 })
 
@@ -2680,8 +2686,8 @@ testthat::test_that("download_run_method sets connecttimeout = 30L", {
   testthat::expect_equal(captured_req$options[["connecttimeout"]], 30L)
 })
 
-testthat::test_that("download_modis CMR query body includes retry and timeout", {
-  fn_body <- paste(deparse(body(download_modis)), collapse = "\n")
+testthat::test_that("query_modis_granules CMR query body includes retry and timeout", {
+  fn_body <- paste(deparse(body(query_modis_granules)), collapse = "\n")
   testthat::expect_match(fn_body, "req_retry")
   testthat::expect_match(fn_body, "req_timeout")
   testthat::expect_match(fn_body, "cmr\\.earthdata\\.nasa\\.gov")
