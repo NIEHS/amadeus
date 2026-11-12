@@ -13,15 +13,12 @@
 #'   A single year, two endpoints, or a longer vector may be supplied in
 #'   any order; repeated years are accepted.
 #' @param min numeric(1). Inclusive lower bound for year validation.
-#'   Default is 1900.
 #' @param max numeric(1). Inclusive upper bound for year validation.
-#'   Defaults to the current calendar year when the function is called.
 #' @details Gaps are filled automatically: `c(2018, 2023)` and
 #'   `c(2018, 2020, 2023)` both return `2018:2023`.
 #'   If any requested year is below `min` or above `max`,
 #'   the entire request raises an error; years are not filtered or truncated.
-#'   The default bounds are generic validation limits and do not establish
-#'   dataset coverage. Remote file availability is not checked.
+#'   Remote file availability is not checked.
 #' @return Numeric vector of consecutive years in ascending order, including
 #'   both endpoints. A single input year returns one value.
 #' @keywords internal
@@ -58,18 +55,15 @@ sequence_years <- function(
 #'   `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
 #'   Dates must be between `min` and `max`, inclusive.
 #' @param min Date(1) or character(1). Inclusive lower bound for date
-#'   validation. Character values use `"YYYY-MM-DD"` format. Default is
-#'   `"1900-01-01"`.
+#'   validation. Character values use `"YYYY-MM-DD"` format.
 #' @param max Date(1) or character(1). Inclusive upper bound for date
-#'   validation. Character values use `"YYYY-MM-DD"` format. Defaults to
-#'   `Sys.Date()` when the function is called.
+#'   validation. Character values use `"YYYY-MM-DD"` format.
 #' @param hyphen logical(1). Include hyphens in the returned date strings.
 #' If `FALSE` (the default), return `"YYYYMMDD"`; if `TRUE`, return
 #' `"YYYY-MM-DD"`.
 #' @details Bounds are checked before generating the sequence. Any requested
 #'   date outside the permitted range causes the entire request to raise an
-#'   error; dates are not filtered or truncated. The default bounds are
-#'   generic validation limits and do not establish dataset coverage.
+#'   error; dates are not filtered or truncated.
 #'   Remote file availability is not checked.
 #' @return A character vector of daily dates in ascending order, including
 #' both endpoints. A single input date returns one date string. The output

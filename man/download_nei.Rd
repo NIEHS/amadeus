@@ -23,6 +23,7 @@ download_nei(
 are 2008, 2011, 2014, 2017, 2020, and 2023. Default is
 \code{c(2017L, 2020L)}. Each value selects an individual inventory;
 \code{c(2017, 2023)} requests only those two years, without filling gaps.
+The download plan preserves the supplied order and repeated years.
 Unsupported years are omitted with a warning that lists the retained
 years. If no supported years remain, the function stops before creating
 directories or contacting the provider.}

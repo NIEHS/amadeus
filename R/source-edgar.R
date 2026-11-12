@@ -46,9 +46,9 @@
 #'   a non-empty vector of years. Every year from the minimum through the
 #'   maximum is selected, including gaps: `c(2018, 2023)` and
 #'   `c(2018, 2020, 2023)` both select `2018:2023`. Years must be non-missing
-#'   integer values from 1900 through the current calendar year. For yearly
-#'   version `"8.1"` data or sector-specific VOC data, `NULL` (default)
-#'   selects bundled archives instead of individual yearly archives.
+#'   integer values. For yearly version `"8.1"` data or sector-specific VOC
+#'   data, `NULL` (default) selects bundled archives instead of individual
+#'   yearly archives.
 #'   Monthly, timeseries, and full VOC-group archives always contain the
 #'   provider's bundled years; `year_range` is validated when supplied but
 #'   does not change their URLs or subset their contents.

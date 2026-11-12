@@ -15,9 +15,9 @@
 #' @param year integer(1 or more). One year, two endpoints, or a non-empty
 #'   vector of years. Every year from the minimum through the maximum is
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
-#'   Default is `c(2018, 2022)`. Missing, fractional, and future years are
-#'   rejected. For SPEI/EDDI, complete multi-year files are downloaded
-#'   regardless of `year`; see Details.
+#'   Default is `c(2018, 2022)`. Missing and fractional years are rejected.
+#'   For SPEI/EDDI, complete multi-year files are downloaded regardless of
+#'   `year`, but supplied years are still validated; see Details.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.

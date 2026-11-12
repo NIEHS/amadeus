@@ -16,7 +16,8 @@
 #' @param collection character(1). GEOS-CF data collection file name.
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token.
-#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param date character(1 or 2). A single date or inclusive range endpoints
+#'   in `"YYYY-MM-DD"` format, in either order.
 #' @param hours integer(1 to 24). Hours of day to download for each date,
 #' in UTC. Supply values from 0 through 23. Default is `0:23`, which selects
 #' all hours. The collection determines the minute within each selected hour.

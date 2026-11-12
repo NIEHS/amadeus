@@ -21,9 +21,8 @@
 #' @param year integer(1 or more). One year, two endpoints, or a non-empty
 #'   vector of years. Every year from the minimum through the maximum is
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
-#'   Default is `c(2018L, 2022L)`. Missing, fractional, pre-1900, and future
-#'   years are rejected. File availability depends on EPA coverage for the
-#'   selected jurisdiction.
+#'   Default is `c(2018L, 2022L)`. Missing and fractional years are rejected.
+#'   File availability depends on EPA coverage for the selected jurisdiction.
 #' @param jurisdiction character(1). TRI file variant to download. Use
 #'   `"US"` (default) for the nationwide file, a two-letter state or territory
 #'   code such as `"AZ"` or `"NC"`, or `"tbl"` for the tribal file. Leading and

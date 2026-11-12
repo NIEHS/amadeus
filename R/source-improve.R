@@ -19,9 +19,9 @@
 #' @param year integer(1 or more). One year, two endpoints, or a non-empty
 #'   vector of years. Every year from the minimum through the maximum is
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
-#'   Default is `c(2018, 2022)`. Missing, fractional, pre-1900, and future
-#'   years are rejected. File availability depends on the selected product
-#'   and provider; local validation does not check product coverage.
+#'   Default is `c(2018, 2022)`. Missing and fractional years are rejected.
+#'   File availability depends on the selected product and provider;
+#'   local validation does not check product coverage.
 #' @param product character(1). Product selector: `"raw"` (default) for
 #'   aerosol measurements (`IMPAER`), `"rhr2"` for Regional Haze Rule II
 #'   data (`IMPRHR2`), or `"rhr3"` for Regional Haze Rule III data (`IMPRHR3`).

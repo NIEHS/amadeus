@@ -34,7 +34,9 @@ download_nlcd(
 vector of years. Every year from the minimum through the maximum is
 requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
 Requested years must be within 1985-2024. Default is 2021.
-Missing, fractional, and future years are rejected.}
+Missing, fractional, and out-of-range years are rejected. Any year
+outside these fixed bounds causes the entire request to fail; years are
+not filtered or truncated.}
 
 \item{directory_to_save}{character(1). Parent directory. Archives are saved
 in \verb{zip_files/} and extracted data in \verb{data_files/}.}

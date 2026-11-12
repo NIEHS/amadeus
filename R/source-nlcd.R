@@ -23,7 +23,9 @@
 #'   vector of years. Every year from the minimum through the maximum is
 #'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
 #'   Requested years must be within 1985-2024. Default is 2021.
-#'   Missing, fractional, and future years are rejected.
+#'   Missing, fractional, and out-of-range years are rejected. Any year
+#'   outside these fixed bounds causes the entire request to fail; years are
+#'   not filtered or truncated.
 #' @param directory_to_save character(1). Parent directory. Archives are saved
 #'   in `zip_files/` and extracted data in `data_files/`.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with

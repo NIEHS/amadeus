@@ -23,9 +23,9 @@ download_improve(
 \item{year}{integer(1 or more). One year, two endpoints, or a non-empty
 vector of years. Every year from the minimum through the maximum is
 requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
-Default is \code{c(2018, 2022)}. Missing, fractional, pre-1900, and future
-years are rejected. File availability depends on the selected product
-and provider; local validation does not check product coverage.}
+Default is \code{c(2018, 2022)}. Missing and fractional years are rejected.
+File availability depends on the selected product and provider;
+local validation does not check product coverage.}
 
 \item{product}{character(1). Product selector: \code{"raw"} (default) for
 aerosol measurements (\code{IMPAER}), \code{"rhr2"} for Regional Haze Rule II
