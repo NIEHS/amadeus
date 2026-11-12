@@ -159,7 +159,7 @@ download_nei <- function(
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
-  # Map year selection to file name; subsetting to year selections.
+  # Map each requested year to its archive, preserving order and repeats.
   chr_urlmap <- c(
     "2008" = "2008neiv3_onroad_byregions.zip",
     "2011" = "2011v2/2011neiv2_onroad_byregions.zip",
@@ -168,13 +168,7 @@ download_nei <- function(
     "2020" = "2020nei_onroad_byregion.zip",
     "2023" = "2023nei_onroad_byregion_21jul2026.zip"
   )
-  chr_urlmap <- unname(
-    grep(
-      paste0(int_year, collapse = "|"),
-      chr_urlmap,
-      value = TRUE
-    )
-  )
+  chr_urlmap <- unname(chr_urlmap[as.character(int_year)])
   chr_filemap <- c(
     "2008" = "2008neiv3_onroad_byregions.zip",
     "2011" = "2011neiv2_onroad_byregions.zip",
@@ -183,13 +177,7 @@ download_nei <- function(
     "2020" = "2020nei_onroad_byregion.zip",
     "2023" = "2023nei_onroad_byregion_21jul2026.zip"
   )
-  chr_filemap <- unname(
-    grep(
-      paste0(int_year, collapse = "|"),
-      chr_filemap,
-      value = TRUE
-    )
-  )
+  chr_filemap <- unname(chr_filemap[as.character(int_year)])
   # ----------------------------------------------------------------------------
   # Generate download URLs.
   chr_urls <- sprintf(
