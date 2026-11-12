@@ -102,7 +102,7 @@ download_nlcd <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "nlcd",
     acknowledgement = acknowledgement,
     download = download,
@@ -140,10 +140,10 @@ download_nlcd <- function(
   )
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year, min = 1985, max = 2024)
+  int_years <- sequence_years(year, min = 1985, max = 2024)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -166,13 +166,13 @@ download_nlcd <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
   # http_version = 2L forces HTTP/1.1 to avoid nghttp2 PROTOCOL_ERRORs from
   # www.mrlc.gov, which drops HTTP/2 connections mid-transfer.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -183,7 +183,7 @@ download_nlcd <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip,
@@ -191,7 +191,7 @@ download_nlcd <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

@@ -209,6 +209,7 @@ importFrom(httr2,
 )
 importFrom(methods,is)
 importFrom(rlang,
+  .data,
   inject,
   sym
 )

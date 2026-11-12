@@ -82,7 +82,7 @@ download_geos <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "geos",
     acknowledgement = acknowledgement,
     download = download,
@@ -111,17 +111,17 @@ download_geos <- function(
   )
   # ----------------------------------------------------------------------------
   # Check NASA EarthData token.
-  chr_nasatoken <- amadeus:::get_token(
+  chr_nasatoken <- get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
   checkmate::assert_string(chr_nasatoken, min.chars = 1L)
   # ----------------------------------------------------------------------------
   # Check `date` and generate sequence.
-  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
+  chr_dates <- sequence_dates(date, hyphen = FALSE)
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Store collections as a `list`.
   list_collections <- as.list(collection)
@@ -135,7 +135,7 @@ download_geos <- function(
         # ----------------------------------------------------------------------
         # Set collection-specific time sequence (e.g. 0000 vs 0030).
         int_offset <- if (grepl("_tavg_1hr_", x)) 30L else 0L
-        chr_times <- amadeus:::sequence_times(
+        chr_times <- sequence_times(
           by = 60L,
           offset = int_offset,
           hours = hours
@@ -176,14 +176,14 @@ download_geos <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(
+    return(invisible(download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,
@@ -193,7 +193,7 @@ download_geos <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -331,9 +331,9 @@ process_geos <-
     ...
   ) {
     #### directory setup
-    path <- amadeus:::download_sanitize_path(path)
+    path <- download_sanitize_path(path)
     #### check for variable
-    amadeus:::check_for_null_parameters(mget(ls()))
+    check_for_null_parameters(mget(ls()))
     if (!is.character(variable) || length(variable) != 1 || !nzchar(variable)) {
       stop("`variable` must be a single non-empty character string.\n")
     }

@@ -80,7 +80,7 @@ download_gridmet <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "gridmet",
     acknowledgement = acknowledgement,
     download = download,
@@ -98,10 +98,10 @@ download_gridmet <- function(
   checkmate::assert_character(variables, min.char = 1L)
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
+  int_years <- sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Switch variables names to codes.
   chr_variables <- amadeus::process_variable_codes(
@@ -142,14 +142,14 @@ download_gridmet <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(
+    return(invisible(download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -159,7 +159,7 @@ download_gridmet <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -223,13 +223,13 @@ process_gridmet <- function(
   ...
 ) {
   #### directory setup
-  path <- amadeus:::download_sanitize_path(path)
+  path <- download_sanitize_path(path)
   #### check dates
   date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
-  amadeus:::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
   variable_checked <- amadeus::process_variable_codes(
     variables = variable,
     source = "gridmet"

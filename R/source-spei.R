@@ -77,7 +77,7 @@ download_spei <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "spei",
     acknowledgement = acknowledgement,
     download = download,
@@ -97,7 +97,7 @@ download_spei <- function(
   chr_timescale <- sprintf("%02d", timescale)
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Select one version; legacy refers to the unversioned /files/ endpoint.
   chr_base <- if (chr_version == "legacy") {
@@ -118,11 +118,11 @@ download_spei <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_url, chr_filename)))
+    return(invisible(download_preview(chr_url, chr_filename)))
   }
   # ----------------------------------------------------------------------------
   # Run download, including existing-file checks and failure reporting.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_url,
     destfiles = chr_filename,
     token = NULL,
@@ -132,5 +132,5 @@ download_spei <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }

@@ -97,7 +97,7 @@ download_aqs <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "aqs",
     acknowledgement = acknowledgement,
     download = download,
@@ -116,10 +116,10 @@ download_aqs <- function(
   checkmate::assert_choice(resolution_temporal, c("daily", "hourly"))
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
+  int_years <- sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -152,11 +152,11 @@ download_aqs <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -166,7 +166,7 @@ download_aqs <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip
@@ -177,7 +177,7 @@ download_aqs <- function(
     sapply(
       int_years,
       function(year_i) {
-        amadeus:::download_normalize_aqs_unzip(
+        download_normalize_aqs_unzip(
           directory_to_unzip = chr_dir_to_save,
           resolution_temporal = resolution_temporal,
           parameter_code = parameter_code,
@@ -188,13 +188,13 @@ download_aqs <- function(
   }
   # ----------------------------------------------------------------------------
   # Remove zip files.
-  amadeus:::download_remove_zips(
+  download_remove_zips(
     remove = remove_zip,
     download_name = chr_filenames
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -309,6 +309,7 @@ download_normalize_aqs_unzip <- function(
 #' @importFrom terra vect project
 #' @importFrom sf st_as_sf
 #' @importFrom dplyr group_by ungroup filter mutate select distinct
+#' @importFrom rlang .data
 #' @note Choose `date` and `mode` values with caution.
 #' The function may return a massive data.table depending on the time range,
 #' resulting in a long processing time or even a crash if data is too large

@@ -91,7 +91,7 @@ download_population <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "groads",
     acknowledgement = acknowledgement,
     download = download,
@@ -111,14 +111,14 @@ download_population <- function(
   chr_year <- match.arg(year)
   # ----------------------------------------------------------------------------
   # Check NASA EarthData token.
-  chr_nasatoken <- amadeus:::get_token(
+  chr_nasatoken <- get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
   checkmate::assert_string(chr_nasatoken, min.chars = 1L)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -195,11 +195,11 @@ download_population <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_url, chr_filename)))
+    return(invisible(download_preview(chr_url, chr_filename)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_url,
     destfiles = chr_filename,
     token = chr_nasatoken,
@@ -209,7 +209,7 @@ download_population <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files and remove if requested.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filename,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip,
@@ -217,7 +217,7 @@ download_population <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -259,7 +259,7 @@ process_population <- function(
     return()
   }
   #### check for variable
-  amadeus:::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
   #### import data
   data <- terra::rast(path, win = extent)
   #### identify names

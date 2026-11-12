@@ -54,7 +54,7 @@ download_sanitize_path <- function(directory) {
 download_setup_dir <- function(directory, zip = FALSE) {
   # ----------------------------------------------------------------------------
   # Sanitize the download path and create missing parent directories.
-  chr_dir_sanitized <- amadeus:::download_sanitize_path(directory)
+  chr_dir_sanitized <- download_sanitize_path(directory)
   if (!dir.exists(chr_dir_sanitized)) {
     dir.create(chr_dir_sanitized, recursive = TRUE)
   }
@@ -63,7 +63,7 @@ download_setup_dir <- function(directory, zip = FALSE) {
   if (zip) {
     # --------------------------------------------------------------------------
     # Create the archive directory.
-    directory_zip <- amadeus:::download_sanitize_path(
+    directory_zip <- download_sanitize_path(
       paste0(
         chr_dir_sanitized,
         "zip_files"
@@ -74,7 +74,7 @@ download_setup_dir <- function(directory, zip = FALSE) {
     }
     # --------------------------------------------------------------------------
     # Create the extracted data directory.
-    directory_data <- amadeus:::download_sanitize_path(
+    directory_data <- download_sanitize_path(
       paste0(
         chr_dir_sanitized,
         "data_files"
@@ -216,7 +216,7 @@ check_urls <- function(
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(
       url_sample,
-      amadeus:::check_url_status
+      check_url_status
     )
     return(url_status)
   }
@@ -352,7 +352,7 @@ download_run_method <- function(
   }
   # ----------------------------------------------------------------------------
   # Retain destinations that are missing or empty.
-  idx_download <- sapply(destfiles, amadeus:::check_destfile)
+  idx_download <- sapply(destfiles, check_destfile)
   chr_urls_filtered <- urls[idx_download]
   chr_destfiles_filtered <- destfiles[idx_download]
   # ----------------------------------------------------------------------------
@@ -456,7 +456,7 @@ download_run_method <- function(
           chr_success_msg <- sprintf(
             "Success: %s (%s)",
             basename(chr_destfile),
-            amadeus:::format_file_size(file.size(chr_destfile))
+            format_file_size(file.size(chr_destfile))
           )
           message(sprintf(
             "%s%s\n",
@@ -735,7 +735,7 @@ download_unzip <- function(
   )
   # ----------------------------------------------------------------------------
   # Remove downloaded archives and their parent directories when requested.
-  amadeus:::download_remove_zips(
+  download_remove_zips(
     remove = remove,
     download_name = file_name
   )
@@ -839,7 +839,7 @@ download_return <- function(
   # ----------------------------------------------------------------------------
   # Return a directory hash or an invisible download summary.
   if (hash) {
-    amadeus:::download_hash(hash = hash, directory_to_save)
+    download_hash(hash = hash, directory_to_save)
   } else {
     invisible(results)
   }

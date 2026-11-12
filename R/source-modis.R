@@ -150,7 +150,7 @@ download_modis <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "modis",
     acknowledgement = acknowledgement,
     download = download,
@@ -178,7 +178,7 @@ download_modis <- function(
   checkmate::assert_true(extent[2L] < extent[4L])
   # ----------------------------------------------------------------------------
   # Check NASA Earthdata token, including when a preview is requested.
-  chr_nasatoken <- amadeus:::get_token(
+  chr_nasatoken <- get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
@@ -187,7 +187,7 @@ download_modis <- function(
   # Check `date` and generate the same inclusive sequence as other downloaders.
   # CMR takes range endpoints, not one query per requested day. Repeat the sole
   # date for a one-day request; otherwise select the first and last dates.
-  chr_dates <- amadeus:::sequence_dates(date, hyphen = TRUE)
+  chr_dates <- sequence_dates(date, hyphen = TRUE)
   chr_date_range <- chr_dates[c(1L, length(chr_dates))]
   # ----------------------------------------------------------------------------
   # Retain the existing cross-year policy during the consistency migration.
@@ -208,7 +208,7 @@ download_modis <- function(
   }
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Resolve the existing CMR version overrides in one place. Explicit NULL
   # omits the version query parameter; it does not mean "latest version".
@@ -225,7 +225,7 @@ download_modis <- function(
   )
   # ----------------------------------------------------------------------------
   # Discover actual URLs and construct the common download table.
-  df_download <- amadeus:::discover_modis(
+  df_download <- discover_modis(
     product = product,
     version = chr_version,
     date = chr_date_range,
@@ -237,14 +237,14 @@ download_modis <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(
+    return(invisible(download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download using the same retry and rate-limit inputs as discovery.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,
@@ -254,7 +254,7 @@ download_modis <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -316,7 +316,7 @@ discover_modis <- function(
   # ----------------------------------------------------------------------------
   # Query the requested product/version first.
   message("Querying NASA CMR for available granules...\n")
-  list_granules <- amadeus:::query_modis_granules(
+  list_granules <- query_modis_granules(
     product = product,
     version = version,
     date = date,
@@ -339,7 +339,7 @@ discover_modis <- function(
       product,
       chr_fallback
     ))
-    list_granules <- amadeus:::query_modis_granules(
+    list_granules <- query_modis_granules(
       product = chr_fallback,
       version = "006",
       date = date,
@@ -385,7 +385,7 @@ discover_modis <- function(
   # ----------------------------------------------------------------------------
   # The existing helper returns the selected paths in their original order.
   # Assign that result directly; a second membership filter is unnecessary.
-  chr_urls <- amadeus:::modis_filter_paths_by_date(chr_urls, date = date)
+  chr_urls <- modis_filter_paths_by_date(chr_urls, date = date)
   # An unrecognized filename date can yield NA in the helper's subset. Drop
   # those placeholders, as the original membership filter did implicitly.
   chr_urls <- chr_urls[!is.na(chr_urls)]
@@ -873,7 +873,7 @@ extent_to_modis_tiles <- function(extent) {
 #' @keywords internal
 #' @noRd
 #' @examples
-#' amadeus:::process_modis_sds(product = "MOD09GA")
+#' process_modis_sds(product = "MOD09GA")
 # previously modis_prefilter_sds
 process_modis_sds <-
   function(

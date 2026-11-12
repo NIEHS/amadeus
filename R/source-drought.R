@@ -126,9 +126,9 @@ download_drought <- function(
   chr_source <- match.arg(source)
   fun_download <- switch(
     chr_source,
-    spei = amadeus:::download_spei,
-    eddi = amadeus:::download_eddi,
-    usdm = amadeus:::download_usdm
+    spei = download_spei,
+    eddi = download_eddi,
+    usdm = download_usdm
   )
   # ----------------------------------------------------------------------------
   # Forward the controls shared by all three sources.
@@ -271,7 +271,7 @@ process_drought <- function(
   source <- match.arg(source)
 
   #### Sanitize path
-  path <- amadeus:::download_sanitize_path(path)
+  path <- download_sanitize_path(path)
 
   #### Validate dates
   date <- if (length(date) == 1) rep(date, 2) else date
@@ -279,7 +279,7 @@ process_drought <- function(
   date <- date[order(as.Date(date))]
 
   #### Check required parameters
-  amadeus:::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
 
   #### Dispatch to source-specific pathway
   if (source %in% c("spei", "eddi")) {

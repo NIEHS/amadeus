@@ -173,7 +173,7 @@ download_edgar <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "edgar",
     acknowledgement = acknowledgement,
     download = download,
@@ -287,11 +287,11 @@ download_edgar <- function(
   int_years <- if (is.null(year_range)) {
     NULL
   } else {
-    amadeus:::sequence_years(year_range)
+    sequence_years(year_range)
   }
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -463,14 +463,14 @@ download_edgar <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(
+    return(invisible(download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -480,7 +480,7 @@ download_edgar <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded or existing archives.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = df_download$destfile,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip,
@@ -488,7 +488,7 @@ download_edgar <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -530,11 +530,11 @@ process_edgar <- function(
   extent = NULL,
   ...
 ) {
-  amadeus:::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
 
   if (length(path) == 1 && dir.exists(path)) {
     path <- list.files(
-      path = amadeus:::download_sanitize_path(path),
+      path = download_sanitize_path(path),
       recursive = TRUE,
       full.names = TRUE
     )

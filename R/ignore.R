@@ -129,10 +129,10 @@ download_olm <- function(
   remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  amadeus:::download_permit(acknowledgement = acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  amadeus:::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus:::download_sanitize_path(directory_to_save)
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
   #### 3. define measurement data paths
   download_urls <-
     list_stac_files(
@@ -161,13 +161,13 @@ download_olm <- function(
     Sys.Date(),
     "_wget_commands.txt"
   )
-  amadeus:::download_sink(commands_txt)
+  download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  amadeus:::download_run(
+  download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -299,7 +299,7 @@ calculate_hms_dev <- function(
   ...
 ) {
   #### check for null parameters
-  amadeus:::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {

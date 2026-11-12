@@ -119,7 +119,7 @@ download_improve <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "improve",
     acknowledgement = acknowledgement,
     download = download,
@@ -137,10 +137,10 @@ download_improve <- function(
   chr_product <- match.arg(product)
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
+  int_years <- sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -171,11 +171,11 @@ download_improve <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -185,7 +185,7 @@ download_improve <- function(
   )
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip,
@@ -193,7 +193,7 @@ download_improve <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -271,7 +271,7 @@ process_improve <- function(
   if (is.null(path) || !dir.exists(path)) {
     stop("`path` must be a valid directory path.\n")
   }
-  path <- amadeus:::download_sanitize_path(path)
+  path <- download_sanitize_path(path)
 
   #### Resolve file prefix from product
   prefix_map <- c(raw = "IMPAER", rhr2 = "IMPRHR2", rhr3 = "IMPRHR3")

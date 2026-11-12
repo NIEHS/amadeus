@@ -142,7 +142,7 @@ download_prism <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "prism",
     acknowledgement = acknowledgement,
     download = download,
@@ -189,7 +189,7 @@ download_prism <- function(
   checkmate::assert_choice(nchar(time), c(2, 4, 6, 8))
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -227,11 +227,11 @@ download_prism <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -241,10 +241,10 @@ download_prism <- function(
   )
   # ----------------------------------------------------------------------------
   # Validate archives.
-  amadeus:::validate_zip(chr_filenames)
+  validate_zip(chr_filenames)
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip,
@@ -252,7 +252,7 @@ download_prism <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

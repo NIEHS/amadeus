@@ -110,7 +110,7 @@ download_cropscape <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "cropscape",
     acknowledgement = acknowledgement,
     download = download,
@@ -130,14 +130,14 @@ download_cropscape <- function(
   # ----------------------------------------------------------------------------
   # Check source-specific year bounds and generate sequence.
   int_minyear <- switch(chr_source, USDA = 2008, GMU = 1997)
-  int_years <- amadeus:::sequence_years(
+  int_years <- sequence_years(
     year,
     min = int_minyear,
     max = as.integer(format(Sys.Date(), "%Y"))
   )
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -167,11 +167,11 @@ download_cropscape <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -186,11 +186,11 @@ download_cropscape <- function(
     sub("\\.(zip|tar\\.gz)$", "", basename(chr_filenames))
   )
   if (isTRUE(unzip)) {
-    invisible(lapply(chr_dirs_to_unzip, amadeus:::download_setup_dir))
+    invisible(lapply(chr_dirs_to_unzip, download_setup_dir))
   }
   # ----------------------------------------------------------------------------
   # Unzip downloaded .zip files.
-  amadeus:::download_unzip(
+  download_unzip(
     file_name = chr_filenames,
     directory_to_unzip = chr_dirs_to_unzip,
     unzip = unzip,
@@ -198,7 +198,7 @@ download_cropscape <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 # nolint end
 

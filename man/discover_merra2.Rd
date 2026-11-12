@@ -83,7 +83,7 @@ df <- data.frame(
   date = "20240101",
   vdir = file.path(tempdir(), "inst1_2d_asm_Nx")
 )
-amadeus:::discover_merra2(
+discover_merra2(
   df = df,
   collection = "inst1_2d_asm_Nx",
   max_tries = 3,

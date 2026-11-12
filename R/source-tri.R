@@ -106,7 +106,7 @@ download_tri <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "tri",
     acknowledgement = acknowledgement,
     download = download,
@@ -126,10 +126,10 @@ download_tri <- function(
   checkmate::assert_string(chr_juris, pattern = "^([A-Z]{2}|TBL)$")
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
+  int_years <- sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Format the validated jurisdiction for URLs and file names.
   chr_jurl <- if (chr_juris == "TBL") "tbl" else chr_juris
@@ -155,11 +155,11 @@ download_tri <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
+    return(invisible(download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -169,7 +169,7 @@ download_tri <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

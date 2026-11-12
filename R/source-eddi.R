@@ -70,7 +70,7 @@ download_eddi <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "eddi",
     acknowledgement = acknowledgement,
     download = download,
@@ -89,8 +89,8 @@ download_eddi <- function(
   chr_timescale <- sprintf("%02d", timescale)
   # ----------------------------------------------------------------------------
   # Check `date` and generate sequence.
-  chr_dates <- amadeus:::sequence_dates(date, hyphen = TRUE)
-  chr_wdates <- amadeus:::drought_weekly_dates(
+  chr_dates <- sequence_dates(date, hyphen = TRUE)
+  chr_wdates <- drought_weekly_dates(
     chr_dates[1L],
     chr_dates[length(chr_dates)]
   )
@@ -102,7 +102,7 @@ download_eddi <- function(
   }
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Generate one download row per requested weekly date.
   df_download <- expand.grid(
@@ -126,14 +126,14 @@ download_eddi <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus:::download_preview(
+    return(invisible(download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus:::download_run_method(
+  download_result <- download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -143,5 +143,5 @@ download_eddi <- function(
   )
   # ----------------------------------------------------------------------------
   # Return results or hash.
-  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+  download_return(download_result, hash, chr_dir_to_save)
 }
