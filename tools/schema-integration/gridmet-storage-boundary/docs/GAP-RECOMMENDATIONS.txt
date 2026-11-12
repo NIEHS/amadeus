@@ -1,0 +1,105 @@
+PRINCIPLE
+Resolve policy/coverage/independent replay before feature expansion. Keep scientific Amadeus calls unchanged; enforce actual data automatically after calculate, during writing/loading and at saved-store open. Stable definitions are checked at build. New runtime rules require a documented gap; avoid duplicate checks without a changed input or trust boundary. No AI model executes validation.
+
+PRIORITY 1 — QUALIFY THE CURRENT BOUNDARY
+Complete scientific decisions and critical rule-level control/rejection cases. Replay one matched request on an independent/affected stack. Test incomplete-load/publication/retry behavior on the target filesystem. Review provenance truth and supported query/trust boundaries. Record actual AI assistance and real human decisions. Keep all unresolved approvals visible.
+
+PRIORITY 2 — DEMONSTRATE OPERATIONAL VALUE AND EXPANSION
+Measure the exact corrected release under matched workload/components. Agree deployment controls and supported concurrency/retention. Then qualify a contrasting dataset and selected backend separately. Add metadata sources and migrations only with versioned authority/conflict rules and compatibility tests.
+
+ONE TRACEABLE RECORD PER CHANGE
+Gap ID → authoritative source/version/observed fact or proposed policy → rule ID and implementation hash → valid/invalid test IDs and results → reviewer/date/decision/rationale → approved scope/release hash. Keep machine acceptance, human approval and publication completion distinct. Historical suite evidence is not an individual-rule negative test. Unknown authorship stays unknown.
+
+EFFICIENT TESTING
+Use cached identical sources to isolate integration cost and correctness; label them cached. Use minimal fixtures for rejection tests and one ordinary small request for replay. Run targeted tests during edits and a full scoped qualification suite for a changed release. Keep monitoring outside row loops. Reuse JSON Schema, generated SQL, recorder and database gate; prefer metadata-driven scope over copied per-dataset scripts. Optional signing/locking/immutable-store controls require a separate explicit design and tests, not a hidden addition.
+
+DECISION
+A bounded operational trial needs reviewed scientific/acceptance policy, demonstrated critical rejection coverage, independent replay, clear failure/retry/access behavior and an agreed limited trust model. Broader production additionally needs supported storage/concurrency/recovery controls and measured cost appropriate to scale. Human decisions remain pending; this document does not set an automatic production flag or guarantee scientific truth.
+
+SB-G01 | P1 — before operational trial | Scientific authority and acceptance
+Gap: Unit/physical-time and acceptance approvals pending
+Action: Review 16 active codes using package labels, observed CF facts and explicit policy; record conflicts as unresolved, not corrected guesses. Approve missingness, unit aliases, physical intervals and tolerances.
+Keep it efficient: Use existing scientific-unit and human-decision sheets; no runtime rule change until approved.
+Evidence: Human scientific review and versioned policy rationale
+Close when: All active codes have a named/dated scoped decision, or explicit exclusion; no pending ambiguity represented as approved.
+Status: Pending
+
+SB-G02 | P1 — before operational trial | Rule-level rejection coverage
+Gap: Suite-level evidence does not independently qualify every rule
+Action: Map critical unit/time/membership/lineage/finite/geometry rules to valid controls, minimal invalid cases and exact-boundary cases. Expand remaining 60 SQL rules and JSON/non-SQL families afterward.
+Keep it efficient: Reuse one shared mutation harness and existing rule IDs; run affected tests on a change; full suite at release. Do not add user-facing calls.
+Evidence: Rule ID → source/version → implementation hash → test ID/input hash/outcome → human decision
+Close when: Every critical rule has passing controls and intended rejections; uncovered rules explicitly listed; 102 SQL queries are not reported as complete schema coverage.
+Status: Pending
+
+SB-G03 | P1 — before operational trial | Independent reproducibility
+Gap: Affected environment replay remains unqualified
+Action: Run the exact pinned release and small identical request/source bytes on an independent stack, including a previously affected stack where available. Compare ordinary raster/result first, then schema and storage.
+Keep it efficient: Use existing replay/environment capture; one small matched request first. Keep core changes out of this documentation update.
+Evidence: Pilot commit, runtime contract hash, install/function identity, source hashes, logs and receipts
+Close when: Ordinary and stored native values agree within approved tolerances; failures localized; supported environments and exclusions documented.
+Status: Pending
+
+SB-G04 | P1 — bounded trust required | Provenance truth and capture limits
+Gap: Unsigned local history; raster fingerprint not full cell proof
+Action: Document observed versus supplied claims and cache reuse. Preserve call/source/output bindings. Add negative recording cases for incomplete/wrong calls and request/output substitution. Consider processed-file hashes where needed, measuring I/O first.
+Keep it efficient: Reuse recorder and after-calculate verification. Avoid full source/raster rehashing at every stage without a concrete requirement.
+Evidence: Recorded claims linked to observations, request keys, source identities and matching run/output; human trust decision
+Close when: Tested fabricated/mismatched context rejected; unobserved history and remaining trust limits stated. Authentication only claimed if separately implemented and tested.
+Status: Pending
+
+SB-G05 | P1 — before operational trial | Failure/retry and incomplete publication
+Gap: Latest simple handoff lacks full production durability
+Action: Replay blocked load, missing/truncated file, failed readback, disk/permission failure and interrupted publication on the intended filesystem using owned copies. Check stage-specific outcomes and new-run retry.
+Keep it efficient: Reuse publication tests and one small case; no fault mutation of published reference artifacts.
+Evidence: Failure point, schema acceptance, workflow completion, pointer before/after, consumer outcome and retry receipt
+Close when: Incomplete runs cannot appear as completed publications or replace last good pointer; diagnostics survive; fresh retry succeeds. Power-loss durability remains excluded unless tested.
+Status: Pending
+
+SB-G06 | P2 — before broader production | Tamper protection and concurrency
+Gap: Unsigned manifests, readonly bits and possible external writers
+Action: Agree deployment trust/retention policy. Use immutable versioned destinations and separate write/read permissions; serialize publication writers. Evaluate signed/anchored manifests only if authenticity requirements justify them.
+Keep it efficient: Use existing infrastructure controls before adding R packages; keep stronger signing/locking a separately reviewed change.
+Evidence: Deployment configuration, access tests, concurrency/corruption tests and threat-model decision
+Close when: Supported access/retention and concurrent-write behavior demonstrated; privileged rewrite limits explicit; no production immutability claim from chmod alone.
+Status: Pending
+
+SB-G07 | P1 — documented access boundary | Direct query bypass
+Gap: Direct DBI/IDE access skips supported verification
+Action: Make verified-open the documented supported path. Provide clear export labels; if direct access is required, verify an immutable copy immediately before access and define its trust scope.
+Keep it efficient: Reuse database.R; do not silently change Amadeus or add redundant row scans on each query.
+Evidence: Supported query command, pre-open receipt and intentionally altered-store negative test
+Close when: Team can demonstrate supported query rejection; raw access explicitly outside guarantee; immutable-read design reviewed if required.
+Status: Pending
+
+SB-G08 | P2 — before efficiency claims | Full-workflow cost
+Gap: Historical timings do not benchmark latest corrected release
+Action: Measure ordinary Amadeus, optimized pilot and exact latest candidate using identical sources, requests and science. Separate science, recording, export, load and open; use randomized order and repeated fresh processes.
+Keep it efficient: Start small/cached, then all16 and a larger request. Reuse monitoring; separate network variability; report peak-RSS measurement limits and actual deliverables.
+Evidence: Commit/release/input identities, raw timings/memory, workload, repeats and uncertainty
+Close when: Correctness equivalent for approved scope; component and total runtime/memory differences reported; no performance claim from a query-only component.
+Status: Pending
+
+SB-G09 | P2 — before wider adoption | Reuse and dataset/engine scope
+Gap: gridMET profile and DuckDB qualified; latest other backends unqualified
+Action: After critical gridMET gaps, test shared boundary components with contrasting IMPROVE; isolate dataset policy as versioned metadata. Separately qualify Sedona/amadeusdb computation and geometry differences if selected.
+Keep it efficient: One contrasting dataset next; reuse shared checks and native dataset routes, avoid a universal dispatcher or new scientific pipeline.
+Evidence: Dataset profile, metadata field authority, native-result equivalence and per-engine acceptance matrix
+Close when: Shared rules reused without hidden gridMET assumptions; dataset-specific missingness/time rules explicit; each supported engine independently qualified.
+Status: Pending
+
+SB-G10 | P2 — before contract changes | Schema evolution and optional metadata
+Gap: Future planning entities differ; external metadata import deferred
+Action: Version schemas/mappings/catalogs separately; preserve matching release for historical stores. Define explicit migration/republication tests. Add external metadata only through reviewed keyed build-time merge with field authority/conflict rules.
+Keep it efficient: No runtime spreadsheet dependency. Do not silently rewrite historical snapshots or create competing authorities.
+Evidence: Old/new versions and hashes, migration map, comparison tests, metadata sources/reviewer decisions
+Close when: Old snapshots remain queryable under matching release, or reviewed migration preserves identity/meaning; external conflicts rejected or explicitly resolved.
+Status: Pending
+
+SB-G11 | P1 — ongoing | AI/human attribution and release decision
+Gap: Historical per-line attribution unknown; approvals incomplete
+Action: Record known AI assistance, human edits, evidence and actual decisions for each new change. Unknown history remains unknown. Human approval cites exact policy/rule/release scope.
+Keep it efficient: Use existing CSV registers and version control; no new runtime AI service or approval engine needed.
+Evidence: Contribution log, rule/test links and named dated human decisions
+Close when: No AI or machine pass presented as scientific approval; pending items visible; release decision has explicit scope, exclusions and evidence.
+Status: Pending

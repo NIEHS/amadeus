@@ -1,0 +1,105 @@
+UPDATED WORKFLOW — R SCRIPT ROLES, INPUTS, OUTPUTS AND VALIDATION TIMING
+12 November 2026. Documentation only; no new validation logic or runtime dependency.
+
+CORE BOUNDARY
+Existing Amadeus scientific functions keep downloading, processing and calculating. The caller chooses arguments. A small explicit external recorder observes execution. After calculate returns, the writer maps outputs and recorded context into schema records, enforces the compiled contract, writes/reads typed Parquet and loads/verifies DuckDB. Only successful completion becomes a database publication. Supported saved-store queries verify the published snapshot before opening read-only.
+
+PILOT COMPARISON
+The earlier pilot example_gridmet.R orchestration and schema_validator.R checks are not executed by this approach. Those were external pilot helpers, not core Amadeus checks. The current test example is an ordinary caller with recording and a post-calculation writer, not a new scientific dispatcher. Existing Amadeus checks remain. Validation moved to shared boundary code; it did not disappear. Export/load/open checks cost time even though they follow scientific calculation. Historical timing evidence does not establish the latest corrected release's total runtime/memory cost.
+
+AI BOUNDARY
+AI is used for development, review and documentation assistance only. No AI inference runs during science, validation, writing/loading or query. Deterministic R / JSON Schema / SQL executes implemented checks. Humans decide scientific authority, physical time, request binding, provenance truth, acceptance policy and release scope. Build success, machine acceptance and human approval are separate. Unknown historical authorship stays unknown.
+
+1. Build contracts and catalog
+Scripts: dev/build_dataset_metadata.R; build_parquet_contract.R; check_approval.R; validate_release.R
+Input: LinkML definitions, package code/labels, unit policy and evidence
+Output: Pinned JSON Schema, SQL, catalog and runtime contract
+When: Build / changed release only
+Boundary / limitation: Approve authoritative definitions and native-unit/time policy. Build consistency does not equal scientific approval.
+
+2. User request
+Scripts: Ordinary caller; examples/ordinary_with_recording.R is a test example
+Input: Variables, dates, locations, paths and method arguments
+Output: Actual request passed to unchanged Amadeus calls and recorder
+When: Before science
+Boundary / limitation: User chooses request. No runtime spreadsheet or AI service; tested scope is explicit.
+
+3. Amadeus download
+Scripts: amadeus::download_data; R/provenance_recorder.R observes
+Input: Request and provider assets or available cache
+Output: Source files, recorded source hashes and call events
+When: Science + recording
+Boundary / limitation: No package patch. Cache identity is not proof of a fresh provider download.
+
+4. Amadeus process
+Scripts: amadeus::process_covariates; provenance_recorder.R observes
+Input: Source files, dates and site extent
+Output: Processed raster/TIFF and recorded call/output context
+When: Science + recording
+Boundary / limitation: Existing processing behavior retained; capture changes and environment identities in any replay.
+
+5. Amadeus calculate
+Scripts: amadeus::calculate_covariates; provenance_recorder.R observes
+Input: Processed raster, sites and method
+Output: Ordinary R result frames and sealed execution context
+When: Science + recording
+Boundary / limitation: Scientific computation ends here. Recorder operates alongside calls; it does not enforce the schema.
+
+6. Verify actual context
+Scripts: R/export_gridmet.R; R/provenance_recorder.R verification
+Input: Completed calculation outputs, actual request and recording
+Output: Verified context for export, or rejection
+When: After calculation
+Boundary / limitation: No pilot example_gridmet.R orchestration or schema_validator.R checks in the active path. Core Amadeus checks remain.
+
+7. Assemble and validate records
+Scripts: R/schema_export.R; R/storage_boundary.R
+Input: Actual outputs/context, compiled catalog and contract
+Output: Accepted schema instance or rejection
+When: After calculation / before publication
+Boundary / limitation: Deterministic JSON Schema/R/SQL check structure, units/binding, dates, membership, finite values and lineage.
+
+8. Write and read typed Parquet
+Scripts: R/storage_boundary.R; R/parquet_experiment.R
+Input: Mapped actual records and compiled storage mapping
+Output: Typed Parquet and full-column readback evidence
+When: Storage boundary
+Boundary / limitation: DuckDB provides Parquet I/O. Typing/metadata alone do not establish scientific validity or true history.
+
+9. Load and verify DuckDB
+Scripts: R/database.R; R/parquet_experiment.R
+Input: Accepted records, Parquet and generated DDL/integrity SQL
+Output: Loaded DB, integrity/fidelity and reopen receipts
+When: During loading / before completion
+Boundary / limitation: 102 SQL queries include empty tables. Schema acceptance alone is not a successful database publication.
+
+10. Bind published artifacts
+Scripts: R/storage_boundary.R: storage_publish_manifest
+Input: Actual owned artifact bytes and matching release/instance
+Output: Manifest hashes for files and receipts
+When: After successful load
+Boundary / limitation: Unsigned local integrity, not authenticated history or protection against coordinated privileged rewriting.
+
+11. Complete and publish pointer
+Scripts: R/schema_export.R
+Input: Successful storage checks and bound manifest
+Output: Read-only critical files, completed workflow and final LATEST
+When: Publication
+Boundary / limitation: Failed load must not complete or advance pointer. Not multi-file power-loss durability.
+
+12. Verify open and query
+Scripts: R/database.R; storage_verify_publication
+Input: Completed publication, file hashes and release identity
+Output: Verified read-only DuckDB query, or rejection
+When: Each supported saved-store open
+Boundary / limitation: No raw-source reread for saved query. Direct DBI/IDE access bypasses this verification path.
+
+13. Review evidence and decide
+Scripts: Separate tests/direct_source_check.R and human review records
+Input: Source comparisons, adversarial tests, replay, known limits
+Output: Scoped human decision or pending status
+When: Qualification / release review
+Boundary / limitation: Units, physical time, binding, provenance truth and acceptance need human decisions. Production approval remains pending.
+
+NEXT DECISIONS
+Follow GAP-RECOMMENDATIONS.txt and review-materials/gap-actions.csv. P1 critical policy/coverage/replay/failure/access/trust decisions precede a bounded operational trial. Deployment protection, broader scope and latest matched cost qualification follow as explicit changes. All actions are pending until evidence and actual reviewer decisions are recorded. No production approval is granted by this workflow update.

@@ -1,0 +1,113 @@
+SLIDE 1: Ordinary Amadeus first; enforce the contract afterward
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Ordinary Amadeus first; enforce the contract afterward
+Recording accompanies science. Validation gates acceptance and storage after calculate.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+1
+Evidence: LATEST
+Amadeus scientific calls
+download_data →
+process_covariates →
+calculate_covariates
+Post-calculation export
+export_gridmet.R +
+schema_export.R +
+storage_boundary.R
+Load and verify storage
+Typed Parquet readback →
+DuckDB SQL / fidelity / reopen
+Build once per release
+LinkML / catalog / unit policy →
+pinned contracts. No runtime AI.
+Record alongside science
+provenance_recorder.R observes
+request / calls / sources / outputs
+Publish and query
+Manifest + completion;
+database.R verifies before
+read-only open
+AI assists development / review / documentation only. Humans approve scientific meaning.
+
+PRESENTER NOTES
+Build contracts feed the post-calculation boundary, not scientific dispatch. Recording is explicit during science; actual validation occurs afterward and during loading. Existing core checks remain. Current scope is 16 daily gridMET variables, point extraction and DuckDB. Human scientific sign-off and independent replay pending. Pinned implementation unchanged by this workflow update.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 2: How this differs from the earlier pilot
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+How this differs from the earlier pilot
+Fewer workflow gates; shared automatic enforcement at output and storage boundaries.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+2
+Evidence: LATEST, HIST
+AREA
+EARLIER PILOT
+CURRENT STORAGE BOUNDARY
+Scientific execution
+Pilot orchestration plus workflow
+checks
+Ordinary Amadeus calls; existing checks remain
+Integration validation
+example_gridmet.R /
+schema_validator.R path
+After calculate: export and shared R / JSON /
+SQL
+Storage acceptance
+Version-specific load/check path
+Typed readback + load / fidelity / reopen before
+completion
+History and saved
+queries
+Version-specific evidence / protection
+Record during science; verify publication at
+saved open
+Validation moved; it did not disappear. Post-calculation work still adds total delivery cost.
+
+PRESENTER NOTES
+The current candidate does not run the two earlier external pilot helpers. They were not core Amadeus APIs. R/export_gridmet.R is a post-calculation writer, not a scientific dispatcher. This is an architecture comparison; older measured candidate cost is not a fresh benchmark of the corrected release. Schema acceptance and database publication are different statuses.
+
+EVIDENCE
+LATEST: evidence/latest.json
+Original: /tmp/gridmet-storage-release.z6v56_9e/VERIFICATION.json
+HIST: evidence/hist.json
+Original: /tmp/gridmet-consolidated-review.w3s0upd6/VERIFICATION.json
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.
+
+SLIDE 3: Close gaps with evidence before broadening scope
+
+GRIDMET / ARCHITECTURE AND EVIDENCE REVIEW
+Close gaps with evidence before broadening scope
+Start with policy, rejection coverage and an independent small-request replay.
+12 NOV 2026 | REVIEW COPY | PRODUCTION APPROVAL PENDING
+3
+ORDER
+ACTION
+REQUIRED EVIDENCE
+1
+Approve units, time, binding and acceptance
+Named / dated policy decisions with exact scope
+2
+Map critical rules to valid + invalid cases
+Rule IDs, source/code hashes and observed outcomes
+3
+Replay and test publication failure / recovery
+Independent identities + values; no false completion
+4
+Measure cost; qualify deployment and reuse
+Matched workload; explicit trust controls and limits
+See gap-actions.csv: 11 gap IDs, efficient actions, closure criteria; all pending.
+
+PRESENTER NOTES
+Closure criteria are proposed decision criteria, not completed work or a new runtime gate. Stronger authenticity/concurrency/durability controls are separately reviewed. Critical tests are run at affected boundaries; avoid redundant full scans. Dataset/backend expansion follows current scope qualification. AI never supplies human scientific approval.
+
+EVIDENCE
+
+
+Relative evidence files are included in this review pack. Native text/shapes are editable; font substitution may alter layout. PDF/PNG are scene previews, not an Office-rendered validation.

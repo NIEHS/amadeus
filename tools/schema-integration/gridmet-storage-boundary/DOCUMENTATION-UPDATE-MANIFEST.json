@@ -1,0 +1,70 @@
+{
+  "revision": "workflow-roles-gap-actions-2026-11-12",
+  "scope": "Documentation/workflow files only; supersedes original PACKAGE-MANIFEST entries only for listed paths",
+  "original_package_manifest_sha256": "11d23035b8216fedc95c2f71f961b58afb9e18fb80f382671f2fb194d46d36ce",
+  "runtime_manifest_sha256_unchanged": "730f7bf63d0ea58001aec1868f23dcb1cded73c0ac843b8afaaa210ca5d5e59d",
+  "scientific_approval": "pending",
+  "production_approved": false,
+  "files": {
+    "docs/GAP-RECOMMENDATIONS.txt": {
+      "sha256": "9edc34440c6914ac9063c899f96b4c48da701e7865fa39df2b6e2c887b5d57e5",
+      "bytes": 11247
+    },
+    "docs/STORAGE-BOUNDARY-WORKFLOW.txt": {
+      "sha256": "a2e166f0253ea474399ce59bbd989949a713d1411bb60026cbfbcd11c61b884d",
+      "bytes": 6851
+    },
+    "docs/workflow.mmd": {
+      "sha256": "9fc3d228f3ab6055013bba2b2033103cfb70ab3b8b0b067db0d62f3c25191ab1",
+      "bytes": 2382
+    },
+    "review-materials/editable-workflow.pdf": {
+      "sha256": "e44d23dd8751bd5dc1b4cce494f8a160793ef06e01a7b4db3bf0bce55d3f05d6",
+      "bytes": 48164
+    },
+    "review-materials/editable-workflow.pptx": {
+      "sha256": "97b7b6c2dd76c513b5283d51660d45704c0e159e9b4f6f8fa7a9730ab8658fb4",
+      "bytes": 43348
+    },
+    "review-materials/gap-actions.csv": {
+      "sha256": "d181648cda382ce09f827d05ba901c82b22c24ca55fe1da6371546139e5e22db",
+      "bytes": 8875
+    },
+    "review-materials/workflow-complete.mmd": {
+      "sha256": "9fc3d228f3ab6055013bba2b2033103cfb70ab3b8b0b067db0d62f3c25191ab1",
+      "bytes": 2382
+    },
+    "review-materials/workflow-complete.pdf": {
+      "sha256": "2cb5a0d4be1c4fc433aad2e37260d6328fdef6f29bfb90da3d7e2f38dc22c2c2",
+      "bytes": 47836
+    },
+    "review-materials/workflow-complete.pptx": {
+      "sha256": "ba0faea0dbe239fed6ada2f3be2f03740660c1b85e07a4f2ee5074bc6f6a1dff",
+      "bytes": 38610
+    },
+    "review-materials/workflow-complete.svg": {
+      "sha256": "46e5f0b902d6cb430e65184146736df6a0902d9b5c91a5243f2fc287673b2aa7",
+      "bytes": 19646
+    },
+    "review-materials/workflow-notes.txt": {
+      "sha256": "8e3b40b65e25a50fed9fe7f723835313c1bf8753dcfc21fa62847f5ffb66a579",
+      "bytes": 4671
+    },
+    "review-materials/workflow-overview.svg": {
+      "sha256": "25fc6643b46db03b3b56514495ef34df5b856885345799698bca52fcc9a5d965",
+      "bytes": 6009
+    },
+    "review-materials/workflow-script-roles.csv": {
+      "sha256": "ce155d1e79d0cc3040643398c52d800d16e931d866b7b2fcd00d7528b6036426",
+      "bytes": 4113
+    },
+    "review-materials/workflow-stages.csv": {
+      "sha256": "ce155d1e79d0cc3040643398c52d800d16e931d866b7b2fcd00d7528b6036426",
+      "bytes": 4113
+    },
+    "review-materials/workflow-visual.html": {
+      "sha256": "5d7ad4c8d76b7707ccce9a21cdc2153ee75d6ab4488688e3b48fbfca7db1b536",
+      "bytes": 47915
+    }
+  }
+}
