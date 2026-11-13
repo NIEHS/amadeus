@@ -28,11 +28,13 @@ download_groads(
 
 - data_region:
 
-  character(1). Data region.
+  character(1). One of `"Americas"` (default), `"Global"`, `"Africa"`,
+  `"Asia"`, `"Europe"`, `"Oceania East"`, or `"Oceania West"`.
 
 - data_format:
 
-  character(1). "Shapefile" or "Geodatabase".
+  character(1). Requested format: `"Shapefile"` (default) or
+  `"Geodatabase"`.
 
 - nasa_earth_data_token:
 
@@ -50,7 +52,8 @@ download_groads(
 
 - download:
 
-  logical(1). DEPRECATED. Downloads happen automatically.
+  logical(1). DEPRECATED. Downloads happen automatically. Set to FALSE
+  to skip downloading and return the planned file list.
 
 - remove_command:
 
@@ -82,7 +85,27 @@ download_groads(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+When `download = TRUE` and `hash = FALSE`, an invisible list containing
+`success`, `failed`, and `skipped` file counts. If the requested archive
+already exists and is nonempty, no file is downloaded; the returned list
+contains `success = 0`, `failed = 0`, and `skipped = 1`. The list always
+contains `failed_urls` and `failed_files` character vectors, both
+`character(0)` when no downloads failed, including when the file was
+skipped.
+
+When `download = FALSE`, an invisible list containing `urls`,
+`destfiles`, and `n_files = 1` is returned without downloading,
+regardless of `hash`.
+
+When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
+hash of the files in the `data_files` directory is returned instead of a
+list.
+
+## Details
+
+`data_region` and `data_format` each select one value. Matching is
+case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+each argument uses its first listed choice.
 
 ## Note
 

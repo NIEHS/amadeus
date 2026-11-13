@@ -32,7 +32,14 @@ download_narr(
 
 - year:
 
-  integer(1 or 2). Year or start/end years for downloading data.
+  integer(1 or more). One year, two endpoints, or a non-empty vector of
+  years. Every year from the minimum through the maximum is requested,
+  including gaps: `c(2018, 2023)` requests `2018:2023`. Default is
+  `c(2018, 2022)`. All years must be between 1979 and the current
+  calendar year, inclusive. Any year outside this range causes the
+  entire request to fail before directory creation or network requests;
+  the range is not filtered or truncated. Missing and fractional years
+  are rejected.
 
 - directory_to_save:
 
@@ -68,7 +75,15 @@ download_narr(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. With `download = TRUE` and `hash = FALSE`,
+an invisible summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+containing `success`, `failed`, `skipped`, `failed_urls`, and
+`failed_files`. The two failure vectors are `character(0)` when no
+downloads failed, including when every file was skipped. With
+`download = TRUE` and `hash = TRUE`, a visible character scalar
+containing the combined MD5 hash of the output directory.
 
 ## Note
 

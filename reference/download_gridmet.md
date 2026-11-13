@@ -29,7 +29,12 @@ download_gridmet(
 
 - year:
 
-  integer(1 or 2). Year or start/end years for downloading data.
+  integer(1 or more). One year, two endpoints, or a non-empty vector of
+  years. Every year from the minimum through the maximum is requested,
+  including gaps: `c(2018, 2023)` requests `2018:2023`. Default is
+  `c(2018, 2022)`. Missing and fractional years are rejected. For
+  SPEI/EDDI, complete multi-year files are downloaded regardless of
+  `year`, but supplied years are still validated; see Details.
 
 - directory_to_save:
 
@@ -65,11 +70,15 @@ download_gridmet(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
-
-## Note
-
-gridMET data does not require authentication.
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. With `download = TRUE` and `hash = FALSE`,
+an invisible summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+containing `success`, `failed`, `skipped`, `failed_urls`, and
+`failed_files`. The two failure vectors are `character(0)` when no
+downloads failed, including when every file was skipped. With
+`download = TRUE` and `hash = TRUE`, a visible character scalar
+containing the combined MD5 hash of the output directory.
 
 ## Details
 
@@ -91,6 +100,10 @@ These files are several GB each. This is distinct from the global CSIC
 SPEI product in
 [`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md).
 See <https://www.northwestknowledge.net/metdata/data/>.
+
+## Note
+
+gridMET data does not require authentication.
 
 ## References
 

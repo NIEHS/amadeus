@@ -1,7 +1,8 @@
 # Create hash of downloaded files.
 
-Create a combined md5sum hash based on the files in a specified
-directory.
+Create a combined MD5 hash from file contents recursively under a
+specified directory, including files in nested subdirectories and
+previously saved files.
 
 ## Usage
 
@@ -17,8 +18,11 @@ download_hash(hash = TRUE, dir = NULL)
 
 - dir:
 
-  character(1). Directory path.
+  character(1). Root directory to hash. Sibling directories are not
+  included; hashing `data_files/` therefore excludes sibling
+  `zip_files/`.
 
 ## Value
 
-character(1) Combined 128-bit md5sum of download files.
+With `hash = TRUE`, a character(1) combined MD5 hash. With
+`hash = FALSE`, invisible `NULL`.

@@ -20,6 +20,8 @@ process_aqs(
   data_field = "Arithmetic.Mean",
   return_format = c("terra", "sf", "data.table"),
   extent = NULL,
+  resolution_temporal = c("daily", "hourly"),
+  tz = c("local", "gmt"),
   ...
 )
 ```
@@ -58,6 +60,17 @@ process_aqs(
   numeric(4). Spatial extent of the resulting object. The order should
   be `c(xmin, xmax, ymin, ymax)`. The coordinate system should be WGS84
   (EPSG:4326).
+
+- resolution_temporal:
+
+  character(1). Daily or hourly data, must match `resolution_temporal`
+  argument passed to
+  [`amadeus::download_aqs`](https://niehs.github.io/amadeus/reference/download_aqs.md)
+
+- tz:
+
+  character(1). "local" or "gmt" for time zone associated with hourly
+  data.
 
 - ...:
 

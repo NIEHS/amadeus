@@ -46,11 +46,6 @@ process_gridmet(
 
 a `SpatRaster` object
 
-## Note
-
-Layer names of the returned `SpatRaster` object contain the variable
-acronym, and date.
-
 ## Details
 
 EDDI uses the same native GRIDMET multi-year workflow as SPEI. Use
@@ -68,6 +63,11 @@ code directory created by
 (e.g., spei30d). The multi-year file is subset using its observation
 dates; no daily interpolation is performed. Layer names retain the
 accumulation period (e.g., spei30d_20200105).
+
+## Note
+
+Layer names of the returned `SpatRaster` object contain the variable
+acronym, and date.
 
 ## Author
 

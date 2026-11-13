@@ -91,11 +91,15 @@
 <url><loc>https://niehs.github.io/amadeus/reference/check_url_status.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/check_urls.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/collapse_nlcd.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/discover_merra2.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/dot-amadeus.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/dot-onLoad.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_aqs.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_cropscape.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_data.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_drought.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_ecoregion.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_eddi.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_edgar.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_geos.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_gmted.html</loc></url>
@@ -114,6 +118,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_nlcd.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_permit.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_population.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_preview.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_prism.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_remove_command.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_remove_zips.html</loc></url>
@@ -122,9 +127,11 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_sanitize_path.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_setup_dir.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_sink.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_spei.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_terraclimate.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_tri.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_unzip.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_usdm.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/drought_weekly_dates.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/dt_as_mysftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/extent_to_modis_tiles.html</loc></url>
@@ -184,6 +191,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/process_variable_codes.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/read_commands.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/rename_time.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/sequence_dates.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/setup_nasa_token.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/sf_as_mysftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/sftime_as_mysftime.html</loc></url>

@@ -31,11 +31,17 @@ download_hms(
 
 - date:
 
-  character(1 or 2). Date range "YYYY-MM-DD" format
+  character(1 or 2). A single date or inclusive range endpoints in
+  `"YYYY-MM-DD"` format, in either order. All dates must be between
+  `"2005-08-05"` and today, inclusive. Any date outside this range
+  causes the entire request to fail before directory creation or network
+  requests; the range is not filtered or truncated.
 
 - directory_to_save:
 
-  character(1). Directory to save data.
+  character(1). Parent directory. Shapefile archives are saved in
+  `zip_files/` and extracted into `data_files/`. KML files are saved
+  directly in `data_files/`.
 
 - acknowledgement:
 
@@ -51,11 +57,16 @@ download_hms(
 
 - unzip:
 
-  logical(1). Unzip zip files (default TRUE).
+  logical(1). Extract all planned Shapefile ZIP archives, including
+  existing archives, into the shared `data_files/` directory. Default is
+  `TRUE`; `FALSE` skips extraction. KML files do not require extraction.
 
 - remove_zip:
 
-  logical(1). Remove zip files after unzipping (default FALSE).
+  logical(1). Remove Shapefile archives and their `zip_files/` directory
+  recursively, including remaining contents, after the extraction loop
+  finishes. Default is `FALSE`; requires `unzip = TRUE`. No archive
+  cleanup is performed for KML downloads.
 
 - show_progress:
 
@@ -63,7 +74,11 @@ download_hms(
 
 - hash:
 
-  logical(1). Return hash of downloaded files (default FALSE)
+  logical(1). Return a combined MD5 hash of all files recursively under
+  `data_files/`, including existing files. Default is `FALSE`; ignored
+  when `download = FALSE`. With Shapefile downloads and `unzip = FALSE`,
+  hashing still uses `data_files/`, which may be empty or contain older
+  data.
 
 - max_tries:
 
@@ -75,7 +90,15 @@ download_hms(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. With `download = TRUE` and `hash = FALSE`,
+an invisible summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+containing `success`, `failed`, `skipped`, `failed_urls`, and
+`failed_files`. The two failure vectors are `character(0)` when no
+downloads failed, including when every file was skipped. With
+`download = TRUE` and `hash = TRUE`, a visible character scalar
+containing the combined MD5 hash of `data_files/`.
 
 ## Note
 

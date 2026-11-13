@@ -1,5 +1,82 @@
 # Changelog
 
+## amadeus 2.1.0
+
+### Download tier Refactor
+
+- Standardized source downloaders and
+  [`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md)
+  around shared argument checks, URL and destination planning, download
+  execution, and return handling. Existing non-empty files are skipped
+  by the shared download runner, which also creates missing destination
+  directories.
+- Standardized `download = FALSE` previews as invisible lists containing
+  `urls`, `destfiles`, and `n_files`. Previews include all planned
+  files, including existing destinations. MODIS, MERRA-2, and GOES
+  discovery can still make network requests. The `download` and
+  `remove_command` arguments remain deprecated with warnings.
+- Standardized download summaries as invisible lists containing
+  `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`.
+  Both failure vectors are `character(0)` when no downloads fail,
+  including when all files are skipped. Counts describe file downloads,
+  not extracted archive members.
+- Aligned `hash = TRUE` returns with each source’s output directory,
+  using `data_files/` for extracted archives. Hashes are visible
+  character scalars and include existing files recursively. Preview
+  returns take precedence over hashing.
+- Consolidated date and year validation. Downloaders using
+  `sequence_years()` accept one year, two endpoints, or a longer vector
+  and request every year between the smallest and largest values. Date
+  ranges accept endpoints in either order. Added configurable bounds and
+  documented the implemented source-specific limits for HMS, NARR, NLCD,
+  and CropScape; requests outside those limits fail rather than being
+  truncated.
+- Removed first-URL preflight probes and their warnings. File-transfer
+  failures are handled by the shared download runner;
+  [`check_url_status()`](https://niehs.github.io/amadeus/reference/check_url_status.md)
+  remains available for other uses.
+- Updated
+  [`download_unzip()`](https://niehs.github.io/amadeus/reference/download_unzip.md)
+  to accept multiple archives with either one shared extraction
+  directory or one directory per archive. Source downloaders use the
+  common helper for batch extraction, including multi-year NLCD
+  requests. Requested archive cleanup runs after the extraction loop.
+- Changed the default CropScape source to GMU and updated the USDA
+  download URL. Archives are stored in `zip_files/`, with separate
+  extraction folders for each archive under `data_files/`. Added
+  `remove_zip` support.
+- Added
+  [`download_eddi()`](https://niehs.github.io/amadeus/reference/download_eddi.md),
+  [`download_spei()`](https://niehs.github.io/amadeus/reference/download_spei.md),
+  and
+  [`download_usdm()`](https://niehs.github.io/amadeus/reference/download_usdm.md).
+  [`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md)
+  delegates to these functions, and
+  [`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md)
+  routes their dataset aliases directly. SPEI now uses an explicit
+  `version` selection (`"2.11"`, `"2.10"`, or `"legacy"`, defaulting to
+  `"2.11"`) instead of automatically falling back between versions.
+- Added CMR pagination to MODIS discovery so requests can retrieve more
+  than 2000 granules. Removed the 31-day warning; existing
+  product-specific cross-year restrictions remain. Incomplete or
+  inconsistent paginated responses raise discovery errors.
+- Moved MERRA-2 product mappings to a package data file and separated
+  listing discovery from downloading. MERRA-2 and GOES listing helpers
+  use `xml2`; GOES listing failures now stop discovery instead of
+  warning and continuing.
+- Expanded NEI inventory selections to 2008, 2011, 2014, 2017, 2020,
+  and 2023. Mixed supported and unsupported selections warn and retain
+  supported years; selections with none supported stop. Named year
+  lookups keep URLs and filenames aligned for reversed or repeated
+  selections. NEI years remain discrete selections, and
+  [`process_nei()`](https://niehs.github.io/amadeus/reference/process_nei.md)
+  still supports only 2017 and 2020.
+- Reorganized R files into `api-`, `source-`, and `utils-` groups,
+  consolidated download helpers, and made internal helper calls
+  explicitly qualified. Existing helper exports are retained. Updated
+  download documentation and test mocks for the shared workflow and
+  return values.
+
 ## amadeus 2.0.3
 
 - Fixed

@@ -44,11 +44,18 @@ download_nlcd(
 
 - year:
 
-  integer(1). Year of NLCD data (1985-2024). Default is 2021.
+  integer(1 or more). One year, two endpoints, or a non-empty vector of
+  years. Every year from the minimum through the maximum is requested,
+  including gaps: `c(2018, 2023)` requests `2018:2023`. Requested years
+  must be within 1985-2024. Default is 2021. Missing, fractional, and
+  out-of-range years are rejected. Any year outside these fixed bounds
+  causes the entire request to fail; years are not filtered or
+  truncated.
 
 - directory_to_save:
 
-  character(1). Directory to save downloaded files.
+  character(1). Parent directory. Archives are saved in `zip_files/` and
+  extracted data in `data_files/`.
 
 - acknowledgement:
 
@@ -65,11 +72,15 @@ download_nlcd(
 
 - unzip:
 
-  logical(1). Unzip downloaded files? Default is `TRUE`.
+  logical(1). Extract all planned yearly archives, including existing
+  archives, into the shared `data_files/` directory. Default is `TRUE`;
+  `FALSE` skips extraction.
 
 - remove_zip:
 
-  logical(1). Remove zip files after extraction? Default is `FALSE`.
+  logical(1). Remove archives and their `zip_files/` directory
+  recursively, including remaining contents, after the extraction loop
+  finishes. Default is `FALSE`; requires `unzip = TRUE`.
 
 - show_progress:
 
@@ -77,7 +88,11 @@ download_nlcd(
 
 - hash:
 
-  logical(1). Return hash of downloaded files? Default is `FALSE`.
+  logical(1). Return a combined MD5 hash of all files recursively under
+  `data_files/`, including existing files. Default is `FALSE`; ignored
+  when `download = FALSE`. With `unzip = FALSE`, hashing still uses
+  `data_files/`, which may be empty or contain previously extracted
+  data.
 
 - max_tries:
 
@@ -89,7 +104,21 @@ download_nlcd(
 
 ## Value
 
-invisible NULL; or hash character if hash=TRUE
+When `download = TRUE` and `hash = FALSE`, an invisible list containing
+`success`, `failed`, and `skipped` file counts. If all requested
+archives already exist and are nonempty, no files are downloaded; the
+returned list contains `success = 0`, `failed = 0`, and `skipped` equal
+to the number of requested files. The list always contains `failed_urls`
+and `failed_files` character vectors, both `character(0)` when no
+downloads failed, including when every file was skipped.
+
+When `download = FALSE`, an invisible list containing `urls`,
+`destfiles`, and `n_files` is returned without downloading, regardless
+of `hash`.
+
+When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
+hash of the files in the `data_files` directory is returned instead of a
+list.
 
 ## References
 

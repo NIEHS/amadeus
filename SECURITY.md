@@ -12,7 +12,7 @@ Policy](https://www.hhs.gov/vulnerability-disclosure-policy/index.html).
 reporting feature.**
 
 Click **“Report a vulnerability”** on the [Security
-Advisories](https://niehs.github.io/security/advisories) tab. Do not
+Advisories](https://niehs.github.io/../security/advisories) tab. Do not
 open a public issue or report through email, Slack, or any other
 channel.
 

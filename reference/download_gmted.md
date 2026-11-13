@@ -29,11 +29,15 @@ download_gmted(
 
 - statistic:
 
-  character(1). Available statistics.
+  character(1). One of `"Breakline Emphasis"` (default),
+  `"Systematic Subsample"`, `"Median Statistic"`, `"Minimum Statistic"`,
+  `"Mean Statistic"`, `"Maximum Statistic"`, or
+  `"Standard Deviation Statistic"`.
 
 - resolution:
 
-  character(1). Available resolutions.
+  character(1). One of `"7.5 arc-seconds"` (default),
+  `"15 arc-seconds"`, or `"30 arc-seconds"`.
 
 - directory_to_save:
 
@@ -45,7 +49,8 @@ download_gmted(
 
 - download:
 
-  logical(1). DEPRECATED. Downloads happen automatically.
+  logical(1). DEPRECATED. Downloads happen automatically. Set to FALSE
+  to skip downloading and return the planned file list.
 
 - remove_command:
 
@@ -77,7 +82,27 @@ download_gmted(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+When `download = TRUE` and `hash = FALSE`, an invisible list containing
+`success`, `failed`, and `skipped` file counts. If all requested
+archives already exist and are nonempty, no files are downloaded; the
+returned list contains `success = 0`, `failed = 0`, and `skipped` equal
+to the number of requested files. The list always contains `failed_urls`
+and `failed_files` character vectors, both `character(0)` when no
+downloads failed, including when every file was skipped.
+
+When `download = FALSE`, an invisible list containing `urls`,
+`destfiles`, and `n_files` is returned without downloading, regardless
+of `hash`.
+
+When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
+hash of the files in the `data_files` directory is returned instead of a
+list.
+
+## Details
+
+`statistic` and `resolution` each select one value. Matching is
+case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+each argument uses its first listed choice.
 
 ## Note
 

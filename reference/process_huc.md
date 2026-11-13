@@ -50,7 +50,7 @@ a `SpatVector` object
 
 ## See also
 
-[`hydrogeofetch::get_huc`](https://doi-usgs.github.io/hydrogeofetch/reference/get_huc.html)
+\`hydrogeofetch::get_huc()“
 
 ## Author
 

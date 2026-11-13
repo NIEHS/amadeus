@@ -1,6 +1,7 @@
 # Remove zip files
 
-Remove downloaded ".zip" files.
+Remove supplied archive files and recursively delete their parent
+directories.
 
 ## Usage
 
@@ -16,15 +17,17 @@ download_remove_zips(remove = FALSE, download_name)
 
 - download_name:
 
-  character. Full zip file path
+  character vector. Archive file paths to remove.
 
 ## Value
 
-NULL; removes downloaded zip files after they are unzipped
+Invisible `NULL`; optionally removes archives and their directories.
 
 ## Note
 
-!!! USE THE FUNCTION WITH CAUTION !!! If `remove = TRUE`, ensure that
-`unzip = TRUE`. Choosing to remove ".zip" files without unzipping will
-retain none of the downloaded data. then it will remove all files in the
-second higher level directory.
+With `remove = TRUE`, each immediate parent directory returned by
+`dirname(download_name)` is deleted recursively, including files that
+were not listed in `download_name`. This helper does not check whether
+extraction occurred. Call it only after all required extractions from
+those directories have finished, with extracted data stored outside the
+directories removed.

@@ -8,11 +8,11 @@ sources.
 
 ``` r
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "GOES",
-    "gmted", "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd",
-    "noaa", "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke",
-    "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "gmted",
+    "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
+    "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
+    "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "drought", "spei", "eddi", "usdm"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -26,7 +26,9 @@ download_data(
 
 - dataset_name:
 
-  character(1). Dataset to download.
+  character(1). Dataset name or alias from the list below. Matching
+  ignores case and accepts unambiguous partial matches. The default
+  selects `"aqs"`.
 
 - directory_to_save:
 
@@ -41,10 +43,10 @@ download_data(
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return the source function's combined MD5 directory hash
+  instead of its download summary. Default is `FALSE`. The directory
+  included in the hash depends on the source and can include existing
+  files. Ignored when `download = FALSE` is passed through `...`.
 
 - nasa_earth_data_token:
 
@@ -58,24 +60,50 @@ download_data(
 
 - rate_limit:
 
-  numeric(1). Minimum seconds between HTTP requests (default 2). Passed
-  to the underlying download function.
+  numeric(1). Non-negative request-throttling interval in seconds,
+  passed to the source function. Default is 2. This controls the average
+  request rate rather than a strict minimum gap between requests.
 
 - ...:
 
-  Additional arguments passed to each download function.
+  Source-specific selections and download controls, such as `date`,
+  `year`, `timescale`, `version`, `download`, `show_progress`,
+  `max_tries`, `unzip`, and `remove_zip`. See the selected source
+  function for its arguments.
 
 ## Value
 
-- For `hash = FALSE`, NULL
+The selected downloader's return value, with its visibility preserved:
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+- With `download = FALSE`, an invisible preview list containing `urls`,
+  `destfiles`, and `n_files`.
 
-- Data files will be downloaded and stored in respective sub-directories
-  within `directory_to_save`. File format and sub-directory names depend
-  on data source and dataset of interest.
+- With downloading enabled and `hash = FALSE`, an invisible summary
+  containing `success`, `failed`, `skipped`, `failed_urls`, and
+  `failed_files`. The two failure vectors are `character(0)` when no
+  downloads failed, including when every file was skipped.
+
+- With downloading enabled and `hash = TRUE`, a visible character scalar
+  containing the combined MD5 hash of the source's output directory.
+
+## Details
+
+This wrapper selects a downloader and forwards arguments. The source
+function performs validation, directory setup, discovery, downloading,
+and extraction. Previews and directory layouts follow that function's
+behavior.
+
+The `"drought"` alias calls
+[`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md)
+with its default SPEI source unless `source` is supplied. The `"spei"`,
+`"eddi"`, and `"usdm"` aliases call
+[`download_spei()`](https://niehs.github.io/amadeus/reference/download_spei.md),
+[`download_eddi()`](https://niehs.github.io/amadeus/reference/download_eddi.md),
+and
+[`download_usdm()`](https://niehs.github.io/amadeus/reference/download_usdm.md)
+directly. Supply the selected function's required arguments through
+`...`. The `source` argument selects a drought source only when
+`dataset_name = "drought"`.
 
 ## Note
 
@@ -152,7 +180,16 @@ For details of each download function per dataset, Please refer to:
   `"improve"`, `"IMPROVE"`
 
 - [`download_drought`](https://niehs.github.io/amadeus/reference/download_drought.md):
-  `"drought"`, `"spei"`, `"eddi"`, `"usdm"`
+  `"drought"`
+
+- [`download_spei`](https://niehs.github.io/amadeus/reference/download_spei.md):
+  `"spei"`
+
+- [`download_eddi`](https://niehs.github.io/amadeus/reference/download_eddi.md):
+  `"eddi"`
+
+- [`download_usdm`](https://niehs.github.io/amadeus/reference/download_usdm.md):
+  `"usdm"`
 
 ## Author
 
@@ -168,8 +205,7 @@ download_data(
   year = 2023,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  download = FALSE # Deprecated; may still contact the source.
 )
 } # }
 ```

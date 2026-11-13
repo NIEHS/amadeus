@@ -33,7 +33,8 @@ download_ecoregion(
 
 - download:
 
-  logical(1). DEPRECATED. Downloads happen automatically.
+  logical(1). DEPRECATED. Downloads happen automatically. Set to FALSE
+  to skip downloading and return the planned file list.
 
 - remove_command:
 
@@ -65,7 +66,21 @@ download_ecoregion(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+When `download = TRUE` and `hash = FALSE`, an invisible list containing
+`success`, `failed`, and `skipped` file counts. If the requested archive
+already exists and is nonempty, no file is downloaded; the returned list
+contains `success = 0`, `failed = 0`, and `skipped = 1`. The list always
+contains `failed_urls` and `failed_files` character vectors, both
+`character(0)` when no downloads failed, including when the file was
+skipped.
+
+When `download = FALSE`, an invisible list containing `urls`,
+`destfiles`, and `n_files = 1` is returned without downloading,
+regardless of `hash`.
+
+When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
+hash of the files in the `data_files` directory is returned instead of a
+list.
 
 ## Note
 

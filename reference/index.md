@@ -14,8 +14,10 @@ Functions which download data from URLs
   : Download drought index data
 - [`download_ecoregion()`](https://niehs.github.io/amadeus/reference/download_ecoregion.md)
   : Download ecoregion data
+- [`download_eddi()`](https://niehs.github.io/amadeus/reference/download_eddi.md)
+  : Download EDDI drought data
 - [`download_edgar()`](https://niehs.github.io/amadeus/reference/download_edgar.md)
-  : Download EDGAR Emissions Data
+  : Download EDGAR emissions data
 - [`download_geos()`](https://niehs.github.io/amadeus/reference/download_geos.md)
   : Download atmospheric composition data
 - [`download_gmted()`](https://niehs.github.io/amadeus/reference/download_gmted.md)
@@ -29,7 +31,7 @@ Functions which download data from URLs
 - [`download_hms()`](https://niehs.github.io/amadeus/reference/download_hms.md)
   : Download wildfire smoke data
 - [`download_huc()`](https://niehs.github.io/amadeus/reference/download_huc.md)
-  : Download National Hydrography Dataset (NHD) data
+  : Download National Hydrography Dataset Plus (NHDPlus) data
 - [`download_improve()`](https://niehs.github.io/amadeus/reference/download_improve.md)
   : Download IMPROVE aerosol monitoring data
 - [`download_koppen_geiger()`](https://niehs.github.io/amadeus/reference/download_koppen_geiger.md)
@@ -37,21 +39,25 @@ Functions which download data from URLs
 - [`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md)
   : Download meteorological and atmospheric data
 - [`download_modis()`](https://niehs.github.io/amadeus/reference/download_modis.md)
-  : Download MODIS product files
+  : Download MODIS product files using the shared download workflow
 - [`download_narr()`](https://niehs.github.io/amadeus/reference/download_narr.md)
   : Download meteorological data
 - [`download_nei()`](https://niehs.github.io/amadeus/reference/download_nei.md)
-  : Download road emissions data
+  : Download NEI onroad emissions data
 - [`download_nlcd()`](https://niehs.github.io/amadeus/reference/download_nlcd.md)
   : Download National Land Cover Database (NLCD) data
 - [`download_population()`](https://niehs.github.io/amadeus/reference/download_population.md)
   : Download population density data
 - [`download_prism()`](https://niehs.github.io/amadeus/reference/download_prism.md)
   : Download PRISM data
+- [`download_spei()`](https://niehs.github.io/amadeus/reference/download_spei.md)
+  : Download SPEI drought data
 - [`download_terraclimate()`](https://niehs.github.io/amadeus/reference/download_terraclimate.md)
   : Download TerraClimate data
 - [`download_tri()`](https://niehs.github.io/amadeus/reference/download_tri.md)
   : Download toxic release data
+- [`download_usdm()`](https://niehs.github.io/amadeus/reference/download_usdm.md)
+  : Download USDM drought data
 
 ### Process
 

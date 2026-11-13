@@ -1,8 +1,8 @@
-# Download MODIS product files
+# Download MODIS product files using the shared download workflow
 
-Downloads MODIS data using httr2 with robust retry logic and rate
-limiting. This function queries NASA's CMR API for available granules
-and downloads relevant tiles based on the specified extent.
+Query NASA CMR for file URLs, prepare a download table, and download
+MODIS or VIIRS files using the shared validation, preview, download, and
+return helpers.
 
 ## Usage
 
@@ -33,84 +33,117 @@ download_modis(
 
 - product:
 
-  character(1). MODIS product code
+  character(1). Supported MODIS or VIIRS product code. The default
+  selects the first listed product.
 
 - version:
 
-  character(1). Default is `"061"`, meaning v061.
+  character(1). Requested CMR version, default `"061"`. Existing
+  product-specific overrides are retained; see Details.
 
 - nasa_earth_data_token:
 
-  character(1) or NULL. NASA EarthData authentication token. For
-  security, recommended options (in priority order):
-
-  - NULL (default): Reads from NASA_EARTHDATA_TOKEN environment variable
-
-  - File path: e.g., "~/.nasa_earthdata_token"
-
-  - Token string: Direct token (not recommended for scripts)
-
-  Use
-  [`setup_nasa_token()`](https://niehs.github.io/amadeus/reference/setup_nasa_token.md)
-  for interactive setup.
+  character(1) or NULL. NASA Earthdata token, token-file path, or `NULL`
+  to use `NASA_EARTHDATA_TOKEN`. Resolved by
+  [`get_token()`](https://niehs.github.io/amadeus/reference/get_token.md),
+  which checks the environment variable first.
 
 - date:
 
-  character(1 or 2). Date range "YYYY-MM-DD" format
+  character(1 or 2). Single date or range endpoints in `"YYYY-MM-DD"`
+  format. Endpoints may be supplied in either order.
 
 - extent:
 
-  numeric(4). Bounding box `c(min_lon, max_lon, min_lat, max_lat)`.
-  Default covers continental US: `c(-125, 22, -64, 50)`.
+  numeric(4). Bounding box in decimal degrees, ordered
+  `c(west, south, east, north)`. Default covers the continental US.
 
 - directory_to_save:
 
-  character(1). Directory to save data.
+  character(1). Non-empty output directory. Files are saved directly in
+  this directory.
 
 - acknowledgement:
 
-  logical(1). Must be `TRUE` to proceed with download
+  logical(1). Must be `TRUE` to proceed.
 
 - download:
 
-  logical(1). DEPRECATED. Downloads now happen automatically. Set to
-  FALSE to skip downloading (generates file list only).
+  logical(1). Deprecated. `FALSE` warns and returns a preview after
+  token lookup, directory creation, and discovery. Discovery still
+  queries CMR in preview mode; data files are not downloaded.
 
 - remove_command:
 
-  logical(1). Deprecated, ignored.
+  logical(1). Deprecated and ignored; `TRUE` warns.
 
 - show_progress:
 
-  logical(1). Show download progress (default TRUE)
+  logical(1). Show per-file download progress. Discovery and summary
+  messages may still be printed when `FALSE`.
 
 - hash:
 
-  logical(1). Return hash of downloaded files (default FALSE)
+  logical(1). Return the combined directory MD5 hash when `TRUE`.
+  Ignored when `download = FALSE`.
 
 - max_tries:
 
-  integer(1). Maximum download retry attempts (default 20)
+  integer(1). Maximum attempts per CMR or file request, including the
+  first attempt. Default is 20.
 
 - rate_limit:
 
-  numeric(1). Minimum seconds between requests (default 2)
+  numeric(1). Non-negative request-throttling interval in seconds,
+  passed to discovery and downloads. Default is 2. Discovery uses a
+  capacity-one bucket; 0 disables discovery throttling. File downloads
+  follow the throttling policy in
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the
+invisible download summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+With `hash = TRUE`, a visible combined MD5 hash for all files under
+`directory_to_save`.
 
-## Note
+The download summary always contains `success`, `failed`, `skipped`,
+`failed_urls`, and `failed_files`. The two failure vectors are
+`character(0)` when no files failed, including when every file was
+skipped.
 
-Due to NASA data access policies, downloads require a valid NASA
-Earthdata token for authentication. For security, it's recommended to
-store your token in an environment variable or file rather than in your
-code. Use
-[`setup_nasa_token()`](https://niehs.github.io/amadeus/reference/setup_nasa_token.md)
-for easy, secure token setup.
+## Details
 
-Both dates in `date` should be in the same year. Directory structure:
-input/modis/raw/{version}/{product}/{year}/{day_of_year}.
+Product-specific version overrides and a CM1-to-A2 fallback are applied
+before filename date filtering. Files use a flat destination directory.
+MOD06_L2 uses `"6.1"`; MOD14CM1/MYD14CM1 use `"005"`; MCD64CMQ uses
+`"006"`; MCD14ML uses `"6.1NRT"`; VNP46A2/VNP64A1 omit the version
+filter. An empty CM1 response triggers the existing A2 version `"006"`
+fallback.
+
+Cross-year ranges remain restricted to MOD06_L2, MOD14CM1, MYD14CM1,
+MCD14ML, MCD64A1, MCD64CMQ, and VNP64A1. Discovery retrieves successive
+CMR pages of up to 2000 granules using the `CMR-Search-After` response
+header. There is no 31-day warning or restriction. The query parameters,
+retry settings, timeout, and throttle are retained across pages.
+
+When supplied, `CMR-Hits` is checked against the number of retrieved
+granule records before link or date filtering. Discovery stops if a page
+request fails, the reported count changes, a required continuation value
+is missing or repeated, or the final record count does not match
+`CMR-Hits`.
+
+CMR supplies actual file URLs, so a product/date Cartesian grid is not
+needed. The inclusive date sequence is used to establish ordered query
+endpoints. A file count is reported without claiming daily or monthly
+completeness for tiled, swath, or composite products.
+
+Discovery keeps the existing 120-second per-attempt timeout; file
+downloads use
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)'s
+default timeout.
 
 ## References
 
@@ -145,6 +178,12 @@ Sensing of Environment*, **210**, 113–143. ISSN 00344257.
 [doi:10.1016/j.rse.2018.03.017](https://doi.org/10.1016/j.rse.2018.03.017)
 . <https://linkinghub.elsevier.com/retrieve/pii/S003442571830110X>.
 
+## See also
+
+[`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md),
+[`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md),
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+
 ## Author
 
 Mitchell Manware, Insang Song
@@ -153,46 +192,13 @@ Mitchell Manware, Insang Song
 
 ``` r
 if (FALSE) { # \dontrun{
-# RECOMMENDED: Set up token once (persists across sessions)
-setup_nasa_token()
-
-# Then download without specifying token
 download_modis(
   product = "MOD09GA",
-  version = "061",
-  date = "2024-01-01",
+  date = c("2024-01-01", "2024-01-03"),
   extent = c(-80, 35, -75, 40),
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
-)
-
-# ALTERNATIVE: Token from file
-download_modis(
-  product = "MOD09GA",
-  version = "061",
-  date = "2024-01-01",
-  extent = c(-80, 35, -75, 40),
-  nasa_earth_data_token = "~/.nasa_earthdata_token",
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
-)
-
-# ALTERNATIVE: Set token for current session
-Sys.setenv(NASA_EARTHDATA_TOKEN = "your_token_here")
-download_modis(
-  product = "MOD09GA",
-  date = "2024-01-01",
-  acknowledgement = TRUE
-)
-
-# Date range
-download_modis(
-  product = "MOD09GA",
-  version = "061",
-  date = c("2024-01-01", "2024-01-07"),
-  extent = c(-80, 35, -75, 40),
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
+  directory_to_save = file.path(tempdir(), "modis"),
+  acknowledgement = TRUE,
+  download = FALSE
 )
 } # }
 ```

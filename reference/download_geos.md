@@ -13,6 +13,7 @@ download_geos(
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  hours = 0:23,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -36,7 +37,14 @@ download_geos(
 
 - date:
 
-  character(1 or 2). Date range "YYYY-MM-DD" format
+  character(1 or 2). A single date or inclusive range endpoints in
+  `"YYYY-MM-DD"` format, in either order.
+
+- hours:
+
+  integer(1 to 24). Hours of day to download for each date, in UTC.
+  Supply values from 0 through 23. Default is `0:23`, which selects all
+  hours. The collection determines the minute within each selected hour.
 
 - directory_to_save:
 
@@ -72,7 +80,25 @@ download_geos(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. With `download = TRUE` and `hash = FALSE`,
+an invisible summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+containing `success`, `failed`, `skipped`, `failed_urls`, and
+`failed_files`. The two failure vectors are `character(0)` when no
+downloads failed, including when every file was skipped. With
+`download = TRUE` and `hash = TRUE`, a visible character scalar
+containing the combined MD5 hash of the output directory.
+
+## Details
+
+Hour selection uses the timestamps of the requested collection. Hourly
+time-averaged collections (`_tavg_1hr_`) use timestamps at 30 minutes
+past the hour, while hourly instantaneous collections (`_inst_1hr_`) use
+timestamps on the hour. For example, `hours = c(0, 6)` selects `00:30`
+and `06:30` UTC for time-averaged collections, or `00:00` and `06:00`
+UTC for instantaneous collections. The same hour selection applies to
+every date in the requested range.
 
 ## Note
 
@@ -102,6 +128,7 @@ if (FALSE) { # \dontrun{
 download_geos(
   collection = "aqc_tavg_1hr_g1440x721_v1",
   date = "2024-01-01",
+  hours = c(0, 6, 12, 18),
   directory_to_save = tempdir(),
   acknowledgement = TRUE
 )

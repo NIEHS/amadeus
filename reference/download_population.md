@@ -7,9 +7,9 @@ density data from NASA's UN WPP-Adjusted Population Density.
 
 ``` r
 download_population(
-  data_resolution = "60 minute",
+  data_resolution = c("60 minute", "30 second", "2.5 minute", "15 minute", "30 minute"),
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
-  year = "2020",
+  year = c("2020", "2000", "2005", "2010", "2015", "all"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -28,15 +28,18 @@ download_population(
 
 - data_resolution:
 
-  character(1). Available resolutions.
+  character(1). One of `"60 minute"` (default), `"30 second"`,
+  `"2.5 minute"`, `"15 minute"`, or `"30 minute"`.
 
 - data_format:
 
-  character(1). "ASCII", "GeoTIFF", or "netCDF".
+  character(1). Requested format: `"GeoTIFF"` (default), `"ASCII"`, or
+  `"netCDF"`.
 
 - year:
 
-  character(1). Available years or "all".
+  character(1). One year: `"2020"` (default), `"2000"`, `"2005"`,
+  `"2010"`, or `"2015"`; use `"all"` for all available years.
 
 - directory_to_save:
 
@@ -48,7 +51,8 @@ download_population(
 
 - download:
 
-  logical(1). DEPRECATED. Downloads happen automatically.
+  logical(1). DEPRECATED. Downloads happen automatically. Set to FALSE
+  to skip downloading and return the planned file list.
 
 - remove_command:
 
@@ -86,7 +90,27 @@ download_population(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+When `download = TRUE` and `hash = FALSE`, an invisible list containing
+`success`, `failed`, and `skipped` file counts. If the requested archive
+already exists and is nonempty, no file is downloaded; the returned list
+contains `success = 0`, `failed = 0`, and `skipped = 1`. The list always
+contains `failed_urls` and `failed_files` character vectors, both
+`character(0)` when no downloads failed, including when the file was
+skipped.
+
+When `download = FALSE`, an invisible list containing `urls`,
+`destfiles`, and `n_files = 1` is returned without downloading,
+regardless of `hash`.
+
+When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
+hash of the files in the `data_files` directory is returned instead of a
+list.
+
+## Details
+
+`data_resolution`, `data_format`, and `year` each select one value.
+Matching is case-sensitive, and unambiguous abbreviations are accepted.
+If omitted, each argument uses its first listed choice.
 
 ## Note
 

@@ -1,7 +1,8 @@
 # Download PRISM data
 
-Accesses and downloads Oregon State University's PRISM data from the
-PRISM Climate Group Web Service
+Download one time period and climate element from the PRISM Climate
+Group Web Service. ZIP archives and extracted data are stored in
+separate subdirectories using the shared download workflow.
 
 ## Usage
 
@@ -29,113 +30,135 @@ download_prism(
 
 - time:
 
-  character(1). Length of 2, 4, 6, or 8. Time period for time series or
-  normals. According to the PRISM Web Service Guide, acceptable formats
-  include (disclaimer: the following is a direct quote; minimal
-  formatting is applied): **Time Series**:
-
-  - `YYYYMMDD` for daily data (between yesterday and January 1st, 1981)
-    – returns a single grid in a .zip file
-
-  - `YYYYMM` for monthly data (between last month and January 1981) –
-    returns a single grid in a .zip file
-
-  - `YYYY` for annual data (between last year and 1981) - returns a
-    single grid in a .zip file
-
-  - `YYYY` for historical data (between 1980 and 1895) - returns a
-    single zip file containing 12 monthly grids for `YYYY` plus the
-    annual.
-
-  **Normals**:
-
-  - Monthly normal: date is `MM` (i.e., 04 for April) or the value 14,
-    which returns the annual normal
-
-  - Daily normal: date is `MMDD` (i.e., 0430 for April 30)
+  character(1). Single time-period code, retaining leading zeros. For
+  `data_type = "ts"`, use `YYYYMMDD` for a daily grid (from 1981),
+  `YYYYMM` for a monthly grid (from 1895), or `YYYY` for an annual grid
+  (from 1895). Each time-series request selects one grid. The legacy
+  normals options use `MM` for a monthly normal, `"14"` for an annual
+  normal, or `MMDD` for a daily normal; see Details for service
+  availability. Local validation requires a character scalar with 2, 4,
+  6, or 8 characters; it does not validate calendar dates or
+  availability.
 
 - element:
 
-  character(1). Data element. One of
-  `c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")` For
-  normals, `c("solslope", "soltotal", "solclear", "soltrans")` are also
-  accepted.
+  character(1). Climate element: `"ppt"` (default), `"tmin"`, `"tmax"`,
+  `"tmean"`, `"tdmean"`, `"vpdmin"`, or `"vpdmax"`. The legacy normals
+  options also accept `"solslope"`, `"soltotal"`, `"solclear"`, and
+  `"soltrans"`; these are rejected for `"ts"`.
 
 - data_type:
 
-  character(1). Data type.
-
-  - `"ts"`: 4km resolution time series.
-
-  - `"normals_800"`: 800m resolution normals.
-
-  - `"normals"`: 4km resolution normals.
+  character(1). Selected data type: `"ts"` (default) for 4 km time
+  series, `"normals_800"` for the legacy 800 m normals URL template, or
+  `"normals"` for the legacy 4 km normals URL template. See Details for
+  service availability.
 
 - format:
 
-  character(1). Data format. Only applicable for `data_type = "ts"`.
+  character(1). Requested time-series raster format: `"nc"` (default),
+  `"asc"`, or `"grib2"`. The argument is validated but omitted from
+  normals requests, with a message. See Details for provider support.
 
 - directory_to_save:
 
-  character(1). Directory to download files.
+  character(1). Non-empty parent directory. Archives are downloaded into
+  `zip_files/` and, when `unzip = TRUE`, extracted into `data_files/`.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be `TRUE` to proceed. Downloaded archives and
+  extracted rasters can require substantial storage.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). Deprecated. `FALSE` warns and returns a preview after
+  directory creation, without contacting the service, downloading, or
+  validating archives. Default is `TRUE`.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands.
+  logical(1). Deprecated and ignored; `TRUE` warns. No command file is
+  generated. Default is `FALSE`.
 
 - unzip:
 
-  logical(1). Unzip the downloaded zip file to extract the data files
-  (nc, grib2, etc.) into `directory_to_save`. Default is `TRUE`. The
-  PRISM API always returns a zip regardless of the requested format.
+  logical(1). Extract the validated ZIP archive into `data_files/`.
+  Default is `TRUE`. `FALSE` retains the archive without extracting it;
+  ZIP validation still runs when `download = TRUE`.
 
 - remove_zip:
 
-  logical(1). Remove the zip file after unzipping. Default is `FALSE`.
-  Only applies when `unzip = TRUE`.
+  logical(1). Remove the downloaded archive and its `zip_files/`
+  directory, including remaining contents, after extraction. Default is
+  `FALSE`. May be `TRUE` only when `unzip = TRUE`. No removal occurs
+  when `download = FALSE`.
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return a combined MD5 hash of the files under
+  `data_files/` instead of the download summary. Default is `FALSE`.
+  Ignored when `download = FALSE`.
 
 - show_progress:
 
-  logical(1). Show download progress. Default is `TRUE`.
+  logical(1). Show file download progress. Default is `TRUE`. Other
+  status messages may still be printed when `FALSE`.
 
 - max_tries:
 
-  integer(1). Maximum download retry attempts. Default is `20`.
+  integer(1). Maximum attempts per file download request, including the
+  initial attempt. Default is 20.
 
 - rate_limit:
 
-  numeric(1). Minimum seconds between requests. Default is `2`.
+  numeric(1). Non-negative throttling interval in seconds, passed to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+  Default is 2.
 
 ## Value
 
-- For `hash = FALSE`, NULL
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. Otherwise, after downloading, validation,
+and optional extraction, `hash = FALSE` returns the download summary
+from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+invisibly. With `hash = TRUE`, returns a visible character scalar
+containing the combined MD5 hash of `data_files/`.
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+The download summary always contains `success`, `failed`, `skipped`,
+`failed_urls`, and `failed_files`. The two failure vectors are
+`character(0)` when no files failed, including when every file was
+skipped.
 
-- .bil (normals) or single grid files depending on the format choice
-  will be stored in `directory_to_save`.
+## Details
+
+`zip_files/` and `data_files/` are sibling directories created beneath
+`directory_to_save`, including for previews and when `unzip = FALSE`.
+The local archive name is constructed from the requested element, data
+type, time, and, for time series, format. Names and paths inside the
+archive are preserved during extraction.
+
+After downloading, the destination archive is checked by listing its
+contents with [`utils::unzip()`](https://rdrr.io/r/utils/unzip.html).
+This check also applies to existing non-empty archives skipped by
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+An unreadable ZIP raises an error, with a preview of the response text
+when available. Listing an archive does not fully verify its members or
+raster contents.
+
+Hashing covers all files under `data_files/`, including existing files,
+and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing
+still uses `data_files/`, which may be empty or contain previously
+extracted data.
+
+The PRISM Web Service Guide dated 26 March 2025 documents time-series
+ZIP downloads, with daily data from 1981 and monthly and annual data
+from 1895. It states that normals are unavailable through this service
+and lists `nc`, `asc`, and `bil` format conversions, rather than
+`grib2`. The normals and `grib2` options remain accepted by this
+function but are not documented as supported by the current service. See
+the guide in References.
 
 ## References
 
@@ -151,6 +174,12 @@ AND BEYOND.” *Transactions of the ASAE*, **43**(6), 1957–1962. ISSN
 - [PRISM Web Service
   Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
 
+## See also
+
+[`download_setup_dir()`](https://niehs.github.io/amadeus/reference/download_setup_dir.md),
+[`download_unzip()`](https://niehs.github.io/amadeus/reference/download_unzip.md),
+[`process_prism()`](https://niehs.github.io/amadeus/reference/process_prism.md)
+
 ## Author
 
 Insang Song
@@ -164,10 +193,9 @@ download_prism(
   element = "ppt",
   data_type = "ts",
   format = "nc",
-  directory_to_save = tempdir(),
+  directory_to_save = file.path(tempdir(), "prism"),
   acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  download = FALSE # Preview the URL and zip_files/ destination.
 )
 } # }
 ```

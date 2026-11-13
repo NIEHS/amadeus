@@ -11,7 +11,6 @@ download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
   year = c(2018, 2022),
-  url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -34,19 +33,19 @@ download_aqs(
 
 - resolution_temporal:
 
-  character(1). Currently only "daily" is supported.
+  character(1). "daily" or "hourly".
 
 - year:
 
-  integer(1 or 2). Year or start/end years for downloading data.
-
-- url_aqs_download:
-
-  character(1). URL to the AQS pre-generated datasets.
+  integer(1 or more). One year, two endpoints, or a non-empty vector of
+  years. Every year from the minimum through the maximum is requested,
+  including gaps: `c(2018, 2023)` requests `2018:2023`. Default is
+  `c(2018, 2022)`. Missing and fractional years are rejected.
 
 - directory_to_save:
 
-  character(1). Directory to save data.
+  character(1). Parent directory. Archives are saved in `zip_files/` and
+  extracted data in `data_files/`.
 
 - acknowledgement:
 
@@ -62,11 +61,15 @@ download_aqs(
 
 - unzip:
 
-  logical(1). Unzip zip files (default TRUE).
+  logical(1). Extract all planned ZIP archives, including existing
+  archives, into `data_files/`. Default is `TRUE`; `FALSE` skips
+  extraction and CSV layout normalization.
 
 - remove_zip:
 
-  logical(1). Remove zip files after unzipping (default FALSE).
+  logical(1). Remove archives and their `zip_files/` directory
+  recursively, including remaining contents, after extraction and CSV
+  layout normalization. Default is `FALSE`; requires `unzip = TRUE`.
 
 - show_progress:
 
@@ -74,7 +77,11 @@ download_aqs(
 
 - hash:
 
-  logical(1). Return hash of downloaded files (default FALSE)
+  logical(1). Return a combined MD5 hash of all files recursively under
+  `data_files/`, including existing files. Default is `FALSE`; ignored
+  when `download = FALSE`. With `unzip = FALSE`, hashing still uses
+  `data_files/`, which may be empty or contain previously extracted
+  data.
 
 - max_tries:
 
@@ -86,7 +93,15 @@ download_aqs(
 
 ## Value
 
-invisible list with download results; or hash character if hash=TRUE
+With `download = FALSE`, an invisible preview list containing `urls`,
+`destfiles`, and `n_files`. With `download = TRUE` and `hash = FALSE`,
+an invisible summary from
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+containing `success`, `failed`, `skipped`, `failed_urls`, and
+`failed_files`. The two failure vectors are `character(0)` when no
+downloads failed, including when every file was skipped. With
+`download = TRUE` and `hash = TRUE`, a visible character scalar
+containing the combined MD5 hash of `data_files/`.
 
 ## Details
 
@@ -108,6 +123,10 @@ Common AQS parameter codes include:
 
 This list is not exhaustive; for the full official table, see the linked
 EPA AQS parameter code table.
+
+Downloaded and existing archives are extracted into the shared
+`data_files/` directory. The CSV layout is then normalized, followed by
+optional archive removal and hashing of the resulting data directory.
 
 ## Note
 
