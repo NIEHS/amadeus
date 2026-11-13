@@ -129,13 +129,11 @@ download_olm <- function(
   remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
   #### 3. define measurement data paths
-
   download_urls <-
     list_stac_files(
       which = product,
@@ -144,7 +142,6 @@ download_olm <- function(
     )
   url_filenames <- strsplit(download_urls, "/", fixed = TRUE)[[1]]
   url_filenames <- sapply(url_filenames, \(x) x[length(x)])
-
   download_names <- paste0(directory_to_save, url_filenames)
   #### 4. build download command
   download_commands <-
@@ -155,7 +152,6 @@ download_olm <- function(
       download_names,
       "\n"
     )
-
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
@@ -165,13 +161,13 @@ download_olm <- function(
     Sys.Date(),
     "_wget_commands.txt"
   )
-  amadeus::download_sink(commands_txt)
+  download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  amadeus::download_run(
+  download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -213,6 +209,8 @@ list_stac_files <-
     which = NULL,
     id_only = FALSE
   ) {
+    # --------------------------------------------------------------------------
+    # Read the STAC catalog and extract its collection IDs.
     allcollections <-
       rstac::read_stac(
         stac_json
@@ -220,10 +218,14 @@ list_stac_files <-
       rstac:::read_collections.catalog()
     collection <- allcollections$collections
     collection_ids <- sapply(collection, \(x) x$id)
+    # --------------------------------------------------------------------------
+    # Return collection IDs when file URLs are not requested.
     if (id_only) {
       return(collection_ids)
     }
 
+    # --------------------------------------------------------------------------
+    # Report the available collection IDs.
     message(
       sprintf(
         "Names of collections include: %s",
@@ -234,9 +236,13 @@ list_stac_files <-
       )
     )
 
+    # --------------------------------------------------------------------------
+    # Select collections by name pattern or index.
     which <- if (!is.numeric(which)) grep(which, collection_ids) else which
     collection <- if (is.null(which)) collection else collection[which]
 
+    # --------------------------------------------------------------------------
+    # Collect asset URLs and retain those matching the requested format.
     collection_assets <-
       lapply(
         collection,
@@ -245,6 +251,8 @@ list_stac_files <-
     collection_assets <- unlist(collection_assets)
     list_assets <- grep(sprintf("%s$", format), collection_assets, value = TRUE)
 
+    # --------------------------------------------------------------------------
+    # Return the matching asset URLs.
     return(list_assets)
   }
 
@@ -291,7 +299,7 @@ calculate_hms_dev <- function(
   ...
 ) {
   #### check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {

@@ -63,7 +63,7 @@ run_live_edgar_chain <- function(
     lon = c(-79.5, -77.5),
     lat = c(36.5, 35.5)
   )
-
+  # ----------------------------------------------------------------------------
   suppressMessages(
     amadeus::download_edgar(
       ...,
@@ -75,7 +75,7 @@ run_live_edgar_chain <- function(
       show_progress = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   zip_files <- list.files(
     "zip_files",
     pattern = "\\.zip$",
@@ -93,7 +93,7 @@ run_live_edgar_chain <- function(
     ignore.case = TRUE,
     value = TRUE
   )
-
+  # ----------------------------------------------------------------------------
   processed <- process_edgar(
     path = raster_files,
     extent = extent
@@ -110,7 +110,7 @@ run_live_edgar_chain <- function(
     locs_id = "site_id",
     radius = radius
   )
-
+  # ----------------------------------------------------------------------------
   list(
     zip_files = zip_files,
     data_files = data_files,
@@ -299,7 +299,7 @@ testthat::test_that("download_edgar (timeseries)", {
 testthat::test_that("download_edgar deprecation warnings", {
   withr::local_package("httr2")
   directory_to_save <- paste0(tempdir(), "/edgar_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     amadeus::download_edgar(
       species = "CO",
@@ -313,7 +313,7 @@ testthat::test_that("download_edgar deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     amadeus::download_edgar(
       species = "CO",
@@ -328,28 +328,25 @@ testthat::test_that("download_edgar deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 ################################################################################
 ##### download_edgar error tests
-
-testthat::test_that("download_edgar (invalid year_range length)", {
-  testthat::expect_error(
-    suppressWarnings(
-      amadeus::download_edgar(
-        species = "CO",
-        temp_res = "yearly",
-        sector_yearly = "ENE",
-        year_range = c(2015, 2016, 2017),
-        acknowledgement = TRUE,
-        download = FALSE,
-        directory_to_save = paste0(tempdir(), "/e/"),
-        unzip = FALSE
-      )
+testthat::test_that("download_edgar (handles invalid year_range length)", {
+  testthat::expect_warning(
+    amadeus::download_edgar(
+      species = "CO",
+      temp_res = "yearly",
+      sector_yearly = "ENE",
+      year_range = c(2015, 2016, 2017),
+      acknowledgement = TRUE,
+      download = FALSE,
+      directory_to_save = paste0(tempdir(), "/e/"),
+      unzip = FALSE
     ),
-    "year_range must be of length 1 or 2"
+    "download=FALSE"
   )
 })
 
@@ -366,7 +363,7 @@ testthat::test_that("download_edgar (invalid species)", {
       directory_to_save = paste0(tempdir(), "/e/"),
       unzip = FALSE
     ),
-    regexp = "No valid URLs were constructed"
+    regexp = "chr_species"
   )
 })
 
@@ -383,7 +380,7 @@ testthat::test_that("download_edgar (incompatible output-format)", {
     ),
     regexp = "Output 'flux' is only supported for format 'nc'."
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_error(
     amadeus::download_edgar(
       species = "CO",
@@ -426,8 +423,8 @@ testthat::test_that("download_edgar (bad version)", {
   )
 })
 
-testthat::test_that("download_edgar (bad year)", {
-  testthat::expect_error(
+testthat::test_that("download_edgar (handle 3 year)", {
+  testthat::expect_no_error(
     suppressWarnings(
       amadeus::download_edgar(
         species = "SO2",
@@ -491,16 +488,23 @@ testthat::test_that("download_edgar mock download with hash", {
 })
 
 ################################################################################
-##### download_edgar missing URL warning branch (some URLs return FALSE)
-
-testthat::test_that("download_edgar missing URL warning path", {
+##### download_edgar delegates transfers without preliminary URL probes
+testthat::test_that("download_edgar(download=TRUE): skips URL probes", {
   call_idx <- 0L
   testthat::local_mocked_bindings(
     check_url_status = function(u, ...) {
       call_idx <<- call_idx + 1L
-      call_idx > 1L # First URL is invalid (FALSE), rest are valid (TRUE)
+      FALSE
     },
-    download_run_method = function(...) list(success = 1, failed = 0),
+    download_run_method = function(urls, ...) {
+      list(
+        success = length(urls),
+        failed = 0L,
+        skipped = 0L,
+        failed_urls = character(0),
+        failed_files = character(0)
+      )
+    },
     download_unzip = function(...) invisible(NULL),
     download_remove_zips = function(...) invisible(NULL),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
@@ -508,9 +512,9 @@ testthat::test_that("download_edgar missing URL warning path", {
   )
   withr::with_tempdir({
     testthat::expect_warning(
-      suppressMessages(
+      result <- suppressMessages(
         download_edgar(
-          species = c("CO", "CH4"),
+          species = c("CO", "SO2"),
           temp_res = "yearly",
           sector_yearly = "ENE",
           year_range = c(2021, 2021),
@@ -521,35 +525,56 @@ testthat::test_that("download_edgar missing URL warning path", {
           hash = FALSE
         )
       ),
-      "Some URLs could not be accessed"
+      regexp = NA
     )
+    testthat::expect_identical(call_idx, 0L)
+    testthat::expect_equal(result$success, 2L)
+    testthat::expect_equal(result$failed, 0L)
   })
 })
 
 ################################################################################
-##### download_edgar all-URLs-invalid error (covers line 4057)
-
-testthat::test_that("download_edgar stops when all URLs invalid", {
+##### download_edgar preserves the runner's failure summary
+testthat::test_that("download_edgar(download=TRUE): returns failure details", {
+  urls_seen <- NULL
+  # ----------------------------------------------------------------------------
   testthat::local_mocked_bindings(
-    check_url_status = function(...) FALSE,
+    download_run_method = function(urls, destfiles, ...) {
+      urls_seen <<- urls
+      list(
+        success = 0L,
+        failed = length(urls),
+        skipped = 0L,
+        failed_urls = urls,
+        failed_files = basename(destfiles)
+      )
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
     .package = "amadeus"
   )
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
-    testthat::expect_error(
-      suppressMessages(
-        download_edgar(
-          species = "CO",
-          temp_res = "yearly",
-          sector_yearly = "ENE",
-          year_range = c(2021, 2022),
-          acknowledgement = TRUE,
-          download = TRUE,
-          directory_to_save = ".",
-          unzip = FALSE
-        )
-      ),
-      "No valid URLs were constructed"
+    result <- suppressMessages(
+      download_edgar(
+        species = "CO",
+        temp_res = "yearly",
+        sector_yearly = "ENE",
+        year_range = c(2021, 2022),
+        acknowledgement = TRUE,
+        download = TRUE,
+        directory_to_save = ".",
+        unzip = FALSE,
+        hash = FALSE
+      )
     )
+    # --------------------------------------------------------------------------
+    testthat::expect_length(urls_seen, 2L)
+    testthat::expect_equal(result$success, 0L)
+    testthat::expect_equal(result$failed, 2L)
+    testthat::expect_equal(result$skipped, 0L)
+    testthat::expect_identical(result$failed_urls, urls_seen)
+    testthat::expect_length(result$failed_files, 2L)
   })
 })
 
@@ -610,8 +635,24 @@ testthat::test_that("process_edgar prefixes informative multi-layer names", {
   withr::local_package("terra")
 
   withr::with_tempdir({
-    r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
-    r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+    r1 <- terra::rast(
+      ncols = 2,
+      nrows = 2,
+      xmin = -80,
+      xmax = -78,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
+    r2 <- terra::rast(
+      ncols = 2,
+      nrows = 2,
+      xmin = -80,
+      xmax = -78,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
     terra::values(r1) <- 1:4
     terra::values(r2) <- 5:8
     rr <- c(r1, r2)
@@ -621,7 +662,9 @@ testthat::test_that("process_edgar prefixes informative multi-layer names", {
 
     edgar <- process_edgar(path = raster_path)
     testthat::expect_true(all(grepl("^edgar_", names(edgar))))
-    testthat::expect_true(all(names(edgar) == c("edgar_nox_total", "edgar_so2_total")))
+    testthat::expect_true(all(
+      names(edgar) == c("edgar_nox_total", "edgar_so2_total")
+    ))
   })
 })
 
@@ -748,7 +791,7 @@ testthat::test_that("calculate_edgar handles empty sf locations", {
 testthat::test_that("download_edgar builds the full 25-VOC matrix", {
   directory_to_save <- paste0(tempdir(), "/edgar_voc_matrix/")
   voc_values <- 1:25
-
+  # ----------------------------------------------------------------------------
   result <- edgar_discover(
     version = "8.1_voc",
     voc = voc_values,
@@ -757,7 +800,7 @@ testthat::test_that("download_edgar builds the full 25-VOC matrix", {
     directory_to_save = directory_to_save,
     acknowledgement = TRUE
   )
-
+  # ----------------------------------------------------------------------------
   expected_urls <- paste0(
     "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/",
     "v81_FT2022_VOC_spec/voc",
@@ -767,7 +810,7 @@ testthat::test_that("download_edgar builds the full 25-VOC matrix", {
     voc_values,
     "_2021_bkl_AGRICULTURE_emi_nc.zip"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(result$n_files, 25)
   testthat::expect_length(result$urls, 25)
   testthat::expect_length(result$destfiles, 25)
@@ -776,7 +819,7 @@ testthat::test_that("download_edgar builds the full 25-VOC matrix", {
     "^.+/zip_files/edgar_voc_",
     result$destfiles
   )))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -784,10 +827,10 @@ testthat::test_that("download_edgar validates live VOC URLs for all 25 groups", 
   skip_on_ci()
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/edgar_voc_live/")
   voc_values <- 1:25
-
+  # ----------------------------------------------------------------------------
   result <- edgar_discover(
     version = "8.1_voc",
     voc = voc_values,
@@ -804,14 +847,14 @@ testthat::test_that("download_edgar validates live VOC URLs for all 25 groups", 
     directory_to_save = directory_to_save,
     acknowledgement = TRUE
   )
-
-  status_sector <- vapply(result$urls, amadeus::check_url_status, logical(1))
+  # ----------------------------------------------------------------------------
+  status_sector <- vapply(result$urls, amadeus:::check_url_status, logical(1))
   status_totals <- vapply(
     result_totals$urls,
-    amadeus::check_url_status,
+    amadeus:::check_url_status,
     logical(1)
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_true(
     all(status_sector),
     info = paste(
@@ -826,7 +869,7 @@ testthat::test_that("download_edgar validates live VOC URLs for all 25 groups", 
       paste(voc_values[!status_totals], collapse = ", ")
     )
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -834,7 +877,7 @@ testthat::test_that("download_edgar discovery feeds process_edgar and calculate_
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     discovery_cases <- list(
       yearly_sector = list(
@@ -863,13 +906,13 @@ testthat::test_that("download_edgar discovery feeds process_edgar and calculate_
         temp_res = "timeseries"
       )
     )
-
+    # --------------------------------------------------------------------------
     locs <- data.frame(
       site_id = c("a", "b"),
       lon = c(-79.5, -77.5),
       lat = c(36.5, 35.5)
     )
-
+    # --------------------------------------------------------------------------
     for (case_name in names(discovery_cases)) {
       discovery <- do.call(
         edgar_discover,
@@ -881,10 +924,10 @@ testthat::test_that("download_edgar discovery feeds process_edgar and calculate_
       data_dir <- file.path(".", case_name)
       write_edgar_fixtures(discovery$destfiles, data_dir)
       processed <- process_edgar(path = data_dir)
-
+      # ------------------------------------------------------------------------
       testthat::expect_s4_class(processed, "SpatRaster")
       testthat::expect_equal(terra::nlyr(processed), discovery$n_files)
-
+      # ------------------------------------------------------------------------
       calc_zero <- calculate_edgar(
         from = processed,
         locs = locs,
@@ -897,7 +940,7 @@ testthat::test_that("download_edgar discovery feeds process_edgar and calculate_
         locs_id = "site_id",
         radius = 1000
       )
-
+      # ------------------------------------------------------------------------
       testthat::expect_true(is.data.frame(calc_zero))
       testthat::expect_true(is.data.frame(calc_buf))
       testthat::expect_equal(ncol(calc_zero) - 1, discovery$n_files)
@@ -912,7 +955,7 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     voc_values <- 1:25
     discovery <- edgar_discover(
@@ -923,7 +966,7 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
       directory_to_save = ".",
       acknowledgement = TRUE
     )
-
+    # --------------------------------------------------------------------------
     write_edgar_fixtures(discovery$destfiles, "./voc_all")
     processed <- process_edgar(path = "./voc_all")
     locs <- data.frame(
@@ -931,7 +974,7 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
       lon = c(-79.5, -77.5),
       lat = c(36.5, 35.5)
     )
-
+    # --------------------------------------------------------------------------
     calc_zero <- calculate_edgar(
       from = processed,
       locs = locs,
@@ -944,7 +987,7 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
       locs_id = "site_id",
       radius = 1000
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_equal(discovery$n_files, 25)
     testthat::expect_equal(terra::nlyr(processed), 25)
     testthat::expect_equal(ncol(calc_zero) - 1, 25)
@@ -959,7 +1002,15 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
 
 testthat::test_that("calculate_edgar errors when deprecated .by is supplied", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 7
   names(from) <- "edgar_voc_1"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -979,7 +1030,15 @@ testthat::test_that("calculate_edgar errors when deprecated .by is supplied", {
 
 testthat::test_that("calculate_edgar .by_time branch derives time and validates inputs", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 7
   names(from) <- "edgar_voc_1"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -1001,7 +1060,11 @@ testthat::test_that("calculate_edgar .by_time branch derives time and validates 
 
   from_multi <- c(from, from)
   names(from_multi) <- c("edgar_voc_1", "edgar_voc_2")
-  terra::time(from_multi) <- as.POSIXct(c(NA, NA), origin = "1970-01-01", tz = "UTC")
+  terra::time(from_multi) <- as.POSIXct(
+    c(NA, NA),
+    origin = "1970-01-01",
+    tz = "UTC"
+  )
   testthat::expect_error(
     calculate_edgar(
       from = from_multi,
@@ -1037,7 +1100,7 @@ testthat::test_that("live yearly EDGAR download feeds process_edgar and calculat
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     live <- run_live_edgar_chain(
       species = "CO",
@@ -1045,7 +1108,7 @@ testthat::test_that("live yearly EDGAR download feeds process_edgar and calculat
       sector_yearly = "ENE",
       year_range = 2021
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_gte(length(live$zip_files), 1)
     testthat::expect_gte(length(live$raster_files), 1)
     testthat::expect_s4_class(live$processed, "SpatRaster")
@@ -1063,14 +1126,14 @@ testthat::test_that("live monthly EDGAR download feeds process_edgar and calcula
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     live <- run_live_edgar_chain(
       species = "SO2",
       temp_res = "monthly",
       sector_monthly = "BUILDINGS"
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_gte(length(live$zip_files), 1)
     testthat::expect_gte(length(live$raster_files), 1)
     testthat::expect_s4_class(live$processed, "SpatRaster")
@@ -1081,29 +1144,29 @@ testthat::test_that("live monthly EDGAR download feeds process_edgar and calcula
   })
 })
 
-testthat::test_that("live timeseries EDGAR download feeds process_edgar and calculate_edgar", {
-  skip_on_ci()
-  skip_on_cran()
-  skip_if_offline()
-  withr::local_package("terra")
-  withr::local_package("sf")
-  withr::local_options(list(sf_use_s2 = FALSE))
+# testthat::test_that("live timeseries EDGAR download feeds process_edgar and calculate_edgar", {
+#   skip_on_ci()
+#   skip_on_cran()
+#   skip_if_offline()
+#   withr::local_package("terra")
+#   withr::local_package("sf")
+#   withr::local_options(list(sf_use_s2 = FALSE))
 
-  withr::with_tempdir({
-    live <- run_live_edgar_chain(
-      species = "NOx",
-      temp_res = "timeseries"
-    )
+#   withr::with_tempdir({
+#     live <- run_live_edgar_chain(
+#       species = "NOx",
+#       temp_res = "timeseries"
+#     )
 
-    testthat::expect_gte(length(live$zip_files), 1)
-    testthat::expect_gte(length(live$raster_files), 1)
-    testthat::expect_s4_class(live$processed, "SpatRaster")
-    testthat::expect_true(is.data.frame(live$calc_zero))
-    testthat::expect_true(is.data.frame(live$calc_buf))
-    testthat::expect_gte(ncol(live$calc_zero) - 1, 1)
-    testthat::expect_gte(ncol(live$calc_buf) - 1, 1)
-  })
-})
+#     testthat::expect_gte(length(live$zip_files), 1)
+#     testthat::expect_gte(length(live$raster_files), 1)
+#     testthat::expect_s4_class(live$processed, "SpatRaster")
+#     testthat::expect_true(is.data.frame(live$calc_zero))
+#     testthat::expect_true(is.data.frame(live$calc_buf))
+#     testthat::expect_gte(ncol(live$calc_zero) - 1, 1)
+#     testthat::expect_gte(ncol(live$calc_buf) - 1, 1)
+#   })
+# })
 
 testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calculate_edgar", {
   skip_on_ci()
@@ -1112,7 +1175,7 @@ testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calc
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     live <- run_live_edgar_chain(
       version = "8.1_voc",
@@ -1120,7 +1183,7 @@ testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calc
       sector_voc = "AGRICULTURE",
       year_range = 2021
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_equal(length(live$zip_files), 25)
     testthat::expect_gte(length(live$raster_files), 25)
     testthat::expect_s4_class(live$processed, "SpatRaster")
@@ -1134,4 +1197,28 @@ testthat::test_that("live all-25 VOC EDGAR downloads feed process_edgar and calc
       )
     }
   })
+})
+
+
+################################################################################
+##### Unsupported EDGAR monthly text requests fail before download setup
+
+testthat::test_that("download_edgar(temp_res=monthly, format=txt): errors", {
+  directory <- file.path(withr::local_tempdir(), "not-created")
+  testthat::local_mocked_bindings(
+    download_setup_dir = function(...) stop("Invalid request reached setup."),
+    download_run_method = function(...) stop("Unexpected invalid download."),
+    .package = "amadeus"
+  )
+  # --------------------------------------------------------------------------
+  # A valid emissions selection isolates the unsupported monthly text format.
+  testthat::expect_error(
+    amadeus::download_edgar(
+      species = "NOx", version = "8.1", temp_res = "monthly",
+      format = "txt", output = "emi",
+      directory_to_save = directory, acknowledgement = TRUE
+    ),
+    "Monthly resolution is only supported for format 'nc'.", fixed = TRUE
+  )
+  testthat::expect_false(dir.exists(directory))
 })

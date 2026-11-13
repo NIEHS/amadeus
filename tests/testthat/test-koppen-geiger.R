@@ -5,7 +5,7 @@
 ##### download_koppen_geiger
 testthat::test_that("download_koppen_geiger", {
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -40,24 +40,21 @@ testthat::test_that("download_koppen_geiger", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that(
-  "download_koppen_geiger remove_command deprecation warning",
-  {
-    withr::with_tempdir({
-      testthat::expect_warning(
-        download_koppen_geiger(
-          data_resolution = "0.5",
-          time_period = "Present",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          remove_command = TRUE
-        ),
-        regexp = "remove_command.*deprecated"
-      )
-    })
-  }
-)
+testthat::test_that("download_koppen_geiger remove_command deprecation warning", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_koppen_geiger(
+        data_resolution = "0.5",
+        time_period = "Present",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
 
 testthat::test_that("download_koppen_geiger mock download with hash", {
   testthat::local_mocked_bindings(
@@ -243,6 +240,6 @@ testthat::test_that("download_koppen_geiger file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })

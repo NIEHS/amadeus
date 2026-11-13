@@ -9,7 +9,7 @@ testthat::test_that("download_prism (url discovery, no download)", {
   element <- "ppt"
   data_type <- "ts"
   format <- "nc"
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_prism(
     time = time,
     element = element,
@@ -24,7 +24,7 @@ testthat::test_that("download_prism (url discovery, no download)", {
   testthat::expect_true(grepl("/prism/data/get/us/", result$urls))
   testthat::expect_true(grepl("/zip_files/", result$destfiles))
   testthat::expect_equal(result$n_files, 1)
-
+  # ----------------------------------------------------------------------------
   # normals path (format is ignored, message expected)
   suppressWarnings(
     testthat::expect_message(
@@ -40,13 +40,13 @@ testthat::test_that("download_prism (url discovery, no download)", {
     )
   )
   testthat::expect_true(grepl("^https://", result2$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_prism deprecation warnings", {
   directory_to_save <- paste0(tempdir(), "/prism_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_prism(
       time = "201005",
@@ -59,7 +59,7 @@ testthat::test_that("download_prism deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_prism(
       time = "201005",
@@ -73,72 +73,34 @@ testthat::test_that("download_prism deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_prism (expected errors)", {
   directory_to_save <- paste0(tempdir(), "/prism/")
-
+  # ----------------------------------------------------------------------------
   # sol* elements not valid for ts data_type
-  testthat::expect_error(
-    download_prism(
-      time = "202105",
-      element = "soltotal",
-      data_type = "ts",
-      format = "nc",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
-    )
+  testthat::expect_warning(
+    testthat::expect_error(
+      download_prism(
+        time = "202105",
+        element = "soltotal",
+        data_type = "ts",
+        format = "nc",
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    ),
+    regexp = "download=FALSE"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that(
-  "download_prism mock download (unzip + remove_zip + hash)",
-  {
-    hash_dir <- NULL
-    testthat::local_mocked_bindings(
-      download_run_method = function(urls, destfiles, ...) {
-        payload <- tempfile(fileext = ".txt")
-        writeLines("prism test payload", payload)
-        utils::zip(destfiles, payload, flags = "-q")
-        unlink(payload)
-        invisible(NULL)
-      },
-      download_unzip = function(...) invisible(NULL),
-      download_hash = function(hash, dir) {
-        hash_dir <<- dir
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
-      result <- suppressWarnings(
-        suppressMessages(
-          download_prism(
-            time = "201005",
-            element = "ppt",
-            data_type = "ts",
-            format = "nc",
-            directory_to_save = ".",
-            acknowledgement = TRUE,
-            download = TRUE,
-            unzip = TRUE,
-            remove_zip = TRUE,
-            hash = TRUE
-          )
-        )
-      )
-      testthat::expect_equal(result, "fakehash")
-      testthat::expect_true(grepl("/data_files/$", hash_dir))
-    })
-  }
-)
-
-testthat::test_that("download_prism mock download (hash = FALSE)", {
+testthat::test_that("download_prism mock download (unzip + remove_zip + hash)", {
+  hash_dir <- NULL
   testthat::local_mocked_bindings(
     download_run_method = function(urls, destfiles, ...) {
       payload <- tempfile(fileext = ".txt")
@@ -148,7 +110,10 @@ testthat::test_that("download_prism mock download (hash = FALSE)", {
       invisible(NULL)
     },
     download_unzip = function(...) invisible(NULL),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_hash = function(hash, dir) {
+      hash_dir <<- dir
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -162,13 +127,60 @@ testthat::test_that("download_prism mock download (hash = FALSE)", {
           directory_to_save = ".",
           acknowledgement = TRUE,
           download = TRUE,
-          unzip = FALSE,
-          remove_zip = FALSE,
-          hash = FALSE
+          unzip = TRUE,
+          remove_zip = TRUE,
+          hash = TRUE
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_equal(result, "fakehash")
+    testthat::expect_true(grepl("/data_files/$", hash_dir))
+  })
+})
+
+testthat::test_that("download_prism(hash=FALSE): returns runner summary", {
+  # ----------------------------------------------------------------------------
+  # Supply a valid ZIP and a realistic runner result for archive validation.
+  expected_result <- list(
+    success = 1,
+    failed = 0,
+    skipped = 0,
+    failed_urls = character(0),
+    failed_files = character(0)
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, ...) {
+      payload <- tempfile(fileext = ".txt")
+      writeLines("prism test payload", payload)
+      utils::zip(destfiles, payload, flags = "-q")
+      unlink(payload)
+      invisible(expected_result)
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_hash = function(...) stop("hash=FALSE must not hash files."),
+    .package = "amadeus"
+  )
+  # ----------------------------------------------------------------------------
+  # Keep real PRISM archive validation and return handling in this test.
+  withr::with_tempdir({
+    result <- withVisible(suppressMessages(
+      download_prism(
+        time = "201005",
+        element = "ppt",
+        data_type = "ts",
+        format = "nc",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        remove_zip = FALSE,
+        hash = FALSE
+      )
+    ))
+    # --------------------------------------------------------------------------
+    # The source returns the complete runner result unchanged and invisibly.
+    testthat::expect_identical(result$value, expected_result)
+    testthat::expect_false(result$visible)
   })
 })
 
@@ -186,7 +198,7 @@ testthat::test_that("download_prism errors when downloaded archive is invalid", 
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     testthat::expect_error(
       download_prism(
@@ -334,7 +346,6 @@ testthat::test_that("calculate_prism", {
     "Calculating PRISM covariates with 1000 meters radius..."
   )
 
-
   # error cases
   testthat::expect_error(
     calculate_prism(list(), locs),
@@ -347,8 +358,24 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
   withr::local_package("sf")
   withr::local_package("exactextractr")
 
-  r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
-  r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+  r1 <- terra::rast(
+    ncols = 2,
+    nrows = 2,
+    xmin = -80,
+    xmax = -78,
+    ymin = 35,
+    ymax = 37,
+    crs = "EPSG:4326"
+  )
+  r2 <- terra::rast(
+    ncols = 2,
+    nrows = 2,
+    xmin = -80,
+    xmax = -78,
+    ymin = 35,
+    ymax = 37,
+    crs = "EPSG:4326"
+  )
   terra::values(r1) <- 1:4
   terra::values(r2) <- 5:8
   rr <- c(r1, r2)
@@ -365,7 +392,15 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
 
 testthat::test_that("calculate_prism errors when deprecated .by is supplied", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 5
   names(from) <- "ppt"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -385,7 +420,15 @@ testthat::test_that("calculate_prism errors when deprecated .by is supplied", {
 
 testthat::test_that("calculate_prism .by_time branch derives time and validates inputs", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 5
   names(from) <- "ppt"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -407,7 +450,11 @@ testthat::test_that("calculate_prism .by_time branch derives time and validates 
 
   from_multi <- c(from, from)
   names(from_multi) <- c("ppt", "tmean")
-  terra::time(from_multi) <- as.POSIXct(c(NA, NA), origin = "1970-01-01", tz = "UTC")
+  terra::time(from_multi) <- as.POSIXct(
+    c(NA, NA),
+    origin = "1970-01-01",
+    tz = "UTC"
+  )
   testthat::expect_error(
     calculate_prism(
       from = from_multi,
@@ -477,45 +524,89 @@ testthat::test_that("calculate_prism(radius=1000): buffer diameter is 2000 meter
   testthat::expect_equal(max(distances), 1000, tolerance = 1)
 })
 
-testthat::test_that(
-  "calculate_prism(radius=1000): extraction uses a single buffer",
-  {
-    withr::local_package("terra")
-    withr::local_package("sf")
-    withr::local_package("exactextractr")
+testthat::test_that("calculate_prism(radius=1000): extraction uses a single buffer", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("exactextractr")
 
-    from <- terra::rast(
-      ncols = 8,
-      nrows = 8,
-      xmin = -2000,
-      xmax = 2000,
-      ymin = -2000,
-      ymax = 2000,
-      crs = "EPSG:3857"
-    )
-    cell_coordinates <- terra::xyFromCell(
-      from,
-      seq_len(terra::ncell(from))
-    )
-    terra::values(from) <- sqrt(rowSums(cell_coordinates^2))
-    names(from) <- "ppt"
+  from <- terra::rast(
+    ncols = 8,
+    nrows = 8,
+    xmin = -2000,
+    xmax = 2000,
+    ymin = -2000,
+    ymax = 2000,
+    crs = "EPSG:3857"
+  )
+  cell_coordinates <- terra::xyFromCell(
+    from,
+    seq_len(terra::ncell(from))
+  )
+  terra::values(from) <- sqrt(rowSums(cell_coordinates^2))
+  names(from) <- "ppt"
 
-    locs <- terra::vect(
-      data.frame(site_id = "s1", x = 0, y = 0),
-      geom = c("x", "y"),
-      crs = "EPSG:3857"
-    )
-    single_buffer <- terra::buffer(locs, width = 1000, quadsegs = 180L)
-    expected <- exactextractr::exact_extract(
-      from,
-      sf::st_as_sf(single_buffer),
-      fun = "mean",
-      force_df = TRUE,
-      progress = FALSE
-    )
+  locs <- terra::vect(
+    data.frame(site_id = "s1", x = 0, y = 0),
+    geom = c("x", "y"),
+    crs = "EPSG:3857"
+  )
+  single_buffer <- terra::buffer(locs, width = 1000, quadsegs = 180L)
+  expected <- exactextractr::exact_extract(
+    from,
+    sf::st_as_sf(single_buffer),
+    fun = "mean",
+    force_df = TRUE,
+    progress = FALSE
+  )
 
-    result <- calculate_prism(from, locs, radius = 1000)
+  result <- calculate_prism(from, locs, radius = 1000)
 
-    testthat::expect_equal(result$ppt_1000, expected[[1]])
-  }
-)
+  testthat::expect_equal(result$ppt_1000, expected[[1]])
+})
+
+
+################################################################################
+##### Archive validation rejects warnings and handles empty response previews
+
+testthat::test_that("validate_zip(): rejects warning-only archive listings", {
+  path <- file.path(withr::local_tempdir(), "damaged.zip")
+  writeLines("provider error response", path)
+  testthat::local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      testthat::expect_identical(zipfile, path)
+      testthat::expect_true(list)
+      warning("Incomplete archive listing.")
+      data.frame(Name = "partial.tif", Length = 1)
+    },
+    .package = "utils"
+  )
+  # --------------------------------------------------------------------------
+  # A listing warning must not be treated as successful archive validation.
+  testthat::expect_error(
+    amadeus:::validate_zip(path),
+    paste0(
+      "Downloaded archive 'damaged.zip' is not a valid zip file.",
+      "Response preview: provider error response"
+    ),
+    fixed = TRUE
+  )
+  testthat::expect_identical(readLines(path), "provider error response")
+})
+
+testthat::test_that("validate_zip(): handles an empty response preview", {
+  path <- file.path(withr::local_tempdir(), "empty.zip")
+  writeBin(raw(), path)
+  testthat::local_mocked_bindings(
+    unzip = function(...) stop("Cannot read archive listing."),
+    .package = "utils"
+  )
+  # --------------------------------------------------------------------------
+  # An empty response still reports the archive name without a preview suffix.
+  testthat::expect_equal(file.size(path), 0)
+  error <- tryCatch(amadeus:::validate_zip(path), error = identity)
+  testthat::expect_s3_class(error, "error")
+  testthat::expect_identical(
+    conditionMessage(error),
+    "Downloaded archive 'empty.zip' is not a valid zip file."
+  )
+})

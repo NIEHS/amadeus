@@ -8,7 +8,7 @@ testthat::test_that("download_huc (no errors, url discovery)", {
   directory_to_save <- paste0(tempdir(), "/huc/")
   allregions <- c("Lower48", "Islands")
   alltypes <- c("Seamless", "OceanCatchment")
-
+  # ----------------------------------------------------------------------------
   for (region in allregions) {
     for (type in alltypes) {
       result <- suppressWarnings(download_huc(
@@ -30,7 +30,7 @@ testthat::test_that("download_huc (no errors, url discovery)", {
 testthat::test_that("download_huc deprecation warnings", {
   withr::local_package("httr2")
   directory_to_save <- paste0(tempdir(), "/huc_dep/")
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_huc(
       "Lower48",
@@ -41,7 +41,7 @@ testthat::test_that("download_huc deprecation warnings", {
     ),
     regexp = "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   testthat::expect_warning(
     download_huc(
       "Lower48",
@@ -53,7 +53,7 @@ testthat::test_that("download_huc deprecation warnings", {
     ),
     regexp = "remove_command.*deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -85,7 +85,12 @@ testthat::test_that("download_huc supports unzip via archive extraction", {
   unzip_called <- FALSE
   testthat::local_mocked_bindings(
     download_run_method = function(...) invisible(NULL),
-    download_unzip = function(file_name, directory_to_unzip, unzip = TRUE) {
+    download_unzip = function(
+      file_name,
+      directory_to_unzip,
+      unzip = TRUE,
+      remove = FALSE
+    ) {
       unzip_called <<- isTRUE(unzip) && grepl("\\.7z$", file_name)
       invisible(NULL)
     },

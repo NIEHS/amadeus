@@ -3,134 +3,11 @@
 
 ################################################################################
 ##### download_gmted
-testthat::test_that("download_gmted", {
-  withr::local_package("httr2")
-  # function parameters
-  statistics <- c("Breakline Emphasis", "Standard Deviation Statistic")
-  resolution <- "7.5 arc-seconds"
-  directory_to_save <- paste0(tempdir(), "/gmted/")
-
-  for (s in seq_along(statistics)) {
-    # Clean directory before test
-    if (dir.exists(directory_to_save)) {
-      unlink(directory_to_save, recursive = TRUE)
-    }
-
-    # Create directory structure manually to simulate what download would create
-    dir.create(directory_to_save, recursive = TRUE, showWarnings = FALSE)
-    dir.create(
-      paste0(directory_to_save, "data_files"),
-      recursive = TRUE,
-      showWarnings = FALSE
-    )
-    dir.create(
-      paste0(directory_to_save, "commands"),
-      recursive = TRUE,
-      showWarnings = FALSE
-    )
-
-    # Create mock command file
-    commands_filename <- paste0(
-      "gmted_",
-      gsub(" ", "", statistics[s]),
-      "_",
-      gsub(" ", "", resolution),
-      "_",
-      Sys.Date(),
-      "_curl_command.txt"
-    )
-    commands_path <- paste0(directory_to_save, commands_filename)
-
-    # Write mock curl commands to file
-    mock_commands <- data.frame(
-      V1 = "curl",
-      V2 = "-n",
-      V3 = "-c",
-      V4 = paste0(directory_to_save, "data_files/test_file.zip"),
-      V5 = "-b",
-      V6 = "https://example.com/test_file.zip",
-      stringsAsFactors = FALSE
-    )
-    write.table(
-      mock_commands,
-      commands_path,
-      row.names = FALSE,
-      col.names = FALSE,
-      sep = ",",
-      quote = FALSE
-    )
-
-    # expect sub-directories to be created
-    subdirs <- list.files(
-      directory_to_save,
-      include.dirs = TRUE,
-      full.names = FALSE
-    )
-
-    testthat::expect_true(
-      length(subdirs) >= 2 # data_files and commands at minimum
-    )
-
-    # Check if commands file exists
-    testthat::expect_true(
-      file.exists(commands_path),
-      info = paste("Commands file should exist at:", commands_path)
-    )
-
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 6)
-    filename <- extract_urls(commands = commands, position = 4)
-
-    # Verify URL extraction worked
-    testthat::expect_true(
-      length(urls) > 0
-    )
-    testthat::expect_true(
-      length(filename) > 0
-    )
-
-    # Create mock downloaded files
-    file.create(
-      file.path(filename),
-      recursive = TRUE
-    )
-    file.create(
-      file.path(
-        paste0(directory_to_save, "/data_files/test.txt")
-      )
-    )
-
-    # Test file removal functionality
-    testthat::expect_true(
-      file.exists(commands_path)
-    )
-
-    # Manually remove command file to test remove_command logic
-    if (file.exists(commands_path)) {
-      file.remove(commands_path)
-    }
-
-    testthat::expect_false(
-      file.exists(commands_path)
-    )
-
-    testthat::expect_true(
-      dir.exists(paste0(directory_to_save, "/data_files"))
-    )
-
-    # Clean up
-    unlink(directory_to_save, recursive = TRUE)
-  }
-})
-
 testthat::test_that("download_gmted with download_data function", {
   withr::local_package("httr2")
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/gmted_download_test/")
-
+  # ----------------------------------------------------------------------------
   # Test that download_data creates proper structure with download = FALSE
   testthat::expect_warning(
     download_data(
@@ -145,12 +22,12 @@ testthat::test_that("download_gmted with download_data function", {
     ),
     "download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Clean up
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -459,7 +336,7 @@ testthat::test_that("download_gmted mock download hash=FALSE", {
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_type(result, "list")
   })
 })
 
@@ -490,6 +367,6 @@ testthat::test_that("download_gmted file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })

@@ -3,87 +3,64 @@
 
 ################################################################################
 ##### download_groads
-testthat::test_that("download_groads", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
+testthat::test_that("download_groads(download=FALSE): previews formats", {
+  # ----------------------------------------------------------------------------
+  # Exercise real URL planning with a local token and no download execution.
   withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
-  # function parameters
-  data_regions <- c("Americas", "Global")
-  data_formats <- c("Geodatabase", "Shapefile")
-  directory_to_save <- paste0(tempdir(), "/groads/")
-
-  # run download function
-  for (r in seq_along(data_regions)) {
-    data_region <- data_regions[r]
-    for (f in seq_along(data_formats)) {
-      # Clean directory before test
-      if (dir.exists(directory_to_save)) {
-        unlink(directory_to_save, recursive = TRUE)
-      }
-
-      testthat::expect_warning(
-        download_data(
-          dataset_name = "sedac_groads",
-          directory_to_save = directory_to_save,
-          acknowledgement = TRUE,
-          data_format = data_formats[f],
-          data_region = data_region,
-          download = FALSE,
-          unzip = FALSE,
-          remove_zip = FALSE,
-          remove_command = FALSE
-        ),
-        "download=FALSE is deprecated"
-      )
-
-      # Check that directory was created
-      testthat::expect_true(
-        dir.exists(directory_to_save)
-      )
-
-      # Check that subdirectories exist
-      subdirs <- list.files(
-        directory_to_save,
-        include.dirs = TRUE,
-        full.names = FALSE
-      )
-
-      testthat::expect_true(
-        length(subdirs) >= 1
-      )
-
-      # define file path with commands
-      commands_path <- paste0(
-        download_sanitize_path(directory_to_save),
-        "sedac_groads_",
-        gsub(" ", "_", tolower(data_region)),
-        "_",
-        Sys.Date(),
-        "_curl_command.txt"
-      )
-
-      # Only proceed with command file tests if it exists
-      if (file.exists(commands_path)) {
-        # import commands
-        commands <- read_commands(commands_path = commands_path)
-        # extract urls
-        urls <- extract_urls(commands = commands, position = 11)
-        # check HTTP URL status
-        url_status <- check_urls(urls = urls, size = 1L)
-        # implement unit tests
-        test_download_functions(
-          directory_to_save = directory_to_save,
-          commands_path = commands_path,
-          url_status = url_status
-        )
-        # remove file with commands after test
-        file.remove(commands_path)
-      }
-    }
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "groads"
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
+  cases <- data.frame(
+    region = c("Americas", "Americas", "Global", "Global"),
+    format = c("Geodatabase", "Shapefile", "Geodatabase", "Shapefile"),
+    filename = c(
+      "groads_v1_americas_gdb.zip", "groads_v1_americas_shp.zip",
+      "groads_v1_global_gdb.zip", "groads_v1_global_gdb.zip"
+    ),
+    remote = c(
+      "groads-v1-americas-gdb.zip", "groads-v1-americas-shp.zip",
+      "groads-v1-global-gdb.zip", "groads-v1-global-gdb.zip"
+    )
+  )
+  for (i in seq_len(nrow(cases))) {
+    # --------------------------------------------------------------------------
+    # Global shapefile requests fall back to the provider's geodatabase archive.
+    testthat::expect_warning(
+      result <- withVisible(suppressMessages(amadeus::download_data(
+        dataset_name = "sedac_groads",
+        data_region = cases$region[i],
+        data_format = cases$format[i],
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE,
+        unzip = FALSE
+      ))),
+      "Setting download=FALSE is deprecated"
+    )
+    testthat::expect_false(result$visible)
+    testthat::expect_identical(result$value, list(
+      urls = paste0(
+        "https://data.earthdata.nasa.gov/nasa-earth/",
+        "human-dimensions/sedac-root/downloads/data/groads/",
+        "groads-global-roads-open-access-v1/", cases$remote[i]
+      ),
+      destfiles = file.path(directory_to_save, "zip_files", cases$filename[i]),
+      n_files = 1L
+    ))
   }
-
-  testthat::expect_warning(
-    download_data(
+  # ----------------------------------------------------------------------------
+  # Previews create the directory layout but no archives or command files.
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "zip_files")))
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "data_files")))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
+  # ----------------------------------------------------------------------------
+  # Both retained deprecated arguments still issue their own warnings.
+  warnings <- testthat::capture_warnings(suppressMessages(
+    amadeus::download_data(
       dataset_name = "sedac_groads",
       data_format = "Shapefile",
       data_region = "Global",
@@ -91,13 +68,12 @@ testthat::test_that("download_groads", {
       acknowledgement = TRUE,
       download = FALSE,
       unzip = FALSE,
-      remove_zip = FALSE,
       remove_command = TRUE
-    ),
-    "download=FALSE|remove_command"
-  )
-  # remove temporary groads
-  unlink(directory_to_save, recursive = TRUE)
+    )
+  ))
+  testthat::expect_length(warnings, 2L)
+  testthat::expect_match(warnings[1], "download=FALSE")
+  testthat::expect_match(warnings[2], "remove_command")
 })
 
 testthat::test_that("download_groads mock download with hash", {
@@ -339,7 +315,7 @@ testthat::test_that("download_groads mock download hash=FALSE", {
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_type(result, "list")
   })
 })
 
@@ -371,7 +347,7 @@ testthat::test_that("download_groads file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })
 

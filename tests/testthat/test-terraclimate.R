@@ -13,7 +13,7 @@ testthat::test_that("download_terraclimate (url discovery)", {
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terracclimate/")
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = c(year_start, year_end),
@@ -22,12 +22,12 @@ testthat::test_that("download_terraclimate (url discovery)", {
     acknowledgement = TRUE,
     download = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   # 6 years × 1 variable = 6 files
   testthat::expect_equal(result$n_files, 6L)
   testthat::expect_true(all(grepl("^https://", result$urls)))
   testthat::expect_true(all(grepl("TerraClimate_ppt", result$urls)))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -40,7 +40,7 @@ testthat::test_that("download_terraclimate (single year)", {
   year <- 2019
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terraclimate/")
-
+  # ----------------------------------------------------------------------------
   result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = year,
@@ -49,11 +49,11 @@ testthat::test_that("download_terraclimate (single year)", {
     acknowledgement = TRUE,
     download = FALSE
   ))
-
+  # ----------------------------------------------------------------------------
   testthat::expect_equal(result$n_files, 1L)
   testthat::expect_true(grepl("2019", result$urls))
   testthat::expect_true(grepl("^https://", result$urls))
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -129,11 +129,10 @@ testthat::test_that("download_terraclimate mock download with hash", {
 })
 
 testthat::test_that(
-  "download_terraclimate continues when preflight check fails transiently",
+  "download_terraclimate(download=TRUE): returns the runner's result",
   {
     run_called <- FALSE
     testthat::local_mocked_bindings(
-      check_url_status = function(...) FALSE,
       check_destfile = function(...) TRUE,
       download_run_method = function(...) {
         run_called <<- TRUE
@@ -151,7 +150,7 @@ testthat::test_that(
             acknowledgement = TRUE
           )
         ),
-        regexp = "Preflight URL check failed"
+        regexp = NA
       )
       testthat::expect_true(run_called)
       testthat::expect_equal(result$success, 1L)

@@ -3,79 +3,61 @@
 
 ################################################################################
 ##### download_narr
-testthat::test_that("download_narr (no errors)", {
-  skip_on_cran()
-  skip_if_offline()
-
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  year_start <- 2018
-  year_end <- 2018
-  variables <- c(
-    "weasd", # monolevel
-    "omega", # pressure level
-    "soill" # subsurface
+testthat::test_that("download_narr(download=FALSE): previews categories", {
+  # ----------------------------------------------------------------------------
+  # URL construction is local and must not invoke the download runner.
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "narr"
   )
-  directory_to_save <- paste0(tempdir(), "/narr/")
-
-  # Expect deprecation warning with download = FALSE
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
+  )
   testthat::expect_warning(
-    download_data(
+    result <- withVisible(suppressMessages(amadeus::download_data(
       dataset_name = "narr",
-      year = c(year_start, year_end),
-      variables = variables,
+      year = c(2018, 2018),
+      variables = c("weasd", "omega", "soill"),
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE
-    ),
+    ))),
     "Setting download=FALSE is deprecated"
   )
-
-  # Check that directory was created
-  testthat::expect_true(
-    dir.exists(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # One annual monolevel file and twelve monthly files per other category.
+  filenames <- c(
+    "weasd.2018.nc",
+    sprintf("omega.2018%02d.nc", 1:12),
+    sprintf("soill.2018%02d.nc", 1:12)
   )
-
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "narr_",
-    year_start,
-    "_",
-    year_end,
-    "_curl_commands.txt"
+  remote_directories <- c(
+    "monolevel", rep("pressure", 12), rep("subsurface", 12)
   )
-
-  # Only proceed if commands file exists
-  if (file.exists(commands_path)) {
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 6)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L)
-    # implement unit tests
-    test_download_functions(
-      directory_to_save = directory_to_save,
-      commands_path = commands_path,
-      url_status = url_status
-    )
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
-
-  unlink(directory_to_save, recursive = TRUE)
+  variable_directories <- c("weasd", rep("omega", 12), rep("soill", 12))
+  testthat::expect_false(result$visible)
+  testthat::expect_identical(result$value, list(
+    urls = paste0(
+      "https://downloads.psl.noaa.gov/NARR/Dailies/",
+      remote_directories, "/", filenames
+    ),
+    destfiles = file.path(directory_to_save, variable_directories, filenames),
+    n_files = 25L
+  ))
+  # ----------------------------------------------------------------------------
+  # Previewing creates the base directory without writing data or commands.
+  testthat::expect_true(dir.exists(directory_to_save))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
 })
 
 testthat::test_that("download_narr (single year)", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr/")
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning
   testthat::expect_warning(
     download_data(
@@ -88,12 +70,12 @@ testthat::test_that("download_narr (single year)", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -119,11 +101,11 @@ testthat::test_that("narr_variable (expected errors)", {
 testthat::test_that("download_narr without download=FALSE", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr_new/")
-
+  # ----------------------------------------------------------------------------
   # Test without download=FALSE (new httr2 method, no deprecation warning)
   testthat::expect_no_error(
     download_data(
@@ -134,12 +116,12 @@ testthat::test_that("download_narr without download=FALSE", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 

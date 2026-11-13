@@ -27,6 +27,8 @@
 #' @param hash_value character(1) value returned by `download_hash()`.
 #' @param url_ok logical(1) returned by `check_url_status()`.
 #' @param destfile_ok logical(1) returned by `check_destfile()`.
+#' @param failed_urls,failed_files Character vectors of simulated failed URLs
+#'   and destination basenames. Empty by default; supply details for failures.
 #' @param ... Additional bindings that override or extend the defaults.
 #' @return Named list of mock bindings.
 #' @keywords internal
@@ -36,12 +38,20 @@ mocks_download_stack <- function(success = 1L,
                                  hash_value = "hash-ok",
                                  url_ok = TRUE,
                                  destfile_ok = TRUE,
+                                 failed_urls = character(0),
+                                 failed_files = character(0),
                                  ...) {
   defaults <- list(
     check_url_status     = function(...) url_ok,
     check_destfile       = function(...) destfile_ok,
     download_run_method  = function(...) {
-      list(success = success, failed = failed, skipped = skipped)
+      list(
+        success = success,
+        failed = failed,
+        skipped = skipped,
+        failed_urls = failed_urls,
+        failed_files = failed_files
+      )
     },
     download_unzip       = function(...) NULL,
     download_remove_zips = function(...) NULL,

@@ -3,113 +3,77 @@
 
 ################################################################################
 ##### download_nlcd
-testthat::test_that("download_nlcd", {
-  skip_on_cran()
-  skip_if_offline()
-
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-
-  # function parameters
-  years <- sample(1985:2023L, size = 2)
+testthat::test_that("download_nlcd(download=FALSE): previews products", {
+  # ----------------------------------------------------------------------------
+  # Cover every product deterministically at both supported year boundaries.
+  directory_to_save <- file.path(
+    normalizePath(withr::local_tempdir(), winslash = "/"), "nlcd"
+  )
   products <- c(
-    "Land Cover",
-    "Land Cover Change",
-    "Land Cover Confidence",
-    "Fractional Impervious Surface",
-    "Impervious Descriptor",
+    "Land Cover", "Land Cover Change", "Land Cover Confidence",
+    "Fractional Impervious Surface", "Impervious Descriptor",
     "Spectral Change Day of Year"
   )
-  product_codes <- c(
-    "LndCov",
-    "LndChg",
-    "LndCnf",
-    "FctImp",
-    "ImpDsc",
-    "SpcChg"
+  product_codes <- c("LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg")
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) stop("Unexpected preview download."),
+    .package = "amadeus"
   )
-
-  withr::with_tempdir({
-    directory_to_save <- file.path(getwd(), "nlcd")
-
-    # run download function
-    for (y in seq_along(years)) {
-      p <- sample(seq_along(products), size = 1L)
-
-      # Expect deprecation warning with download = FALSE
+  for (year in c(1985L, 2024L)) {
+    for (p in seq_along(products)) {
+      # ------------------------------------------------------------------------
+      # The preview contains a provider URL and its matching zip_files path.
       testthat::expect_warning(
-        download_data(
+        result <- withVisible(suppressMessages(amadeus::download_data(
           dataset_name = "nlcd",
-          year = years[y],
+          year = year,
           product = products[p],
           directory_to_save = directory_to_save,
           acknowledgement = TRUE,
           download = FALSE,
-          remove_command = FALSE,
           unzip = FALSE
-        ),
+        ))),
         "Setting download=FALSE is deprecated"
       )
-
-      # Check that directory was created
-      testthat::expect_true(
-        dir.exists(directory_to_save)
+      filename <- sprintf(
+        "Annual_NLCD_%s_%d_CU_C1V1.zip", product_codes[p], year
       )
-
-      # define file path with commands
-      commands_path <- paste0(
-        download_sanitize_path(directory_to_save),
-        "nlcd_",
-        tolower(product_codes[p]),
-        "_",
-        years[y],
-        "_",
-        Sys.Date(),
-        "_curl_command.txt"
-      )
-
-      # Only proceed if commands file exists
-      if (file.exists(commands_path)) {
-        # import commands
-        commands <- read_commands(commands_path = commands_path)
-        # extract urls
-        urls <- extract_urls(commands = commands, position = 5)
-        # check HTTP URL status
-        url_status <- check_urls(urls = urls, size = 1L)
-        # implement unit tests
-        test_download_functions(
-          directory_to_save = directory_to_save,
-          commands_path = commands_path,
-          url_status = url_status
-        )
-        # remove file with commands after test
-        file.remove(commands_path)
-      }
-    }
-
-    # Test error case with invalid year
-    # This should produce BOTH warnings (download=FALSE and remove_command=TRUE)
-    # AND an error. We need to capture the warnings
-    # while still expecting the error.
-    testthat::expect_error(
-      testthat::expect_warning(
-        testthat::expect_warning(
-          download_data(
-            dataset_name = "nlcd",
-            year = 1900,
-            product = "land cover",
-            directory_to_save = directory_to_save,
-            acknowledgement = TRUE,
-            download = FALSE,
-            remove_command = TRUE
-          ),
-          regexp = "Setting download=FALSE is deprecated"
+      testthat::expect_false(result$visible)
+      testthat::expect_identical(result$value, list(
+        urls = paste0(
+          "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/",
+          filename
         ),
-        regexp = "Parameter 'remove_command' is deprecated"
-      )
-    )
-  })
-  # Automatic cleanup when withr::with_tempdir exits
+        destfiles = file.path(directory_to_save, "zip_files", filename),
+        n_files = 1L
+      ))
+    }
+  }
+  # ----------------------------------------------------------------------------
+  # Previewing creates the layout without writing archives or command files.
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "zip_files")))
+  testthat::expect_true(dir.exists(file.path(directory_to_save, "data_files")))
+  testthat::expect_length(list.files(directory_to_save, recursive = TRUE), 0L)
+  # ----------------------------------------------------------------------------
+  # Deprecated controls warn before the invalid-year request is rejected.
+  testthat::expect_error(
+    testthat::expect_warning(
+      testthat::expect_warning(
+        amadeus::download_data(
+          dataset_name = "nlcd",
+          year = 1900,
+          product = "land cover",
+          directory_to_save = directory_to_save,
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+        ),
+        "Setting download=FALSE is deprecated"
+      ),
+      "Parameter 'remove_command' is deprecated"
+    ),
+    "year"
+  )
 })
 
 ################################################################################
@@ -117,13 +81,13 @@ testthat::test_that("download_nlcd", {
 testthat::test_that("download_nlcd deprecation warnings", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     directory_to_save <- file.path(getwd(), "nlcd_deprecation")
-
+    # --------------------------------------------------------------------------
     # Test 1: download=FALSE deprecation warning
     testthat::expect_warning(
       download_data(
@@ -136,7 +100,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
       ),
       regexp = "Setting download=FALSE is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 2: remove_command deprecation warning
     testthat::expect_warning(
       download_data(
@@ -149,7 +113,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
       ),
       regexp = "Parameter 'remove_command' is deprecated"
     )
-
+    # --------------------------------------------------------------------------
     # Test 3: Both deprecated parameters together (should give both warnings)
     warnings <- testthat::capture_warnings(
       download_data(
@@ -162,7 +126,7 @@ testthat::test_that("download_nlcd deprecation warnings", {
         remove_command = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(
       any(grepl("Setting download=FALSE is deprecated", warnings))
     )
@@ -799,7 +763,7 @@ testthat::test_that("download_nlcd file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })
 
@@ -825,7 +789,7 @@ testthat::test_that("download_nlcd mock download hash=FALSE", {
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_type(result, "list")
   })
 })
 
@@ -917,7 +881,7 @@ testthat::test_that("download_nlcd stops with invalid year", {
         download = FALSE
       )
     ),
-    "not recognized"
+    "Assertion on 'year' failed"
   )
 })
 
@@ -989,185 +953,170 @@ testthat::test_that("download_nlcd passes http_version=2L to download_run_method
 ################################################################################
 ##### calculate_nlcd buffer radius
 
-testthat::test_that(
-  "calculate_nlcd(radius=6000, geom='terra'): uses R as radius and 2R as diameter",
-  {
-    withr::local_package("terra")
-    withr::local_package("exactextractr")
+testthat::test_that("calculate_nlcd(radius=6000, geom='terra'): uses R as radius and 2R as diameter", {
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
 
-    input_radius <- 6000
-    nlcd <- process_nlcd(
-      path = testthat::test_path("..", "testdata", "nlcd"),
-      year = 2021
-    )
-    locs <- terra::vect(
-      data.frame(site_id = "site_1", lon = -78.85, lat = 36.09),
-      geom = c("lon", "lat"),
-      crs = "EPSG:4326"
-    )
-    center <- terra::crds(terra::project(locs, terra::crs(nlcd)))[1, ]
+  input_radius <- 6000
+  nlcd <- process_nlcd(
+    path = testthat::test_path("..", "testdata", "nlcd"),
+    year = 2021
+  )
+  locs <- terra::vect(
+    data.frame(site_id = "site_1", lon = -78.85, lat = 36.09),
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+  center <- terra::crds(terra::project(locs, terra::crs(nlcd)))[1, ]
 
-    result <- suppressMessages(
+  result <- suppressMessages(
+    calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      locs_id = "site_id",
+      radius = input_radius,
+      mode = "exact",
+      geom = "terra"
+    )
+  )
+  result_extent <- as.vector(terra::ext(result))
+  output_diameters <- c(
+    x = result_extent[2] - result_extent[1],
+    y = result_extent[4] - result_extent[3]
+  )
+  vertices <- terra::geom(result)
+  distances_from_center <- sqrt(
+    (vertices[, "x"] - center[1])^2 +
+      (vertices[, "y"] - center[2])^2
+  )
+
+  testthat::expect_s4_class(result, "SpatVector")
+  testthat::expect_identical(terra::geomtype(result), "polygons")
+  testthat::expect_true(terra::same.crs(result, nlcd))
+  testthat::expect_equal(
+    unname(output_diameters),
+    rep(2 * input_radius, 2),
+    tolerance = 1e-6
+  )
+  testthat::expect_equal(
+    max(distances_from_center),
+    input_radius,
+    tolerance = 1e-6
+  )
+  testthat::expect_lte(
+    max(distances_from_center),
+    input_radius + 1e-6
+  )
+})
+
+testthat::test_that("calculate_nlcd(class_names='code'/'mrlc'): returns equivalent named classes", {
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  nlcd <- process_nlcd(
+    path = testthat::test_path("..", "testdata", "nlcd"),
+    year = 2021
+  )
+  locs <- terra::vect(
+    data.frame(
+      site_id = 1:2,
+      lon = c(-78.85, -78.73),
+      lat = c(36.09, 35.96)
+    ),
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+
+  output_code <- calculate_nlcd(
+    from = nlcd,
+    locs = locs,
+    radius = 6000,
+    class_names = "code"
+  )
+  output_mrlc <- calculate_nlcd(
+    from = nlcd,
+    locs = locs,
+    radius = 6000,
+    class_names = "mrlc"
+  )
+
+  code_cols <- grep("^NLCD_", names(output_code), value = TRUE)
+  mrlc_cols <- grep("^NLCD_", names(output_mrlc), value = TRUE)
+
+  testthat::expect_match(code_cols, "^NLCD_[0-9]+_06000$")
+  testthat::expect_contains(
+    mrlc_cols,
+    c(
+      "NLCD_Evergreen_Forest_06000",
+      "NLCD_Shrub_Scrub_06000"
+    )
+  )
+  testthat::expect_equal(length(mrlc_cols), length(code_cols))
+  testthat::expect_equal(
+    unname(as.matrix(output_mrlc[mrlc_cols])),
+    unname(as.matrix(output_code[code_cols]))
+  )
+})
+
+testthat::test_that("format_nlcd_mrlc_classes(product='ImpDsc'): uses descriptor class names", {
+  testthat::expect_equal(
+    format_nlcd_mrlc_classes(
+      c("0", "1", "2", "250"),
+      product = "ImpDsc"
+    ),
+    c("Non_Urban", "Roads", "Urban", "NoData")
+  )
+})
+
+testthat::test_that("get_nlcd_product(Product='ImpDsc'): identifies descriptor metadata", {
+  withr::local_package("terra")
+  nlcd <- terra::rast(nrows = 1, ncols = 1)
+  terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+
+  testthat::expect_equal(get_nlcd_product(nlcd), "ImpDsc")
+})
+
+testthat::test_that("calculate_nlcd(class_names='mrlc', product=non-class): rejects class names", {
+  withr::local_package("terra")
+
+  product_names <- c(
+    LndCnf = "Land Cover Confidence",
+    FctImp = "Fractional Impervious Surface",
+    SpcChg = "Spectral Change Day of Year"
+  )
+  locs <- terra::vect(
+    data.frame(site_id = "site_1", x = 50, y = 50),
+    geom = c("x", "y"),
+    crs = "EPSG:3857"
+  )
+
+  for (product_code in names(product_names)) {
+    nlcd <- terra::rast(
+      nrows = 1,
+      ncols = 1,
+      xmin = 0,
+      xmax = 100,
+      ymin = 0,
+      ymax = 100,
+      crs = "EPSG:3857"
+    )
+    terra::values(nlcd) <- 1
+    terra::metags(nlcd) <- c(
+      "Year=2020",
+      paste0("Product=", product_code)
+    )
+
+    testthat::expect_error(
       calculate_nlcd(
         from = nlcd,
         locs = locs,
-        locs_id = "site_id",
-        radius = input_radius,
-        mode = "exact",
-        geom = "terra"
-      )
-    )
-    result_extent <- as.vector(terra::ext(result))
-    output_diameters <- c(
-      x = result_extent[2] - result_extent[1],
-      y = result_extent[4] - result_extent[3]
-    )
-    vertices <- terra::geom(result)
-    distances_from_center <- sqrt(
-      (vertices[, "x"] - center[1])^2 +
-        (vertices[, "y"] - center[2])^2
-    )
-
-    testthat::expect_s4_class(result, "SpatVector")
-    testthat::expect_identical(terra::geomtype(result), "polygons")
-    testthat::expect_true(terra::same.crs(result, nlcd))
-    testthat::expect_equal(
-      unname(output_diameters),
-      rep(2 * input_radius, 2),
-      tolerance = 1e-6
-    )
-    testthat::expect_equal(
-      max(distances_from_center),
-      input_radius,
-      tolerance = 1e-6
-    )
-    testthat::expect_lte(
-      max(distances_from_center),
-      input_radius + 1e-6
-    )
-  }
-)
-
-testthat::test_that(
-  "calculate_nlcd(class_names='code'/'mrlc'): returns equivalent named classes",
-  {
-    withr::local_package("terra")
-    withr::local_package("exactextractr")
-    withr::local_options(list(sf_use_s2 = FALSE))
-
-    nlcd <- process_nlcd(
-      path = testthat::test_path("..", "testdata", "nlcd"),
-      year = 2021
-    )
-    locs <- terra::vect(
-      data.frame(
-        site_id = 1:2,
-        lon = c(-78.85, -78.73),
-        lat = c(36.09, 35.96)
+        class_names = "mrlc"
       ),
-      geom = c("lon", "lat"),
-      crs = "EPSG:4326"
-    )
-
-    output_code <- calculate_nlcd(
-      from = nlcd,
-      locs = locs,
-      radius = 6000,
-      class_names = "code"
-    )
-    output_mrlc <- calculate_nlcd(
-      from = nlcd,
-      locs = locs,
-      radius = 6000,
-      class_names = "mrlc"
-    )
-
-    code_cols <- grep("^NLCD_", names(output_code), value = TRUE)
-    mrlc_cols <- grep("^NLCD_", names(output_mrlc), value = TRUE)
-
-    testthat::expect_match(code_cols, "^NLCD_[0-9]+_06000$")
-    testthat::expect_contains(
-      mrlc_cols,
-      c(
-        "NLCD_Evergreen_Forest_06000",
-        "NLCD_Shrub_Scrub_06000"
-      )
-    )
-    testthat::expect_equal(length(mrlc_cols), length(code_cols))
-    testthat::expect_equal(
-    unname(as.matrix(output_mrlc[mrlc_cols])),
-    unname(as.matrix(output_code[code_cols]))
-)
-  }
-)
-
-testthat::test_that(
-  "format_nlcd_mrlc_classes(product='ImpDsc'): uses descriptor class names",
-  {
-    testthat::expect_equal(
-      format_nlcd_mrlc_classes(
-        c("0", "1", "2", "250"),
-        product = "ImpDsc"
-      ),
-      c("Non_Urban", "Roads", "Urban", "NoData")
+      paste0("not available for ", product_names[[product_code]])
     )
   }
-)
-
-testthat::test_that(
-  "get_nlcd_product(Product='ImpDsc'): identifies descriptor metadata",
-  {
-    withr::local_package("terra")
-    nlcd <- terra::rast(nrows = 1, ncols = 1)
-    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
-
-    testthat::expect_equal(get_nlcd_product(nlcd), "ImpDsc")
-  }
-)
-
-testthat::test_that(
-  "calculate_nlcd(class_names='mrlc', product=non-class): rejects class names",
-  {
-    withr::local_package("terra")
-
-    product_names <- c(
-      LndCnf = "Land Cover Confidence",
-      FctImp = "Fractional Impervious Surface",
-      SpcChg = "Spectral Change Day of Year"
-    )
-    locs <- terra::vect(
-      data.frame(site_id = "site_1", x = 50, y = 50),
-      geom = c("x", "y"),
-      crs = "EPSG:3857"
-    )
-
-    for (product_code in names(product_names)) {
-      nlcd <- terra::rast(
-        nrows = 1,
-        ncols = 1,
-        xmin = 0,
-        xmax = 100,
-        ymin = 0,
-        ymax = 100,
-        crs = "EPSG:3857"
-      )
-      terra::values(nlcd) <- 1
-      terra::metags(nlcd) <- c(
-        "Year=2020",
-        paste0("Product=", product_code)
-      )
-
-      testthat::expect_error(
-        calculate_nlcd(
-          from = nlcd,
-          locs = locs,
-          class_names = "mrlc"
-        ),
-        paste0("not available for ", product_names[[product_code]])
-      )
-    }
-  }
-)
+})
 
 testthat::test_that(
   paste0(
@@ -1217,42 +1166,39 @@ testthat::test_that(
   }
 )
 
-testthat::test_that(
-  "calculate_nlcd(class_names='mrlc', product='ImpDsc'): names descriptor classes",
-  {
-    withr::local_package("terra")
-    nlcd <- terra::rast(
-      nrows = 1,
-      ncols = 3,
-      xmin = 0,
-      xmax = 300,
-      ymin = 0,
-      ymax = 100,
-      crs = "EPSG:3857"
-    )
-    terra::values(nlcd) <- 0:2
-    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
-    locs <- terra::vect(
-      data.frame(site_id = "site_1", x = 150, y = 50),
-      geom = c("x", "y"),
-      crs = "EPSG:3857"
-    )
+testthat::test_that("calculate_nlcd(class_names='mrlc', product='ImpDsc'): names descriptor classes", {
+  withr::local_package("terra")
+  nlcd <- terra::rast(
+    nrows = 1,
+    ncols = 3,
+    xmin = 0,
+    xmax = 300,
+    ymin = 0,
+    ymax = 100,
+    crs = "EPSG:3857"
+  )
+  terra::values(nlcd) <- 0:2
+  terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+  locs <- terra::vect(
+    data.frame(site_id = "site_1", x = 150, y = 50),
+    geom = c("x", "y"),
+    crs = "EPSG:3857"
+  )
 
-    output <- calculate_nlcd(
-      from = nlcd,
-      locs = locs,
-      radius = 300,
-      mode = "terra",
-      class_names = "mrlc"
-    )
+  output <- calculate_nlcd(
+    from = nlcd,
+    locs = locs,
+    radius = 300,
+    mode = "terra",
+    class_names = "mrlc"
+  )
 
-    testthat::expect_contains(
-      names(output),
-      c(
-        "NLCD_Non_Urban_00300",
-        "NLCD_Roads_00300",
-        "NLCD_Urban_00300"
-      )
+  testthat::expect_contains(
+    names(output),
+    c(
+      "NLCD_Non_Urban_00300",
+      "NLCD_Roads_00300",
+      "NLCD_Urban_00300"
     )
-  }
-)
+  )
+})

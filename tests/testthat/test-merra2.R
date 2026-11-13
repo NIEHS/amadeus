@@ -102,7 +102,7 @@ testthat::test_that("download_merra2 (no errors)", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     "NASA_EARTHDATA_TOKEN not set"
   )
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -110,7 +110,7 @@ testthat::test_that("download_merra2 (no errors)", {
   date_end <- "2022-02-15"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- paste0(tempdir(), "/merra2/")
-
+  # ----------------------------------------------------------------------------
   # Test that the function runs without error (requires NASA token)
   testthat::expect_no_error(
     download_data(
@@ -121,25 +121,25 @@ testthat::test_that("download_merra2 (no errors)", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
   testthat::skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
   collections <- c("inst1_2d_asm_Nx")
   directory_to_save <- paste0(tempdir(), "/merra2_deprecated/")
-
+  # ----------------------------------------------------------------------------
   # Expect deprecation warning when using download = FALSE
   testthat::expect_warning(
     download_data(
@@ -152,7 +152,7 @@ testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
     ),
     "Setting download=FALSE is deprecated"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -163,14 +163,14 @@ testthat::test_that("download_merra2 (single date)", {
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     "NASA_EARTHDATA_TOKEN not set"
   )
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- paste0(tempdir(), "/merra2/")
-
+  # ----------------------------------------------------------------------------
   # Test that the function runs without error (requires NASA token)
   testthat::expect_no_error(
     download_data(
@@ -181,32 +181,32 @@ testthat::test_that("download_merra2 (single date)", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 with NASA token", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # Skip if no NASA token is available
   if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
     skip("NASA_EARTHDATA_TOKEN not set")
   }
-
+  # ----------------------------------------------------------------------------
   # function parameters
   date <- "2024-01-02"
   collections <- c("inst1_2d_int_Nx")
   directory_to_save <- paste0(tempdir(), "/merra2_token/")
-
+  # ----------------------------------------------------------------------------
   # Test download with token
   testthat::expect_no_error(
     result <- download_data(
@@ -217,32 +217,32 @@ testthat::test_that("download_merra2 with NASA token", {
       acknowledgement = TRUE
     )
   )
-
+  # ----------------------------------------------------------------------------
   # Check that directory was created
   testthat::expect_true(
     dir.exists(directory_to_save)
   )
-
+  # ----------------------------------------------------------------------------
   # Check that some files were processed (either downloaded or skipped)
   testthat::expect_true(
     length(list.files(directory_to_save, recursive = TRUE)) > 0
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 fails without NASA token", {
   skip_on_cran()
   skip_if_offline()
-
+  # ----------------------------------------------------------------------------
   withr::local_package("httr2")
   withr::local_package("stringr")
-
+  # ----------------------------------------------------------------------------
   # Temporarily unset NASA token
   withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
-
+  # ----------------------------------------------------------------------------
   directory_to_save <- paste0(tempdir(), "/merra2_notoken/")
-
+  # ----------------------------------------------------------------------------
   # Should error when no token is available
   testthat::expect_error(
     download_data(
@@ -254,7 +254,7 @@ testthat::test_that("download_merra2 fails without NASA token", {
     ),
     "NASA_EARTHDATA_TOKEN"
   )
-
+  # ----------------------------------------------------------------------------
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -362,7 +362,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
     },
     .package = "amadeus"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressMessages(
       download_merra2(
@@ -372,7 +372,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
         acknowledgement = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     expected_files <- c(
       "FWI.MERRA2.CORRECTED.Daily.Default.20240811.nc",
       "FWI.MERRA2.CORRECTED.Daily.Default.20240812.nc"
@@ -382,7 +382,7 @@ testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
       "fwiCalcs.MERRA2/Default/MERRA2.CORRECTED/2024/",
       expected_files
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$success, 2)
     testthat::expect_null(captured$token)
     testthat::expect_equal(captured$urls, expected_urls)
@@ -407,25 +407,23 @@ testthat::test_that("download_merra2 supports mixed FWI and standard requests", 
   fake_xml <- paste0(fake_nc4, ".xml")
   fake_html <- sprintf(
     '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4, fake_xml, fake_xml
+    fake_nc4,
+    fake_nc4,
+    fake_xml,
+    fake_xml
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
-
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     result <- suppressMessages(
       download_merra2(
@@ -436,7 +434,7 @@ testthat::test_that("download_merra2 supports mixed FWI and standard requests", 
         acknowledgement = TRUE
       )
     )
-
+    # --------------------------------------------------------------------------
     testthat::expect_true(is.character(captured$token))
     testthat::expect_true(nzchar(captured$token))
     testthat::expect_equal(result$success, 3)
@@ -721,7 +719,10 @@ make_merra2_hourly_fixture <- function(path, n_hours = 3) {
     layer
   }
 
-  layers <- do.call(c, lapply(seq_len(n_hours), function(i) build_layer(i * 10)))
+  layers <- do.call(
+    c,
+    lapply(seq_len(n_hours), function(i) build_layer(i * 10))
+  )
   terra::time(layers) <- as.POSIXct(
     paste0("2018-01-01 0", seq(0, n_hours - 1), ":00:00"),
     format = "%Y-%m-%d %H:%M:%S",
@@ -755,8 +756,14 @@ testthat::test_that("process_merra2 daily_agg=FALSE default is unchanged", {
       daily_agg = FALSE
     )
   )
-  testthat::expect_equal(terra::nlyr(merra2_default), terra::nlyr(merra2_explicit_false))
-  testthat::expect_equal(terra::values(merra2_default), terra::values(merra2_explicit_false))
+  testthat::expect_equal(
+    terra::nlyr(merra2_default),
+    terra::nlyr(merra2_explicit_false)
+  )
+  testthat::expect_equal(
+    terra::values(merra2_default),
+    terra::values(merra2_explicit_false)
+  )
 })
 
 testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
@@ -770,12 +777,22 @@ testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
       process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir)
     )
     merra2_daily_mean <- suppressMessages(
-      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
-                     daily_agg = TRUE, fun = "mean")
+      process_merra2(
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
+      )
     )
     merra2_daily_max <- suppressMessages(
-      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
-                     daily_agg = TRUE, fun = "max")
+      process_merra2(
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "max"
+      )
     )
 
     # 3 sub-daily layers
@@ -798,78 +815,72 @@ testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
   })
 })
 
-testthat::test_that(
-  "process_covariates(covariate=merra2, daily_agg=TRUE): forwards daily aggregation args",
-  {
-    withr::local_package("terra")
+testthat::test_that("process_covariates(covariate=merra2, daily_agg=TRUE): forwards daily aggregation args", {
+  withr::local_package("terra")
 
-    withr::with_tempdir({
-      tmpdir <- getwd()
-      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_hourly_fixture(tmpdir, n_hours = 3)
 
-      merra2_daily_mean <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+    merra2_daily_mean <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      merra2_daily_sum <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "sum"
-        )
+    )
+    merra2_daily_sum <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "sum"
       )
+    )
 
-      testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1L)
-      testthat::expect_equal(terra::nlyr(merra2_daily_sum), 1L)
-      testthat::expect_true(all(
-        terra::values(merra2_daily_sum) >= terra::values(merra2_daily_mean),
-        na.rm = TRUE
-      ))
-    })
-  }
-)
+    testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1L)
+    testthat::expect_equal(terra::nlyr(merra2_daily_sum), 1L)
+    testthat::expect_true(all(
+      terra::values(merra2_daily_sum) >= terra::values(merra2_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
 
-testthat::test_that(
-  "process_covariates(covariate=merra|merra2, daily_agg=TRUE): alias dispatch is consistent",
-  {
-    withr::local_package("terra")
-    withr::with_tempdir({
-      tmpdir <- getwd()
-      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
-      out_merra2 <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+testthat::test_that("process_covariates(covariate=merra|merra2, daily_agg=TRUE): alias dispatch is consistent", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+    out_merra2 <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      out_merra <- suppressMessages(
-        process_covariates(
-          covariate = "merra",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+    )
+    out_merra <- suppressMessages(
+      process_covariates(
+        covariate = "merra",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      testthat::expect_equal(terra::nlyr(out_merra), terra::nlyr(out_merra2))
-      testthat::expect_equal(terra::values(out_merra), terra::values(out_merra2))
-    })
-  }
-)
+    )
+    testthat::expect_equal(terra::nlyr(out_merra), terra::nlyr(out_merra2))
+    testthat::expect_equal(terra::values(out_merra), terra::values(out_merra2))
+  })
+})
 
 testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
   withr::local_package("terra")
@@ -881,12 +892,22 @@ testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
       process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir)
     )
     merra2_fwi_agg <- suppressMessages(
-      process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir,
-                     daily_agg = TRUE)
+      process_merra2(
+        date = "2024-08-11",
+        variable = "FWI",
+        path = tmpdir,
+        daily_agg = TRUE
+      )
     )
     # FWI is already daily; daily_agg should not change the output
-    testthat::expect_equal(terra::nlyr(merra2_fwi_default), terra::nlyr(merra2_fwi_agg))
-    testthat::expect_equal(terra::values(merra2_fwi_default), terra::values(merra2_fwi_agg))
+    testthat::expect_equal(
+      terra::nlyr(merra2_fwi_default),
+      terra::nlyr(merra2_fwi_agg)
+    )
+    testthat::expect_equal(
+      terra::values(merra2_fwi_default),
+      terra::values(merra2_fwi_agg)
+    )
   })
 })
 
@@ -1115,21 +1136,19 @@ testthat::test_that("download_merra2 actual download path via httr2 mock", {
   fake_xml <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4.xml"
   fake_html <- sprintf(
     '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4, fake_xml, fake_xml
+    fake_nc4,
+    fake_nc4,
+    fake_xml,
+    fake_xml
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
@@ -1174,7 +1193,7 @@ testthat::test_that("download_merra2 handles req_perform error with warning", {
     .package = "httr2"
   )
   withr::with_tempdir({
-    testthat::expect_warning(
+    testthat::expect_error(
       suppressMessages(
         download_merra2(
           collection = "inst1_2d_asm_Nx",
@@ -1186,7 +1205,7 @@ testthat::test_that("download_merra2 handles req_perform error with warning", {
           hash = FALSE
         )
       ),
-      "Failed to get directory listing"
+      "Failed to read MERRA-2 listing"
     )
   })
 })
@@ -1208,20 +1227,18 @@ testthat::test_that("download_merra2 download=FALSE returns url list", {
   fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4"
   fake_html <- sprintf(
     '<html><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4
+    fake_nc4,
+    fake_nc4
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
     },
-    resp_body_string = function(resp, ...) rawToChar(resp$body),
     .package = "httr2"
   )
   withr::with_tempdir({
@@ -1363,4 +1380,126 @@ testthat::test_that("calculate_merra2 .by_time level-aware grouping", {
   testthat::expect_equal(lev1, 15)
   testthat::expect_equal(lev2, 35)
   testthat::expect_s3_class(result_mean$time, "POSIXct")
+})
+
+
+################################################################################
+##### MERRA-2 discovery validates inputs and listing completeness
+
+testthat::test_that("discover_merra2(base): rejects non-directory HTTP URLs", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # Reject unsupported schemes and paths that are not directory URLs.
+  bases <- c("ftp://example.org/data/", "https://example.org/data/file.nc4")
+  for (base in bases) {
+    df <- data.frame(base = base, date = "20200101", vdir = "data/")
+    testthat::expect_error(
+      amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+      "Each base must be an HTTP(S) directory URL ending in '/'.", fixed = TRUE
+    )
+  }
+})
+
+testthat::test_that("discover_merra2(date): rejects invalid dates", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  # --------------------------------------------------------------------------
+  # Both formatting errors and impossible calendar dates fail before HTTP.
+  for (date in c("2020-01-01", "20200230", "20201301")) {
+    df <- data.frame(
+      base = "https://example.org/data/", date = date, vdir = "data/"
+    )
+    testthat::expect_error(
+      amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+      "Dates must be valid YYYYMMDD strings.", fixed = TRUE
+    )
+  }
+})
+
+testthat::test_that("discover_merra2(df): rejects conflicting destinations", {
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/", date = "20200101",
+    vdir = c("first/", "second/")
+  )
+  # --------------------------------------------------------------------------
+  # One base/date pair cannot identify two different destinations.
+  testthat::expect_error(
+    amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
+    "Each base/date pair must identify exactly one input row.", fixed = TRUE
+  )
+})
+
+testthat::test_that("discover_merra2(): requires data for every date", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "text/html"),
+        body = charToRaw(paste0(
+          '<html><body><a href="MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'day 1</a><a href="MERRA2_400.inst1_2d_asm_Nx.20200102.nc4.xml">',
+          'day 2 metadata</a></body></html>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/",
+    date = c("20200101", "20200102"), vdir = "data/"
+  )
+  # --------------------------------------------------------------------------
+  # Metadata alone cannot satisfy the requested day's required .nc4 file.
+  testthat::expect_error(
+    amadeus:::discover_merra2(
+      df, collection = "inst1_2d_asm_Nx", rate_limit = 0
+    ),
+    "Missing MERRA-2 data for 20200102 in: https://example.org/data/",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 1L)
+})
+
+testthat::test_that("discover_merra2(): rejects conflicting filenames", {
+  calls <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      calls <<- calls + 1L
+      httr2::response(
+        url = req$url,
+        headers = list("Content-Type" = "text/html"),
+        body = charToRaw(paste0(
+          '<html><body>',
+          '<a href="first/MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'first</a><a href="second/MERRA2_400.inst1_2d_asm_Nx.20200101.nc4">',
+          'second</a></body></html>'
+        ))
+      )
+    },
+    .package = "httr2"
+  )
+  df <- data.frame(
+    base = "https://example.org/data/", date = "20200101", vdir = "data/"
+  )
+  # --------------------------------------------------------------------------
+  # Different remote paths must not silently overwrite the same local file.
+  testthat::expect_error(
+    amadeus:::discover_merra2(
+      df, collection = "inst1_2d_asm_Nx", rate_limit = 0
+    ),
+    "Multiple URLs map to the same file name in: https://example.org/data/",
+    fixed = TRUE
+  )
+  testthat::expect_identical(calls, 1L)
 })

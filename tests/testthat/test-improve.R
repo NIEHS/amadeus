@@ -13,7 +13,9 @@ testthat::test_that("process_improve_sites_builtin returns expected metadata tab
 
   testthat::expect_s3_class(sites, "data.table")
   testthat::expect_true(nrow(sites) > 200L)
-  testthat::expect_true(all(c("SiteCode", "Latitude", "Longitude", "ProgramKey") %in% names(sites)))
+  testthat::expect_true(all(
+    c("SiteCode", "Latitude", "Longitude", "ProgramKey") %in% names(sites)
+  ))
   testthat::expect_equal(sum(duplicated(sites$SiteCode)), 0L)
   testthat::expect_true("IMPROVE" %in% unique(stats::na.omit(sites$ProgramKey)))
   testthat::expect_true(all(c("ACAD1", "BIBE1", "YOSE1") %in% sites$SiteCode))
@@ -276,7 +278,9 @@ testthat::test_that("process_improve uses embedded metadata when sites file miss
 
 testthat::test_that("download_improve deprecated params warn", {
   testthat::local_mocked_bindings(
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
     .package = "amadeus"
   )
   testthat::expect_warning(
@@ -366,7 +370,8 @@ testthat::test_that("download_improve hash=TRUE returns hash after download", {
       product = "raw",
       directory_to_save = ".",
       acknowledgement = TRUE,
-      hash = TRUE
+      hash = TRUE,
+      unzip = FALSE
     )
     testthat::expect_equal(result, "fakehash")
   })
@@ -387,7 +392,8 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
       product = "raw",
       directory_to_save = ".",
       acknowledgement = TRUE,
-      hash = FALSE
+      hash = FALSE,
+      unzip = FALSE
     )
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$success, 1)
@@ -395,6 +401,9 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
       "^https://vibe\\.cira\\.colostate\\.edu/data/export/IMPAER/IMPAER_2022\\.txt\\.zip$",
       captured$urls[1]
     ))
-    testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
+    testthat::expect_true(grepl(
+      "IMPAER_2022\\.txt\\.zip$",
+      captured$destfiles[1]
+    ))
   })
 })

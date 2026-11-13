@@ -1,227 +1,164 @@
-#' Set column names
+################################################################################
+# Support and internal {calculate} functions.
+################################################################################
+
+################################################################################
+#' Reject deprecated legacy grouping argument in dots
 #' @description
-#' Apply standard column names to calculated covariates consistent with
-#' the requirements of the \code{beethoven} package. Column names follow fixed
-#' format of 3 character data genre, 2 - 15 character variable code, 1 digit
-#' temporal lag, and 5 digit buffer radius (in meters). Variable code character
-#' range is required to retain interpretable column names across datasets.
-#' @note
-#' \code{beethoven} utilizes point, 1km, and 10km radius buffer distance for
-#' covariate calculation, and therefore the buffer radius column is
-#' padded to 5 digits. If provided a buffer radius greater than 5 digits,
-#'  \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
-#' radius of 100km = CCC_CCCCC_I_100000).
-#' @param from data.frame(1) or SpatVector(1). Calculated covariates as
-#' returned from \code{calc_covariates()} or a source specific covariate
-#' function.
-#' @param lag integer(1). Temporal lag.
-#' @param dataset character(1). Covariate parent dataset.
-#' @param locs_id character(1). Column containing identifier for each unique
-#' coordinate location.
+#' Internal helper for calculate APIs that now support temporal
+#' summarization via \code{.by_time} only. Stops immediately when a
+#' deprecated legacy grouping argument is supplied through \code{...}.
+#' @param ... Placeholders.
 #' @keywords internal auxiliary
-#' @importFrom stringi stri_pad
-#' @return a data.frame or SpatVector object (depending on `from`)
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops on deprecated legacy grouping input.
 #' @export
-calc_setcolumns <- function(
-  from,
-  lag,
-  dataset,
-  locs_id
-) {
-  #### check from is data.frame
-  stopifnot(class(from) %in% c("data.frame", "SpatVector"))
-  #### original names
-  names_from <- colnames(from)
-  #### copy
-  names_return <- names_from
-  #### identifier
-  id_index <- which(names_from == locs_id)
-  names_return[id_index] <- locs_id
-  #### time
-  time_index <- which(
-    names_from %in% c("time", "year", "date", "hour")
-  )
-  stopifnot(length(time_index) <= 1)
-  names_return[time_index] <- "time"
-  #### description (for time period coverage)
-  description_index <- which(names_from == "description")
-  stopifnot(length(description_index) <= 1)
-  names_return[description_index] <- "description"
-  #### geometry
-  geometry_index <- which(names_from == "geometry")
-  stopifnot(length(geometry_index) <= 1)
-  names_return[geometry_index] <- "geometry"
-  #### latitude and longitude
-  lat_index <- which(
-    tolower(names_from) %in% c("lat", "latitude")
-  )
-  stopifnot(length(lat_index) <= 1)
-  names_return[lat_index] <- "lat"
-  lon_index <- which(
-    tolower(names_from) %in% c("lon", "longitude")
-  )
-  stopifnot(length(lon_index) <= 1)
-  names_return[lon_index] <- "lon"
-  #### vertical pressure level
-  level_index <- which(names_from == "level")
-  stopifnot(length(level_index) <= 1)
-  names_return[level_index] <- "level"
-  #### dataset and genre
-  datasets <- c(
-    "aqs",
-    "ecoregions",
-    "geos",
-    "gmted",
-    "koppen geiger",
-    "merra2",
-    "modis",
-    "narr",
-    "nlcd",
-    "hms",
-    "groads",
-    "pop",
-    "tri",
-    "nei",
-    "gridmet",
-    "terraclimate"
-  )
-  stopifnot(dataset %in% datasets)
-  genre <- substr(dataset, 1, 3)
-  #### covariates
-  cov_index <- which(
-    !(c(
-      names_from %in%
-        c(
-          locs_id,
-          "geometry",
-          "time",
-          "lat",
-          "lon",
-          "level",
-          "description"
-        )
-    ))
-  )
-  for (c in seq_along(cov_index)) {
-    name_covariate <- names_return[cov_index[c]]
-    name_split <- strsplit(name_covariate, "_")[[1]]
-    name_variable <- tolower(name_split[1])
-    name_variable <- gsub(
-      "\\.",
-      "",
-      gsub(
-        "-",
-        "",
-        gsub(
-          " ",
-          "",
-          name_variable
-        )
-      )
-    )
-    nchar_radius <- nchar(as.character(name_split[2]))
-    width_radius <- ifelse(nchar_radius > 5, nchar_radius, 5)
-    name_new <- paste0(
-      genre,
-      "_",
-      strsplit(
-        name_variable,
-        1,
-        15
-      ),
-      "_",
-      lag,
-      "_",
-      stringi::stri_pad(
-        name_split[2],
-        width = width_radius,
-        pad = 0,
-        side = "left"
-      )
-    )
-    names_return[cov_index[c]] <- toupper(name_new)
+check_unsupported_by <- function(..., .call = NULL) {
+  dots <- list(...)
+  call_names <- character(0)
+  if (!is.null(.call)) {
+    call_names <- names(as.list(.call)[-1])
   }
-  #### check for unique names
-  stopifnot(length(names_return) == length(unique(names_return)))
-  return(from)
+  if (".by" %in% names(dots) || ".by" %in% call_names) {
+    stop_legacy_by_error()
+  }
+  invisible(NULL)
 }
 
-#' Send progress messages
-#' @description
-#' Send messages updating covariate extraction progress.
-#' @param dataset character(1). Data source.
-#' @param variable placeholder
-#' @param time placeholder
-#' @param time_type placeholder
-#' @param level placeholder
-#' @return NULL; provides progress messages to R console.
-#' @keywords internal auxiliary
-#' @export
-calc_message <- function(
-  dataset,
-  variable,
-  time,
-  time_type,
-  level,
-  layer_time = NULL
-) {
-  message_time <- calc_time(
-    time = time,
-    format = time_type,
-    dataset = dataset,
-    layer_time = layer_time
-  )
-  if (dataset == "skip") {
-    return()
-  }
-  if (dataset == "gmted") {
-    return_message <- paste0(
-      "Calculating ",
-      amadeus::process_gmted_codes(
-        substr(
-          variable,
-          1,
-          2
-        ),
-        statistic = TRUE,
-        invert = TRUE
-      ),
-      " covariates with ",
-      amadeus::process_gmted_codes(
-        substr(
-          variable,
-          3,
-          4
-        ),
-        resolution = TRUE,
-        invert = TRUE
-      ),
-      " resolution data.\n"
+################################################################################
+#' Build standardized error for legacy grouping usage
+#' @keywords internal
+#' @noRd
+stop_legacy_by_error <- function() {
+  stop(
+    paste0(
+      "`.by` is no longer supported in calculate APIs. ",
+      "Use `.by_time` for temporal summarization (e.g., 'day', ",
+      "'week', 'month', or 'year').\n"
     )
-  } else {
-    if (is.null(level)) {
-      return_message <- paste0(
-        "Calculating ",
-        variable,
-        " covariates for ",
-        message_time,
-        "...\n"
-      )
-    } else {
-      return_message <- paste0(
-        "Calculating ",
-        variable,
-        " covariates at ",
-        level,
-        " for ",
-        message_time,
-        "...\n"
-      )
-    }
-  }
-  message(return_message)
+  )
 }
 
+################################################################################
+#' Validate the `.by_time` temporal summarization argument
+#' @description
+#' Validates the \code{.by_time} argument used by covariate extraction
+#' functions for temporal summarization. When non-\code{NULL},
+#' \code{.by_time} must be a single character string naming a supported
+#' temporal unit token (singular or plural): \code{"minute"},
+#' \code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
+#' \code{"quarter"}, or \code{"year"}.
+#' @param .by_time NULL or character(1). Temporal summarization unit.
+#'   \code{NULL} means no temporal summarization.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative error if the
+#'   value is invalid.
+#' @export
+check_by_time <- function(.by_time) {
+  if (is.null(.by_time)) {
+    return(invisible(NULL))
+  }
+  if (!is.character(.by_time) || length(.by_time) != 1L) {
+    stop(
+      paste0(
+        "`.by_time` must be NULL or a single character string naming ",
+        "a temporal unit.
+"
+      )
+    )
+  }
+  allowed <- c(
+    "minute",
+    "minutes",
+    "hour",
+    "hours",
+    "day",
+    "days",
+    "week",
+    "weeks",
+    "month",
+    "months",
+    "quarter",
+    "quarters",
+    "year",
+    "years"
+  )
+  if (!.by_time %in% allowed) {
+    stop(
+      paste0(
+        "`.by_time` must be one of: ",
+        paste(allowed, collapse = ", "),
+        ".
+"
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+################################################################################
+#' Validate the `fun_temporal` parameter
+#' @description
+#' Validates the `fun_temporal` argument used by covariate
+#' extraction functions.  When \code{NULL} (the default), no
+#' temporal aggregation is applied and existing per-layer
+#' extraction behavior is preserved.  When non-\code{NULL},
+#' the value must be one of \code{"mean"}, \code{"median"},
+#' \code{"sum"}, \code{"max"}, or \code{"min"}.
+#' @param fun_temporal NULL or character(1). Name of the
+#'   temporal summary function. \code{NULL} means no temporal
+#'   aggregation (default / backward-compatible behavior).
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative
+#'   error if the value is invalid.
+#' @export
+check_fun_temporal <- function(fun_temporal) {
+  if (is.null(fun_temporal)) {
+    return(invisible(NULL))
+  }
+  allowed <- c("mean", "median", "sum", "max", "min")
+  if (
+    !is.character(fun_temporal) ||
+      length(fun_temporal) != 1L
+  ) {
+    stop(
+      paste0(
+        "`fun_temporal` must be NULL or a single ",
+        "character string.\n"
+      )
+    )
+  }
+  if (!fun_temporal %in% allowed) {
+    stop(
+      sprintf(
+        paste0(
+          "`fun_temporal` must be one of: %s.\n"
+        ),
+        paste(allowed, collapse = ", ")
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+################################################################################
+#' Check that `geom` value is one of `FALSE`, `"sf"`, or `"terra"`
+#' @description Check that `geom` value is one of `FALSE`, `"sf"`,
+#' or `"terra"`.
+#' @param geom FALSE/"sf"/"terra".'
+#' @keywords internal auxiliary
+#' @author Mitchell Manware
+#' @return NULL; will stop if `geom` is not one of the three options
+#' @export
+check_geom <- function(geom) {
+  if (!geom %in% c(FALSE, "sf", "terra")) {
+    stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
+  }
+}
+
+################################################################################
 #' Prepare extraction locations
 #' @description
 #' Prepare the point locations for extracting data by transforming `locs` to
@@ -254,7 +191,7 @@ calc_prepare_locs <- function(
   geom = FALSE
 ) {
   #### check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
+  check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n", locs_id))
   }
@@ -302,21 +239,7 @@ calc_prepare_locs <- function(
   return(list(sites_e, sites_id))
 }
 
-#' Validate extents overlap
-#' @param x SpatRaster(1)
-#' @param y SpatRaster(1)
-#' @return logical(1)
-#' @keywords internal auxiliary
-#' @export
-calc_extents_overlap <- function(x, y) {
-  ext_x <- as.vector(terra::ext(x))
-  ext_y <- as.vector(terra::ext(y))
-  !(ext_x[2] < ext_y[1] ||
-      ext_y[2] < ext_x[1] ||
-      ext_x[4] < ext_y[3] ||
-      ext_y[4] < ext_x[3])
-}
-
+################################################################################
 #' Prepare optional weighting raster
 #' @param from SpatRaster(1). Template raster.
 #' @param weights NULL, SpatRaster, SpatVector/sf polygon, or file path.
@@ -426,6 +349,23 @@ calc_prepare_weights <- function(from, weights = NULL) {
   terra::resample(weights_re, from[[1]], method = "bilinear")
 }
 
+################################################################################
+#' Validate extents overlap
+#' @param x SpatRaster(1)
+#' @param y SpatRaster(1)
+#' @return logical(1)
+#' @keywords internal auxiliary
+#' @export
+calc_extents_overlap <- function(x, y) {
+  ext_x <- as.vector(terra::ext(x))
+  ext_y <- as.vector(terra::ext(y))
+  !(ext_x[2] < ext_y[1] ||
+    ext_y[2] < ext_x[1] ||
+    ext_x[4] < ext_y[3] ||
+    ext_y[4] < ext_x[3])
+}
+
+################################################################################
 #' Convert point extractions to tiny polygons for exact extraction
 #' @param locs_vector SpatVector(1)
 #' @param radius numeric(1)
@@ -451,6 +391,7 @@ calc_prepare_exact_geoms <- function(locs_vector, radius) {
   sf::st_as_sf(terra::buffer(locs_vector, width = width, quadsegs = 90L))
 }
 
+################################################################################
 #' Resolve weighted summary function names for exactextractr
 #' @param fun character(1)
 #' @param weighted logical(1)
@@ -469,6 +410,7 @@ calc_weighted_fun <- function(fun, weighted = FALSE) {
   )
 }
 
+################################################################################
 #' Prepare time values
 #' @description
 #' Prepare the time values for covariate calculation based on type of time
@@ -647,36 +589,84 @@ calc_time <- function(
   stop("Unsupported time format.\n")
 }
 
-#' Check time values
+################################################################################
+#' Send progress messages
 #' @description
-#' Check the time values within calculated covariates `data.frame`
-#' @param covar data.frame(1). Calculated covariates `data.frame`.
-#' @param POSIXt logical(1). Should the time values in `covar` be of class
-#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
-#' (year and year-month).
-#' @return NULL; returns a stop error if `time` is wrong class
+#' Send messages updating covariate extraction progress.
+#' @param dataset character(1). Data source.
+#' @param variable placeholder
+#' @param time placeholder
+#' @param time_type placeholder
+#' @param level placeholder
+#' @return NULL; provides progress messages to R console.
 #' @keywords internal auxiliary
 #' @export
-# nolint start
-calc_check_time <- function(
-  covar,
-  POSIXt = TRUE
+calc_message <- function(
+  dataset,
+  variable,
+  time,
+  time_type,
+  level,
+  layer_time = NULL
 ) {
-  stopifnot(methods::is(covar, "data.frame"))
-  if ("time" %in% names(covar)) {
-    if (POSIXt) {
-      stopifnot(all(sapply(covar$time, methods::is, "POSIXt")))
-    } else {
-      stopifnot(all(sapply(covar$time, methods::is, "integer")))
-    }
-  } else {
-    message(
-      "`$time` not detected in `data.frame` provided.\n"
-    )
+  message_time <- calc_time(
+    time = time,
+    format = time_type,
+    dataset = dataset,
+    layer_time = layer_time
+  )
+  if (dataset == "skip") {
+    return()
   }
+  if (dataset == "gmted") {
+    return_message <- paste0(
+      "Calculating ",
+      amadeus::process_gmted_codes(
+        substr(
+          variable,
+          1,
+          2
+        ),
+        statistic = TRUE,
+        invert = TRUE
+      ),
+      " covariates with ",
+      amadeus::process_gmted_codes(
+        substr(
+          variable,
+          3,
+          4
+        ),
+        resolution = TRUE,
+        invert = TRUE
+      ),
+      " resolution data.\n"
+    )
+  } else {
+    if (is.null(level)) {
+      return_message <- paste0(
+        "Calculating ",
+        variable,
+        " covariates for ",
+        message_time,
+        "...\n"
+      )
+    } else {
+      return_message <- paste0(
+        "Calculating ",
+        variable,
+        " covariates at ",
+        level,
+        " for ",
+        message_time,
+        "...\n"
+      )
+    }
+  }
+  message(return_message)
 }
-# nolint end
 
+################################################################################
 #' Perform covariate extraction
 #' @description
 #' Extract covariate values from `SpatRaster` object passed from
@@ -893,254 +883,7 @@ calc_worker <- function(
   return(data.frame(sites_extracted))
 }
 
-#' Prepare covariates for return
-#' @description
-#' Check the time column for proper class and, if `geom = TRUE`,
-#' transform `data.frame` into a `SpatVector` object.
-#' @param covar data.frame(1). Calculated covariates `data.frame`.
-#' @param POSIXt logical(1). Should the time values in `covar` be of class
-#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
-#' (year and year-month).
-#' @param geom FALSE/"sf"/"terra". Should `covar` be returned as a
-#' `data.frame`? Default is `FALSE`, options with geometry are "sf" or "terra".
-#' @param crs terra::crs(1). Coordinate reference system (inherited from
-#' `from`).
-#' @importFrom terra vect
-#' @keywords internal auxiliary
-#' @author Mitchell Manware
-#' @return a data.frame or SpatVector object (depending on `geom` paramter)
-#' @export
-# nolint start
-calc_return_locs <- function(
-  covar,
-  POSIXt = TRUE,
-  geom,
-  crs
-) {
-  # time value check
-  if ("time" %in% names(covar)) {
-    calc_check_time(covar = covar, POSIXt = POSIXt)
-  }
-  # nolint end
-  # if geom, convert to and return SpatVector
-  if (geom %in% c("terra", "sf")) {
-    if (nrow(covar) == 0) {
-      if ("geometry" %in% names(covar)) {
-        covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
-      } else if (all(c("lon", "lat") %in% names(covar))) {
-        covar_sf <- sf::st_sf(
-          covar,
-          geometry = sf::st_sfc(crs = crs)
-        )
-      } else {
-        warning(
-          paste(
-            "`geom` was requested but no geometry columns were found in",
-            "`covar`; returning data.frame."
-          )
-        )
-        return(data.frame(covar))
-      }
-      if (geom == "sf") {
-        return(covar_sf)
-      }
-      return(suppressWarnings(terra::vect(covar_sf)))
-    }
-    covar_return <- NULL
-    if ("geometry" %in% names(covar)) {
-      covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
-      covar_return <- if (geom == "sf") {
-        covar_sf
-      } else {
-        suppressWarnings(terra::vect(covar_sf))
-      }
-    } else if (all(c("lon", "lat") %in% names(covar))) {
-      covar_return <- terra::vect(
-        covar,
-        geom = c("lon", "lat"),
-        crs = crs
-      )
-    }
-    if (is.null(covar_return)) {
-      warning(
-        paste(
-          "`geom` was requested but no geometry columns were found in",
-          "`covar`; returning data.frame."
-        )
-      )
-      return(data.frame(covar))
-    }
-    if (geom == "terra") {
-      return(covar_return)
-    } else if (geom == "sf") {
-      return(
-        if (inherits(covar_return, "sf")) {
-          covar_return
-        } else {
-          sf::st_as_sf(covar_return)
-        }
-      )
-    }
-  } else {
-    return(data.frame(covar))
-  }
-}
-
-#' Check that `geom` value is one of `FALSE`, `"sf"`, or `"terra"`
-#' @description Check that `geom` value is one of `FALSE`, `"sf"`,
-#' or `"terra"`.
-#' @param geom FALSE/"sf"/"terra".'
-#' @keywords internal auxiliary
-#' @author Mitchell Manware
-#' @return NULL; will stop if `geom` is not one of the three options
-#' @export
-check_geom <- function(geom) {
-  if (!geom %in% c(FALSE, "sf", "terra")) {
-    stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
-  }
-}
-
-
-#' Validate the `fun_temporal` parameter
-#' @description
-#' Validates the `fun_temporal` argument used by covariate
-#' extraction functions.  When \code{NULL} (the default), no
-#' temporal aggregation is applied and existing per-layer
-#' extraction behavior is preserved.  When non-\code{NULL},
-#' the value must be one of \code{"mean"}, \code{"median"},
-#' \code{"sum"}, \code{"max"}, or \code{"min"}.
-#' @param fun_temporal NULL or character(1). Name of the
-#'   temporal summary function. \code{NULL} means no temporal
-#'   aggregation (default / backward-compatible behavior).
-#' @keywords internal auxiliary
-#' @author Insang Song
-#' @return \code{NULL} invisibly; stops with an informative
-#'   error if the value is invalid.
-#' @export
-check_fun_temporal <- function(fun_temporal) {
-  if (is.null(fun_temporal)) {
-    return(invisible(NULL))
-  }
-  allowed <- c("mean", "median", "sum", "max", "min")
-  if (
-    !is.character(fun_temporal) ||
-      length(fun_temporal) != 1L
-  ) {
-    stop(
-      paste0(
-        "`fun_temporal` must be NULL or a single ",
-        "character string.\n"
-      )
-    )
-  }
-  if (!fun_temporal %in% allowed) {
-    stop(
-      sprintf(
-        paste0(
-          "`fun_temporal` must be one of: %s.\n"
-        ),
-        paste(allowed, collapse = ", ")
-      )
-    )
-  }
-  invisible(NULL)
-}
-
-
-#' Build standardized error for legacy grouping usage
-#' @keywords internal
-#' @noRd
-stop_legacy_by_error <- function() {
-  stop(
-    paste0(
-      "`.by` is no longer supported in calculate APIs. ",
-      "Use `.by_time` for temporal summarization (e.g., 'day', ",
-      "'week', 'month', or 'year').\n"
-    )
-  )
-}
-
-
-#' Reject deprecated legacy grouping argument in dots
-#' @description
-#' Internal helper for calculate APIs that now support temporal
-#' summarization via \code{.by_time} only. Stops immediately when a
-#' deprecated legacy grouping argument is supplied through \code{...}.
-#' @param ... Placeholders.
-#' @keywords internal auxiliary
-#' @author Insang Song
-#' @return \code{NULL} invisibly; stops on deprecated legacy grouping input.
-#' @export
-check_unsupported_by <- function(..., .call = NULL) {
-  dots <- list(...)
-  call_names <- character(0)
-  if (!is.null(.call)) {
-    call_names <- names(as.list(.call)[-1])
-  }
-  if (".by" %in% names(dots) || ".by" %in% call_names) {
-    stop_legacy_by_error()
-  }
-  invisible(NULL)
-}
-
-
-#' Validate the `.by_time` temporal summarization argument
-#' @description
-#' Validates the \code{.by_time} argument used by covariate extraction
-#' functions for temporal summarization. When non-\code{NULL},
-#' \code{.by_time} must be a single character string naming a supported
-#' temporal unit token (singular or plural): \code{"minute"},
-#' \code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
-#' \code{"quarter"}, or \code{"year"}.
-#' @param .by_time NULL or character(1). Temporal summarization unit.
-#'   \code{NULL} means no temporal summarization.
-#' @keywords internal auxiliary
-#' @author Insang Song
-#' @return \code{NULL} invisibly; stops with an informative error if the
-#'   value is invalid.
-#' @export
-check_by_time <- function(.by_time) {
-  if (is.null(.by_time)) {
-    return(invisible(NULL))
-  }
-  if (!is.character(.by_time) || length(.by_time) != 1L) {
-    stop(
-      paste0(
-        "`.by_time` must be NULL or a single character string naming ",
-        "a temporal unit.
-"
-      )
-    )
-  }
-  allowed <- c(
-    "minute",
-    "minutes",
-    "hour",
-    "hours",
-    "day",
-    "days",
-    "week",
-    "weeks",
-    "month",
-    "months",
-    "quarter",
-    "quarters",
-    "year",
-    "years"
-  )
-  if (!.by_time %in% allowed) {
-    stop(
-      paste0(
-        "`.by_time` must be one of: ",
-        paste(allowed, collapse = ", "),
-        ".
-"
-      )
-    )
-  }
-  invisible(NULL)
-}
-
+################################################################################
 #' Normalize `.by_time` time-unit aliases
 #' @description Internal helper that maps singular/plural `.by_time` tokens
 #' to canonical units.
@@ -1172,7 +915,7 @@ normalize_by_time_unit <- function(unit) {
   aliases[[unit]]
 }
 
-
+################################################################################
 #' Bucket a time column to a `.by_time` unit
 #' @description Buckets time values to one of the supported `.by_time` units.
 #' @param time_vals vector. Time values to bucket.
@@ -1215,7 +958,7 @@ bucket_time_by_unit <- function(time_vals, unit) {
   )
 }
 
-
+################################################################################
 #' Summarize extracted covariates by `.by_time` temporal unit
 #' @description
 #' Generic temporal summarizer for covariate tables. When
@@ -1314,6 +1057,7 @@ calc_summarize_by <- function(
   data.frame(summary_df[, unique(col_order), drop = FALSE])
 }
 
+################################################################################
 #' Summarize extracted covariates at native temporal grain
 #' @description Internal helper that summarizes numeric covariates by
 #' \code{locs_id + time + group_cols_extra} while preserving the original time
@@ -1392,6 +1136,7 @@ calc_summarize_native_time <- function(
   data.frame(summary_df[, unique(col_order), drop = FALSE])
 }
 
+################################################################################
 #' Apply default/native or explicit temporal summarization
 #' @param covar data.frame.
 #' @param .by_time NULL or character(1).
@@ -1431,7 +1176,7 @@ calc_apply_time_summary <- function(
   )
 }
 
-
+################################################################################
 #' Summarize extracted covariates by temporal bucket
 #' @description
 #' Applies a named summary function across covariate columns
@@ -1561,348 +1306,277 @@ calc_summarize_temporal <- function(
   data.frame(summary_df[, col_order, drop = FALSE])
 }
 
-
-#' A single-date MODIS worker
-#' @param from SpatRaster. Preprocessed objects.
-#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
-#' are summarized.
-#' @param locs_id character(1). Field name where unique site identifiers
-#' are stored. Default is `"site_id"`
-#' @param radius numeric. Radius to generate circular buffers.
-#' @param date Date(1). date to query.
-#' @param name_extracted character. Names of calculated covariates.
-#' @param fun_summary function. Summary function for
-#' multilayer rasters. Passed to `foo`. See [`exactextractr::exact_extract`]
-#' for details.
-#' @param max_cells integer(1). Maximum number of cells to be read at once.
-#' Higher values will expedite processing, but will increase memory usage.
-#' Maximum possible value is `2^31 - 1`.
-#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
-#' Default is `FALSE`, options with geometry are "sf" or "terra". The
-#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
-#' See [`exactextractr::exact_extract`] for details.
-#' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentation of the MODIS
-#' product
-#' they are using to ensure proper scale.
-#' An example for the MOD11A1 product's LST_Day_1km variable (land surface
-#' temperature)
-#' would be `scale = "* 0.02"`.
-#' Default is `NULL`, which applies no scale.
-#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
-#'   path. Optional weights raster for weighted extraction. If `NULL`
-#'   (default), unweighted extraction is performed.
-#' @param ... Placeholders.
-#' @description The function operates at MODIS/VIIRS products
-#' on a daily basis. Given that the raw hdf files are downloaded from
-#' NASA, standard file names include a data retrieval date flag starting
-#' with letter "A". Leveraging that piece of information, the function will
-#' select files of scope on the date of interest.
-#' Please note that this function does not provide a function to filter
-#' swaths or tiles, so it is strongly recommended to check and pre-filter
-#' the file names at users' discretion.
-#' @seealso
-#' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
-#'     [process_blackmarble()]
-#' @keywords internal
-#' @author Insang Song
-#' @return a data.frame or SpatVector object.
-#' @importFrom terra extract project vect nlyr describe
-#' @importFrom methods is
-#' @importFrom sf st_as_sf st_drop_geometry
-#' @examples
-#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
-#' ##       amount of data which is not included in the package.
-#' \dontrun{
-#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
-#' calculate_modis_daily(
-#'   from = mod06l2_warp, # dervied from process_modis() example
-#'   locs = locs,
-#'   locs_id = "id",
-#'   radius = 0,
-#'   date = "2024-01-01",
-#'   name_extracted = "cloud_fraction_0",
-#'   fun_summary = "mean",
-#'   max_cells = 3e7
-#' )
-#' }
-#' @export
-calculate_modis_daily <- function(
-  from = NULL,
-  locs = NULL,
-  locs_id = "site_id",
-  radius = 0L,
-  date = NULL,
-  name_extracted = NULL,
-  fun_summary = "mean",
-  weights = NULL,
-  max_cells = 3e7,
-  geom = FALSE,
-  scale = NULL,
-  ...
-) {
-  if (!methods::is(locs, "SpatVector")) {
-    locs <- try(terra::vect(locs), silent = TRUE)
-    if (inherits(locs, "try-error")) {
-      stop("locs should be a SpatVector or convertible object.")
-    }
-  }
-  if (!locs_id %in% names(locs)) {
-    stop(sprintf("locs should include columns named %s.\n", locs_id))
-  }
-
-  extract_with_buffer <- function(
-    points,
-    surf,
-    radius,
-    id,
-    func = "mean",
-    weights = NULL,
-    maxcells = NULL
-  ) {
-    # generate buffers
-    if (radius == 0) {
-      radius <- 1e-6
-    } # approximately 1 meter in degree
-    bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
-    bufs <- terra::project(bufs, terra::crs(surf))
-    # extract raster values
-    weights_norm <- amadeus::calc_prepare_weights(
-      from = surf[[1]],
-      weights = weights
-    )
-    func_extract <- amadeus::calc_weighted_fun(
-      fun = func,
-      weighted = !is.null(weights_norm)
-    )
-    extract_args <- list(
-      x = surf,
-      y = sf::st_as_sf(bufs),
-      fun = func_extract,
-      force_df = TRUE,
-      stack_apply = TRUE,
-      append_cols = id,
-      progress = FALSE,
-      max_cells_in_memory = maxcells
-    )
-    if (!is.null(weights_norm)) {
-      extract_args$weights <- weights_norm
-    }
-    surf_at_bufs <- do.call(exactextractr::exact_extract, extract_args)
-    return(surf_at_bufs)
-  }
-
-  ## NaN to NA
-  from[is.nan(from)] <- NA
-
-  # apply scale as expression to `from` values
-  chr_scale <- paste0("from ", scale)
-  # Evaluate the scale expression
-  from_scale <- eval(parse(text = chr_scale)[[1]])
-
-  # from_scale[is.nan(from_scale)] <- NA
-
-  # raster used to be vrt_today
-  extracted <-
-    extract_with_buffer(
-      points = locs,
-      surf = from_scale,
-      id = locs_id,
-      radius = radius,
-      func = fun_summary,
-      weights = weights,
-      maxcells = max_cells
-    )
-  # cleaning names
-  # assuming that extracted is a data.frame
-  name_offset <- terra::nlyr(from)
-  # multiple columns will get proper names
-  name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
-  colnames(extracted)[name_range] <- name_extracted
-  extracted$time <- as.POSIXlt(date)
-  check_geom(geom)
-  if (geom %in% c("sf", "terra")) {
-    # convert to base date, as terra::vect does not like class "POSIXlt"
-    extracted$time <- as.Date.POSIXlt(extracted$time)
-    # location ID with geometry
-    locs_geom_id <- suppressMessages(calc_prepare_locs(
-      from = from,
-      locs = locs,
-      locs_id = locs_id,
-      radius = radius,
-      geom = geom
-    )[[2]])
-    # merge
-    extracted_merge <- merge(
-      locs_geom_id,
-      extracted,
-      by = locs_id
-    )
-    # re-convert to POSIXlt after creating the vect
-    extracted_merge$time <- as.POSIXlt(extracted_merge$time)
-    extracted_return <- calc_return_locs(
-      covar = extracted_merge,
-      POSIXt = TRUE,
-      geom = geom,
-      crs = terra::crs(from)
-    )
-  } else {
-    calc_check_time(covar = extracted, POSIXt = TRUE)
-    extracted_return <- extracted
-  }
-  gc()
-  return(extracted_return)
-}
-
-#' Collapse listed NLCD values while filling in NA for sites outside data.
-#' @param data Buffered values from NLCD data.
-#' @param mode "exact" or "terra"
-#' @param locs extraction locations.
-#' @param locs_id character(1). Name of unique identifier.
+################################################################################
+#' Set column names
+#' @description
+#' Apply standard column names to calculated covariates consistent with
+#' the requirements of the \code{beethoven} package. Column names follow fixed
+#' format of 3 character data genre, 2 - 15 character variable code, 1 digit
+#' temporal lag, and 5 digit buffer radius (in meters). Variable code character
+#' range is required to retain interpretable column names across datasets.
+#' @note
+#' \code{beethoven} utilizes point, 1km, and 10km radius buffer distance for
+#' covariate calculation, and therefore the buffer radius column is
+#' padded to 5 digits. If provided a buffer radius greater than 5 digits,
+#'  \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
+#' radius of 100km = CCC_CCCCC_I_100000).
+#' @param from data.frame(1) or SpatVector(1). Calculated covariates as
+#' returned from \code{calc_covariates()} or a source specific covariate
+#' function.
+#' @param lag integer(1). Temporal lag.
+#' @param dataset character(1). Covariate parent dataset.
+#' @param locs_id character(1). Column containing identifier for each unique
+#' coordinate location.
 #' @keywords internal auxiliary
-#' @importFrom collapse rowbind
+#' @importFrom stringi stri_pad
+#' @return a data.frame or SpatVector object (depending on `from`)
 #' @export
-collapse_nlcd <- function(
-  data,
-  mode = c("terra", "exact"),
-  locs = NULL,
-  locs_id = "site_id"
+calc_setcolumns <- function(
+  from,
+  lag,
+  dataset,
+  locs_id
 ) {
-  # Add mode matching
-  mode <- match.arg(mode)
-
-  # Filter NULL values
-  data_nonnull <- Filter(Negate(is.null), data)
-
-  # Check for empty data
-  if (length(data_nonnull) == 0) {
-    warning("No non-null data provided to collapse_nlcd")
-    return(data.frame())
-  }
-
-  # Combine data
-  data_rbind <- collapse::rowbind(data_nonnull, fill = TRUE)
-
-  # Check if result is empty
-  if (is.null(data_rbind) || nrow(data_rbind) == 0) {
-    warning("Row binding resulted in empty data frame")
-    return(data.frame())
-  }
-
-  if (mode == "terra") {
-    # Now safe to create NA row
-    na_row <- data_rbind[1, , drop = FALSE]
-    na_row[] <- NA
-
-    # Replace all NULL elements with the NA row
-    data_na <- lapply(data, function(x) if (is.null(x)) na_row else x)
-
-    # Combine into a single data frame
-    data_filled <- collapse::rowbind(data_na, fill = TRUE)
-  } else {
-    stopifnot(!is.null(locs))
-
-    sites_wdata <- unlist(lapply(data, function(x) x[[locs_id]]))
-    sites_missing <- setdiff(unlist(locs[[locs_id]]), sites_wdata)
-
-    df_missing <- data.frame(setNames(list(sites_missing), locs_id))
-
-    data_filled <- collapse::rowbind(data_rbind, df_missing, fill = TRUE)
-  }
-
-  return(data_filled)
-}
-
-#' Format NLCD class codes using MRLC class names
-#' @param codes character. NLCD class codes. Four-digit Land Cover Change
-#'   values are interpreted as concatenated from/to class codes.
-#' @param product character(1). Annual NLCD product code.
-#' @return A character vector of filesystem-safe MRLC class names.
-#' @noRd
-format_nlcd_mrlc_classes <- function(codes, product = "LndCov") {
-  lookup_file <- switch(
-    product,
-    "ImpDsc" = "Impervious_Descriptor.csv",
-    "nlcd_classes.csv"
+  #### check from is data.frame
+  stopifnot(class(from) %in% c("data.frame", "SpatVector"))
+  #### original names
+  names_from <- colnames(from)
+  #### copy
+  names_return <- names_from
+  #### identifier
+  id_index <- which(names_from == locs_id)
+  names_return[id_index] <- locs_id
+  #### time
+  time_index <- which(
+    names_from %in% c("time", "year", "date", "hour")
   )
-  nlcd_classes <- utils::read.csv(
-    system.file("extdata", lookup_file, package = "amadeus"),
-    stringsAsFactors = FALSE
+  stopifnot(length(time_index) <= 1)
+  names_return[time_index] <- "time"
+  #### description (for time period coverage)
+  description_index <- which(names_from == "description")
+  stopifnot(length(description_index) <= 1)
+  names_return[description_index] <- "description"
+  #### geometry
+  geometry_index <- which(names_from == "geometry")
+  stopifnot(length(geometry_index) <= 1)
+  names_return[geometry_index] <- "geometry"
+  #### latitude and longitude
+  lat_index <- which(
+    tolower(names_from) %in% c("lat", "latitude")
   )
-  class_lookup <- stats::setNames(nlcd_classes$names, nlcd_classes$value)
-
-  formatted <- vapply(
-    codes,
-    function(code) {
-      if (grepl("^[0-9]{4}$", code)) {
-        from_name <- unname(class_lookup[substr(code, 1L, 2L)])
-        to_name <- unname(class_lookup[substr(code, 3L, 4L)])
-        if (!is.na(from_name) && !is.na(to_name)) {
-          return(paste(from_name, "to", to_name, sep = "_"))
-        }
-      }
-
-      class_name <- unname(class_lookup[code])
-      if (is.na(class_name)) {
-        paste0("Unknown_", code)
-      } else {
-        class_name
-      }
-    },
-    character(1)
+  stopifnot(length(lat_index) <= 1)
+  names_return[lat_index] <- "lat"
+  lon_index <- which(
+    tolower(names_from) %in% c("lon", "longitude")
   )
-
-  formatted <- gsub("[^[:alnum:]]+", "_", formatted)
-  unname(gsub("(^_+|_+$)", "", formatted))
-}
-
-#' Identify an Annual NLCD product
-#' @param from SpatRaster(1). An Annual NLCD raster.
-#' @return A character(1) Annual NLCD product code.
-#' @noRd
-get_nlcd_product <- function(from) {
-  product_codes <- c(
-    "LndCov",
-    "LndChg",
-    "LndCnf",
-    "FctImp",
-    "ImpDsc",
-    "SpcChg"
+  stopifnot(length(lon_index) <= 1)
+  names_return[lon_index] <- "lon"
+  #### vertical pressure level
+  level_index <- which(names_from == "level")
+  stopifnot(length(level_index) <= 1)
+  names_return[level_index] <- "level"
+  #### dataset and genre
+  datasets <- c(
+    "aqs",
+    "ecoregions",
+    "geos",
+    "gmted",
+    "koppen geiger",
+    "merra2",
+    "modis",
+    "narr",
+    "nlcd",
+    "hms",
+    "groads",
+    "pop",
+    "tri",
+    "nei",
+    "gridmet",
+    "terraclimate"
   )
-  metadata <- terra::metags(from)
-  product_index <- which(tolower(metadata$name) == "product")
-  if (length(product_index) > 0L) {
-    product <- metadata$value[product_index[1]]
-    product_match <- match(tolower(product), tolower(product_codes))
-    if (!is.na(product_match)) {
-      return(product_codes[product_match])
-    }
-  }
-
-  identifiers <- names(from)
-  raster_sources <- tryCatch(
-    terra::sources(from),
-    error = function(e) character()
+  stopifnot(dataset %in% datasets)
+  genre <- substr(dataset, 1, 3)
+  #### covariates
+  cov_index <- which(
+    !(c(
+      names_from %in%
+        c(
+          locs_id,
+          "geometry",
+          "time",
+          "lat",
+          "lon",
+          "level",
+          "description"
+        )
+    ))
   )
-  identifiers <- c(identifiers, as.character(raster_sources))
-  matches <- unique(unlist(lapply(
-    identifiers,
-    function(x) {
-      product <- regmatches(
-        x,
-        regexpr(
-          paste(product_codes, collapse = "|"),
-          x,
-          ignore.case = TRUE
+  for (c in seq_along(cov_index)) {
+    name_covariate <- names_return[cov_index[c]]
+    name_split <- strsplit(name_covariate, "_")[[1]]
+    name_variable <- tolower(name_split[1])
+    name_variable <- gsub(
+      "\\.",
+      "",
+      gsub(
+        "-",
+        "",
+        gsub(
+          " ",
+          "",
+          name_variable
         )
       )
-      product_codes[match(tolower(product), tolower(product_codes))]
-    }
-  )))
-  matches <- matches[!is.na(matches)]
-  if (length(matches) == 1L) {
-    return(matches)
+    )
+    nchar_radius <- nchar(as.character(name_split[2]))
+    width_radius <- ifelse(nchar_radius > 5, nchar_radius, 5)
+    name_new <- paste0(
+      genre,
+      "_",
+      strsplit(
+        name_variable,
+        1,
+        15
+      ),
+      "_",
+      lag,
+      "_",
+      stringi::stri_pad(
+        name_split[2],
+        width = width_radius,
+        pad = 0,
+        side = "left"
+      )
+    )
+    names_return[cov_index[c]] <- toupper(name_new)
   }
-
-  "LndCov"
+  #### check for unique names
+  stopifnot(length(names_return) == length(unique(names_return)))
+  return(from)
 }
+
+################################################################################
+#' Check time values
+#' @description
+#' Check the time values within calculated covariates `data.frame`
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @return NULL; returns a stop error if `time` is wrong class
+#' @keywords internal auxiliary
+#' @export
+# nolint start
+calc_check_time <- function(
+  covar,
+  POSIXt = TRUE
+) {
+  stopifnot(methods::is(covar, "data.frame"))
+  if ("time" %in% names(covar)) {
+    if (POSIXt) {
+      stopifnot(all(sapply(covar$time, methods::is, "POSIXt")))
+    } else {
+      stopifnot(all(sapply(covar$time, methods::is, "integer")))
+    }
+  } else {
+    message(
+      "`$time` not detected in `data.frame` provided.\n"
+    )
+  }
+}
+# nolint end
+
+################################################################################
+#' Prepare covariates for return
+#' @description
+#' Check the time column for proper class and, if `geom = TRUE`,
+#' transform `data.frame` into a `SpatVector` object.
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @param geom FALSE/"sf"/"terra". Should `covar` be returned as a
+#' `data.frame`? Default is `FALSE`, options with geometry are "sf" or "terra".
+#' @param crs terra::crs(1). Coordinate reference system (inherited from
+#' `from`).
+#' @importFrom terra vect
+#' @keywords internal auxiliary
+#' @author Mitchell Manware
+#' @return a data.frame or SpatVector object (depending on `geom` paramter)
+#' @export
+# nolint start
+calc_return_locs <- function(
+  covar,
+  POSIXt = TRUE,
+  geom,
+  crs
+) {
+  # time value check
+  if ("time" %in% names(covar)) {
+    calc_check_time(covar = covar, POSIXt = POSIXt)
+  }
+  # nolint end
+  # if geom, convert to and return SpatVector
+  if (geom %in% c("terra", "sf")) {
+    if (nrow(covar) == 0) {
+      if ("geometry" %in% names(covar)) {
+        covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      } else if (all(c("lon", "lat") %in% names(covar))) {
+        covar_sf <- sf::st_sf(
+          covar,
+          geometry = sf::st_sfc(crs = crs)
+        )
+      } else {
+        warning(
+          paste(
+            "`geom` was requested but no geometry columns were found in",
+            "`covar`; returning data.frame."
+          )
+        )
+        return(data.frame(covar))
+      }
+      if (geom == "sf") {
+        return(covar_sf)
+      }
+      return(suppressWarnings(terra::vect(covar_sf)))
+    }
+    covar_return <- NULL
+    if ("geometry" %in% names(covar)) {
+      covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      covar_return <- if (geom == "sf") {
+        covar_sf
+      } else {
+        suppressWarnings(terra::vect(covar_sf))
+      }
+    } else if (all(c("lon", "lat") %in% names(covar))) {
+      covar_return <- terra::vect(
+        covar,
+        geom = c("lon", "lat"),
+        crs = crs
+      )
+    }
+    if (is.null(covar_return)) {
+      warning(
+        paste(
+          "`geom` was requested but no geometry columns were found in",
+          "`covar`; returning data.frame."
+        )
+      )
+      return(data.frame(covar))
+    }
+    if (geom == "terra") {
+      return(covar_return)
+    } else if (geom == "sf") {
+      return(
+        if (inherits(covar_return, "sf")) {
+          covar_return
+        } else {
+          sf::st_as_sf(covar_return)
+        }
+      )
+    }
+  } else {
+    return(data.frame(covar))
+  }
+}
+################################################################################
