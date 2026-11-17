@@ -1,0 +1,451 @@
+# Authoritative schema: amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml
+# Metadata profile; source reconciliation documented in resource_audit.json.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/climatology_lab_terraclimate
+  name: climatology_lab_terraclimate
+  label: Climatology Lab TerraClimate
+  producer_institution: Climatology Lab, University of California, Merced
+  homepage: https://www.climatologylab.org/terraclimate.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _terraclimate
+  description: 'Publishing programme distinct from gridMET. Current v1.1 uses ERA5 anomalies; legacy v1.0
+    used CRU/JRA-55. Do not mix versions. The workbook describes the older 1958-based record. Source catalog
+    and 2018-file global attributes confirm v1.1 and 1950-based coverage. Counterfactual and +2/+4 degree
+    pseudo-climates are excluded. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I3): CC0 1.0 (public domain); cite Abatzoglou et al. (2018). Inventory
+    source status (H3): Active; this is not observation QA, API availability or verified support for every
+    product. Inventory first-release/history wording (J3): 2018. The 2018 methods citation describes the
+    original 1958-based release. Current provider catalog/global metadata confirm ERA5-driven v1.1 with
+    historical coverage from 1950. Original methods DOI is not a v1.1 dataset DOI.'
+  license_spdx: CC0-1.0
+  citation_apa: Abatzoglou, J. T., Dobrowski, S. Z., Parks, S. A., & Hegewisch, K. C. (2018). TerraClimate,
+    a high-resolution global dataset of monthly climate and climatic water balance from 1958–2015. Scientific
+    Data, 5, 170191. https://doi.org/10.1038/sdata.2017.191 Methods citation for the original release;
+    v1.1 methodology differs as documented by the provider.
+products:
+- id: amadeus:product/terraclimate_v1_1_monthly
+  name: terraclimate_v1_1_monthly
+  label: TerraClimate v1.1 monthly historical climate and water balance
+  data_source: amadeus:source/climatology_lab_terraclimate
+  data_genre:
+  - meteorology
+  - climate
+  - water
+  - drought
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: monthly
+  description: 'ERA5-driven historical reconstruction, not direct independent observations. Monthly mean
+    daily maxima/minima are not monthly absolute temperature extrema. Monthly accumulated depths remain
+    spatially intensive. Soil, SWE and PDSI are end-of-month states. Global rectangle includes masked
+    land/ocean cells. First model year may contain spin-up effects. Native 2018 headers inspected for
+    all fourteen fields; per-file revisions and future availability must be checked. Legacy downloader
+    URLs are mutable and do not prove delivery version; verify file version before use. [Resource reconciliation:
+    inventory completeness] Inventory coverage statement (Amadeus data sources!N3): Yes (global land).
+    This statement does not establish validity of every cell/date or fill observation gaps.'
+  product_version: '1.1'
+  grid_definition: amadeus:grid/terraclimate_global_1_24deg
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 1/24 degree; approximately 4 km, latitude dependent
+  spatial_extent_descriptor: Global terrestrial surfaces; grid envelope -180..180, -90..90
+  temporal_resolution_iso: P1M
+  temporal_alignment: start
+  calendar: gregorian
+  temporal_coverage_start: '1950-01-01'
+  update_cadence_iso: P1Y
+  access_url: https://thredds.northwestknowledge.net/thredds/catalog/TERRACLIMATE_ALL/data/catalog.html
+  amadeus_dataset_name: terraclimate
+  amadeus_process_covariate: terraclimate
+  amadeus_calculate_covariate: terraclimate
+grid_definitions:
+- id: amadeus:grid/terraclimate_global_1_24deg
+  name: terraclimate_global_1_24deg
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.041666666666666664
+  resolution_y: 0.041666666666666664
+  resolution_unit: deg
+  n_columns: 8640
+  n_rows: 4320
+  origin_x: -180.0
+  origin_y: 90.0
+canonical_variables:
+- id: amadeus:var/actual_evapotranspiration_monthly_amount
+  name: actual_evapotranspiration_monthly_amount
+  label: Monthly actual evapotranspiration depth
+  standard_name: https://w3id.org/niehs/amadeus/var/actual_evapotranspiration_monthly_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly actual evapotranspiration depth; statistical support is part of this identity.
+- id: amadeus:var/climatic_water_deficit_monthly_amount
+  name: climatic_water_deficit_monthly_amount
+  label: Monthly climatic water deficit depth
+  standard_name: https://w3id.org/niehs/amadeus/var/climatic_water_deficit_monthly_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly climatic water deficit depth; statistical support is part of this identity.
+- id: amadeus:var/reference_evapotranspiration_co2_adjusted_monthly_amount
+  name: reference_evapotranspiration_co2_adjusted_monthly_amount
+  label: Monthly CO2-adjusted reference evapotranspiration depth
+  standard_name: https://w3id.org/niehs/amadeus/var/reference_evapotranspiration_co2_adjusted_monthly_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly CO2-adjusted reference evapotranspiration depth; statistical support is part of
+    this identity.
+- id: amadeus:var/precipitation_monthly_amount
+  name: precipitation_monthly_amount
+  label: Monthly precipitation depth
+  standard_name: https://w3id.org/niehs/amadeus/var/precipitation_monthly_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly precipitation depth; statistical support is part of this identity.
+- id: amadeus:var/runoff_monthly_amount
+  name: runoff_monthly_amount
+  label: Monthly runoff depth
+  standard_name: https://w3id.org/niehs/amadeus/var/runoff_monthly_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly runoff depth; statistical support is part of this identity.
+- id: amadeus:var/soil_water_end_of_month_depth
+  name: soil_water_end_of_month_depth
+  label: End-of-month total-column soil water equivalent depth
+  standard_name: https://w3id.org/niehs/amadeus/var/soil_water_end_of_month_depth
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: End-of-month total-column soil water equivalent depth; statistical support is part of this
+    identity.
+- id: amadeus:var/snow_water_equivalent_end_of_month
+  name: snow_water_equivalent_end_of_month
+  label: End-of-month snow water equivalent
+  standard_name: https://w3id.org/niehs/amadeus/var/snow_water_equivalent_end_of_month
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: End-of-month snow water equivalent; statistical support is part of this identity.
+- id: amadeus:var/air_temperature_monthly_mean_daily_maximum
+  name: air_temperature_monthly_mean_daily_maximum
+  label: Monthly mean daily maximum 2 m air temperature
+  standard_name: https://w3id.org/niehs/amadeus/var/air_temperature_monthly_mean_daily_maximum
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Cel
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean daily maximum 2 m air temperature; statistical support is part of this identity.
+- id: amadeus:var/air_temperature_monthly_mean_daily_minimum
+  name: air_temperature_monthly_mean_daily_minimum
+  label: Monthly mean daily minimum 2 m air temperature
+  standard_name: https://w3id.org/niehs/amadeus/var/air_temperature_monthly_mean_daily_minimum
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: Cel
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean daily minimum 2 m air temperature; statistical support is part of this identity.
+- id: amadeus:var/surface_downwelling_shortwave_flux_monthly_mean
+  name: surface_downwelling_shortwave_flux_monthly_mean
+  label: Monthly mean surface downwelling shortwave flux
+  standard_name: https://w3id.org/niehs/amadeus/var/surface_downwelling_shortwave_flux_monthly_mean
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean surface downwelling shortwave flux; statistical support is part of this identity.
+- id: amadeus:var/water_vapor_pressure_2m_monthly_mean
+  name: water_vapor_pressure_2m_monthly_mean
+  label: Monthly mean 2 m vapor pressure
+  standard_name: https://w3id.org/niehs/amadeus/var/water_vapor_pressure_2m_monthly_mean
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kPa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean 2 m vapor pressure; statistical support is part of this identity.
+- id: amadeus:var/vapor_pressure_deficit_monthly_mean
+  name: vapor_pressure_deficit_monthly_mean
+  label: Monthly mean vapor pressure deficit
+  standard_name: https://w3id.org/niehs/amadeus/var/vapor_pressure_deficit_monthly_mean
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kPa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean vapor pressure deficit; statistical support is part of this identity.
+- id: amadeus:var/wind_speed_10m_monthly_mean
+  name: wind_speed_10m_monthly_mean
+  label: Monthly mean 10 m wind speed
+  standard_name: https://w3id.org/niehs/amadeus/var/wind_speed_10m_monthly_mean
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Monthly mean 10 m wind speed; statistical support is part of this identity.
+- id: amadeus:var/palmer_drought_severity_index_end_of_month
+  name: palmer_drought_severity_index_end_of_month
+  label: End-of-month Palmer drought severity index
+  standard_name: https://w3id.org/niehs/amadeus/var/palmer_drought_severity_index_end_of_month
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: End-of-month Palmer drought severity index; statistical support is part of this identity.
+product_variables:
+- id: amadeus:pvar/terraclimate.aet
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/actual_evapotranspiration_monthly_amount
+  native_name: aet
+  amadeus_variable_code: aet
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: water_evaporation_amount
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: sum
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.def
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/climatic_water_deficit_monthly_amount
+  native_name: def
+  amadeus_variable_code: def
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: water_potential_evaporation_amount_minus_water_evaporation_amount
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: sum
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.pet
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/reference_evapotranspiration_co2_adjusted_monthly_amount
+  native_name: pet
+  amadeus_variable_code: pet
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: water_potential_evaporation_amount
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: sum
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.ppt
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/precipitation_monthly_amount
+  native_name: ppt
+  amadeus_variable_code: ppt
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-2147483648'
+  cf_standard_name: precipitation_amount
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage int; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: sum
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.q
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/runoff_monthly_amount
+  native_name: q
+  amadeus_variable_code: q
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-2147483648'
+  cf_standard_name: runoff_amount
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage int; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: sum
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.soil
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/soil_water_end_of_month_depth
+  native_name: soil
+  amadeus_variable_code: soil
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: soil_moisture_content
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  temporal_alignment: end
+- id: amadeus:pvar/terraclimate.swe
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/snow_water_equivalent_end_of_month
+  native_name: swe
+  amadeus_variable_code: swe
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-2147483648'
+  cf_standard_name: liquid_water_content_of_surface_snow
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage int; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  temporal_alignment: end
+- id: amadeus:pvar/terraclimate.tmax
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/air_temperature_monthly_mean_daily_maximum
+  native_name: tmax
+  amadeus_variable_code: tmax
+  native_units_ucum: Cel
+  native_value_scale_factor: 0.01
+  native_value_offset: -99.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: air_temperature
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.tmin
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/air_temperature_monthly_mean_daily_minimum
+  native_name: tmin
+  amadeus_variable_code: tmin
+  native_units_ucum: Cel
+  native_value_scale_factor: 0.01
+  native_value_offset: -99.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: air_temperature
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.srad
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/surface_downwelling_shortwave_flux_monthly_mean
+  native_name: srad
+  amadeus_variable_code: srad
+  native_units_ucum: W/m2
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: downwelling_shortwave_flux_in_air
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.vap
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/water_vapor_pressure_2m_monthly_mean
+  native_name: vap
+  amadeus_variable_code: vap
+  native_units_ucum: kPa
+  native_value_scale_factor: 0.001
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: water_vapor_partial_pressure_in_air
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.vpd
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/vapor_pressure_deficit_monthly_mean
+  native_name: vpd
+  amadeus_variable_code: vpd
+  native_units_ucum: kPa
+  native_value_scale_factor: 0.01
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: vapor_pressure_deficit
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.ws
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/wind_speed_10m_monthly_mean
+  native_name: ws
+  amadeus_variable_code: ws
+  native_units_ucum: m/s
+  native_value_scale_factor: 0.01
+  native_value_offset: 0.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: wind_speed
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  aggregation_method: mean
+  aggregation_window_iso: P1M
+  temporal_alignment: interval
+- id: amadeus:pvar/terraclimate.PDSI
+  product: amadeus:product/terraclimate_v1_1_monthly
+  canonical_variable: amadeus:var/palmer_drought_severity_index_end_of_month
+  native_name: PDSI
+  amadeus_variable_code: PDSI
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -45.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '-32768'
+  cf_standard_name: palmer_drought_severity_index
+  harmonization_note: 'CF-style decoding: physical = raw * scale_factor + add_offset, after masking raw
+    fill. Native storage short; _Unsigned=false. Do not apply packing twice when the reader already decodes.
+    Provider CF standard_name is retained verbatim without asserting ontology equivalence. No canonical
+    physical plausibility bounds were established.'
+  temporal_alignment: end

@@ -1,0 +1,326 @@
+id: https://w3id.org/niehs/amadeus/provenance
+name: amadeus-provenance
+title: AmadeusDB — Provenance Layer
+version: "0.1.0"
+description: |-
+  Tool runs and the derivation DAG. Deliberately slot-for-slot compatible with
+  EnVar's `ToolRun` and `ProvenanceChain`, because the point is that an amadeus
+  run record *is* an EnVar tool-run record — no adapter, no lossy projection.
+
+  Objective O-02 requires that "every derived output resolves to source assets
+  and processing runs". Two foreign keys deliver that: `AmbientValue.asset` →
+  the bytes, `AmbientValue.processing_run` → this table. `upstream_runs` makes
+  the chain walkable, so a value extracted at a patient's address resolves back
+  through calculate → process → download → the original URL and hash.
+
+  `run_role` maps to the amadeus verbs, which means the DAG is not an abstract
+  provenance graph — it is the actual `download → process → calculate` pipeline
+  with its arguments recorded.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+  prov: http://www.w3.org/ns/prov#
+default_prefix: amadeus
+default_range: string
+
+imports:
+- linkml:types
+- amadeus_common
+
+#────────────────────────────────────────────────────────────────
+# CLASSES
+#────────────────────────────────────────────────────────────────
+
+classes:
+
+  ToolRun:
+    title: Tool Run
+    class_uri: prov:Activity
+    description: >-
+      One execution of one amadeus operation, with everything needed to decide
+      whether it can be trusted and whether it can be skipped.
+
+      "Whether it can be skipped" is the idempotency requirement: re-running a
+      workflow with the same inputs and configuration should reuse valid outputs
+      and recover from partial failures without silent duplication. That needs
+      `input_file_sha256`, `output_file_sha256`, `run_arguments` and `status` —
+      not a timestamp and a log line.
+    exact_mappings:
+    - envar:ToolRun
+    slots:
+    - id
+    - run_role
+    - tool_name
+    - tool_version
+    - function_name
+    - run_arguments
+    - container_image_repository
+    - container_image_digest
+    - run_timestamp_utc
+    - run_duration_seconds
+    - run_environment
+    - input_asset_ids
+    - input_file_sha256
+    - input_row_count
+    - output_file_sha256
+    - output_row_count
+    - upstream_runs
+    - status
+    - log_excerpt
+    - materialization_mode
+    - bytes_transferred
+    - request_count
+    slot_usage:
+      run_role:
+        required: true
+      tool_name:
+        required: true
+        ifabsent: string(amadeus)
+      tool_version:
+        required: true
+      run_timestamp_utc:
+        required: true
+      status:
+        required: true
+      function_name:
+        description: >-
+          The specific amadeus function called (`download_narr`,
+          `process_narr`, `calculate_narr`). More useful than `tool_name` alone,
+          since one package version contains many operations with different
+          failure modes.
+      run_arguments:
+        description: >-
+          The call's arguments as a JSON object string. The single field that
+          decides whether a result is reproducible. Kept opaque because the
+          argument sets differ per function and per source; validating them is
+          the `ExtractionRequest`'s job for the calculate path, and an adapter
+          contract test's job for the download path.
+      container_image_digest:
+        description: >-
+          Immutable image digest, not a tag. Tags move; a digest is the only
+          thing that makes "the same container" a checkable claim, and the
+          plan requires digest references in run manifests.
+      bytes_transferred:
+        description: >-
+          Network bytes for this run. The benchmark plan's acceptance target is
+          "at least 75% fewer bytes transferred for a remote subset request
+          where the upstream format/API supports pushdown" — which requires
+          this to be measured per run rather than estimated.
+    rules:
+    - preconditions:
+        slot_conditions:
+          status:
+            equals_string: succeeded
+          run_role:
+            any_of:
+            - equals_string: process
+            - equals_string: calculate
+      postconditions:
+        slot_conditions:
+          output_row_count:
+            required: true
+      description: >-
+        A successful processing or calculation run must state how many rows it
+        produced. Row-count parity against a frozen baseline is the cheapest
+        golden-regression check there is.
+    - preconditions:
+        slot_conditions:
+          run_role:
+            any_of:
+            - equals_string: process
+            - equals_string: calculate
+            - equals_string: harmonize
+      postconditions:
+        slot_conditions:
+          upstream_runs:
+            required: true
+      description: >-
+        Anything downstream of download must name what it consumed. Without
+        this the chain has a hole and provenance terminates in the wrong place.
+    - preconditions:
+        slot_conditions:
+          status:
+            equals_string: failed
+      postconditions:
+        slot_conditions:
+          log_excerpt:
+            required: true
+      description: >-
+        A failed run must carry diagnostic output. "A failed run is
+        diagnosable and can resume without corrupting accepted outputs" is an
+        operability acceptance criterion, and it is unmeetable if failures
+        record nothing.
+
+  ProvenanceChain:
+    title: Provenance Chain
+    description: >-
+      A materialised walk of `upstream_runs` from a derived value back to its
+      terminus, plus what the terminus is. Stored rather than always recomputed
+      because it is what an exported EnVar record carries, and because the
+      recursive query is expensive to run per row at export time.
+    exact_mappings:
+    - envar:ProvenanceChain
+    slots:
+    - id
+    - chain_steps
+    - terminus_type
+    - compatibility_assertions
+    slot_usage:
+      terminus_type:
+        required: true
+
+#────────────────────────────────────────────────────────────────
+# SLOTS
+#────────────────────────────────────────────────────────────────
+
+slots:
+
+  run_role:
+    range: RunRoleEnum
+
+  tool_name:
+    range: string
+    exact_mappings:
+    - envar:tool_name
+
+  tool_version:
+    range: string
+    exact_mappings:
+    - envar:tool_version
+    examples:
+    - value: "1.3.2.1"
+
+  function_name:
+    range: string
+
+  run_arguments:
+    range: string
+    exact_mappings:
+    - envar:run_arguments
+
+  container_image_repository:
+    range: string
+    exact_mappings:
+    - envar:container_image_repository
+
+  container_image_digest:
+    range: string
+    exact_mappings:
+    - envar:container_image_digest
+    pattern: "^sha256:[0-9a-f]{64}$"
+
+  run_timestamp_utc:
+    range: datetime
+    exact_mappings:
+    - envar:run_timestamp_utc
+
+  run_duration_seconds:
+    range: float
+    exact_mappings:
+    - envar:run_duration_seconds
+
+  run_environment:
+    range: string
+    description: >-
+      Runtime environment as a JSON object string — R version, platform, key
+      package versions (`terra`, `sf`, `exactextractr`), and the database engine
+      and version. The engine matters: a SedonaDB result and a DuckDB result of
+      the same request are not guaranteed identical, and the capability matrix
+      the plan calls for is only auditable if each run says which engine ran it.
+
+  input_asset_ids:
+    range: string
+    multivalued: true
+    description: Assets consumed by this run.
+
+  input_file_sha256:
+    range: Sha256
+    exact_mappings:
+    - envar:input_file_sha256
+
+  input_row_count:
+    range: integer
+    exact_mappings:
+    - envar:input_row_count
+
+  output_file_sha256:
+    range: Sha256
+    exact_mappings:
+    - envar:output_file_sha256
+
+  output_row_count:
+    range: integer
+    exact_mappings:
+    - envar:output_row_count
+
+  upstream_runs:
+    range: string
+    multivalued: true
+    description: >-
+      Identifiers of the runs this one consumed. The DAG edge. Typed as strings
+      rather than object references so the table is self-contained and loadable
+      before its own foreign keys resolve — a run may be recorded before its
+      parents are fully written.
+
+  status:
+    range: RunStatusEnum
+
+  log_excerpt:
+    range: string
+    exact_mappings:
+    - envar:run_log_excerpt
+
+  bytes_transferred:
+    range: integer
+
+  request_count:
+    range: integer
+    description: Number of HTTP or API requests issued, for rate-limit accounting.
+
+  chain_steps:
+    range: string
+    multivalued: true
+    description: Run identifiers, ordered from the derived value back to the terminus.
+
+  terminus_type:
+    range: ProvenanceChainTerminusEnum
+    exact_mappings:
+    - envar:provenance_chain_terminus_type
+
+  compatibility_assertions:
+    range: string
+    multivalued: true
+    description: >-
+      Assertions that consecutive steps were compatible — matching CRS, units,
+      calendar, day boundary. The seam between two steps belongs to neither
+      step, and this is where a mismatch gets recorded instead of silently
+      absorbed.
+
+#────────────────────────────────────────────────────────────────
+# ENUMS
+#────────────────────────────────────────────────────────────────
+
+enums:
+
+  ProvenanceChainTerminusEnum:
+    exact_mappings:
+    - envar:ProvenanceChainTerminusEnum
+    permissible_values:
+      raw_source_download:
+      remote_asset_scan:
+        description: >-
+          The chain bottoms out at a remote asset read in place, with nothing
+          downloaded. The streaming case, which EnVar's enum does not have.
+        annotations:
+          amadeus_extension: "true"
+      pre_existing_curated_dataset:
+      externally_imported_dataset:
+        description: >-
+          A dataset contributed from outside amadeus, whose upstream derivation
+          amadeus did not perform and cannot vouch for.
+        annotations:
+          amadeus_extension: "true"
+      synthetic_data:

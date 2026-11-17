@@ -1,0 +1,2 @@
+# Minimal direct requirements; pip resolves their transitive dependencies.
+-r dataset_spec_objects/catalog_requirements.txt

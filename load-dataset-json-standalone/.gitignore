@@ -1,0 +1,8 @@
+.venv-catalog/
+__pycache__/
+*.pyc
+test-results/
+linkml-json-iplementation/output/*
+!linkml-json-iplementation/output/amadeus_schema.schema.json
+.Rhistory
+.RData

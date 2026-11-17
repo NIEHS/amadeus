@@ -1,0 +1,15 @@
+test_asset_cannot_include_another_products_binding (test_bridge.BridgeChecks.test_asset_cannot_include_another_products_binding) ... ok
+test_boolean_does_not_compare_equal_to_number (test_bridge.BridgeChecks.test_boolean_does_not_compare_equal_to_number) ... ok
+test_dangling_reference_is_rejected (test_bridge.BridgeChecks.test_dangling_reference_is_rejected) ... ok
+test_duplicate_yaml_keys_and_nonfinite_json_are_rejected (test_bridge.BridgeChecks.test_duplicate_yaml_keys_and_nonfinite_json_are_rejected) ... ok
+test_nonexistent_completion_flag_is_rejected (test_bridge.BridgeChecks.test_nonexistent_completion_flag_is_rejected) ... ok
+test_nullable_optional_collection_remains_valid (test_bridge.BridgeChecks.test_nullable_optional_collection_remains_valid) ... ok
+test_packing_requires_native_units_under_generated_condition (test_bridge.BridgeChecks.test_packing_requires_native_units_under_generated_condition) ... ok
+test_preserved_json_schema_accepts_current_example (test_bridge.BridgeChecks.test_preserved_json_schema_accepts_current_example) ... ok
+test_schema_hash_changes_invalidate_the_plan (test_bridge.BridgeChecks.test_schema_hash_changes_invalidate_the_plan) ... ok
+test_singleton_array_must_not_be_unboxed (test_bridge.BridgeChecks.test_singleton_array_must_not_be_unboxed) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.236s
+
+OK

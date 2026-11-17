@@ -1,0 +1,2 @@
+# Reuse the tested direct pins for the existing LinkML catalog workflow.
+-r ../dataset_spec_objects/catalog_requirements.txt

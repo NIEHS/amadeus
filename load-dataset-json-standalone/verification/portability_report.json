@@ -1,0 +1,31 @@
+{
+  "assessment_date": "2026-11-17",
+  "status": "PASS",
+  "isolation": "Copied bundle to a temporary directory outside the Amadeus checkout, with spaces in its path; invoked tests from another working directory. Used existing installed interpreters and packages, not a newly installed environment.",
+  "source_files_unchanged": 48,
+  "R_serialization_checks": 18,
+  "R_loader_checks": 29,
+  "Python_validation_tests": 10,
+  "merra2_usage_example": "PASS (7 products, 45 bindings)",
+  "batch": {
+    "status": "PASS",
+    "source_documents_checked": 24,
+    "output_documents_checked": 24,
+    "checks": {
+      "schema": "PASS",
+      "source_parity_and_relationships": "PASS",
+      "input_hashes": "PASS",
+      "scientific_provider_evidence": "NOT_RUN",
+      "rds_and_discovery_handles": "NOT_RUN"
+    },
+    "global_counts": {
+      "data_sources": 25,
+      "products": 209,
+      "grid_definitions": 38,
+      "canonical_variables": 1799,
+      "product_variables": 1957,
+      "assets": 124
+    }
+  },
+  "scope": "Bundled project files only; runtime packages must be installed separately. Scientific provider validation was not run."
+}

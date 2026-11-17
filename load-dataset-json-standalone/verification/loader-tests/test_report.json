@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "reviewed_utc": "2026-11-17 15:45:02 UTC",
+  "R_version": "R version 4.6.0 (2026-04-24)",
+  "R_packages": {
+    "yaml": "2.3.12",
+    "jsonlite": "2.0.0"
+  },
+  "suites": {
+    "dependencies": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "dependencies.log"
+    },
+    "serialization": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "serialization.log"
+    },
+    "bridge": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "bridge.log"
+    },
+    "loaders": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log": "loaders.log"
+    }
+  }
+}

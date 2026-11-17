@@ -1,0 +1,198 @@
+{
+  "snapshot_date": "2026-11-17",
+  "description": "Unmodified source snapshots; hashes are relative to this standalone folder. No parent repository is needed.",
+  "files": [
+    {
+      "path": "linkml-json-iplementation/R/load_dataset_json.R",
+      "sha256": "757d3d15ba8d3327b2cbe20f8931d65233db5e9226e41f407b82e5c168ba5f17"
+    },
+    {
+      "path": "linkml-json-iplementation/R/convert_catalog.R",
+      "sha256": "177153a0b5359928fd6ca776d965fff2842e96f4ec2c10aaa7e6bdfbc96066d5"
+    },
+    {
+      "path": "linkml-json-iplementation/R/README_load_dataset_json.md",
+      "sha256": "3a3ddf8ca7b83e0907459d7fe9988a187842521b4f60b74a5032325d9dff6683"
+    },
+    {
+      "path": "linkml-json-iplementation/python/dataset_bridge.py",
+      "sha256": "b2bba8889fa70f095fd805d2f577f43f96086e9992ff1775c7779995ce7f067f"
+    },
+    {
+      "path": "linkml-json-iplementation/python/linkml_bridge.py",
+      "sha256": "c1f17860ce4b3cae42d0fd3d37617b0ebc354931bd01bcb5d507256d92fcb90b"
+    },
+    {
+      "path": "linkml-json-iplementation/requirements.txt",
+      "sha256": "6bd69438d2f5b36be32cd319cef91c41f36f0805748b5772ec5606eac1051cae"
+    },
+    {
+      "path": "linkml-json-iplementation/run_pipeline.R",
+      "sha256": "16924b741ee224b90f36b945f1ab82e21c7072905ced997bea44d867132e9a3f"
+    },
+    {
+      "path": "linkml-json-iplementation/tests/test_bridge.py",
+      "sha256": "401922b99aaa2016f7b7ecb0738a9f14193fb0c5a4fe249157ae2edccc35e883"
+    },
+    {
+      "path": "linkml-json-iplementation/tests/test_conversion.R",
+      "sha256": "307a4d5a3db6b3cd67d393c816d9f66ee0e066c6e6f18da78e39b8f4cb38caea"
+    },
+    {
+      "path": "linkml-json-iplementation/tests/test_dataset_loaders.R",
+      "sha256": "585762ef18ba39cab93d64c477d6fe54263586545b73549301880008c3e202aa"
+    },
+    {
+      "path": "linkml-json-iplementation/output/amadeus_schema.schema.json",
+      "sha256": "15c521e1a93d80c5438822843fb9499b8f94eb93cc19dcf5d43ca2b8dfe1cece"
+    },
+    {
+      "path": "dataset_spec_objects/catalog_workflow.py",
+      "sha256": "468fbd61995a5d9dc7875405dd3d47cc0084cbf550b7ecae8c2045c408fdc257"
+    },
+    {
+      "path": "dataset_spec_objects/catalog_updates_20261109/read_catalog.R",
+      "sha256": "11865e97e85c203f1f6b9f599a97d453885a9c90086e0b4eff3bc38b84437fcf"
+    },
+    {
+      "path": "dataset_spec_objects/catalog_requirements.txt",
+      "sha256": "a3e50347ceb180c24d54af2c0d0100ab96cbfbd871e15ff541d496032c45fd92"
+    },
+    {
+      "path": "validated_catalog_handles/validate_catalogs.py",
+      "sha256": "3bcd8696fa27d5a48507173a756ccecb85132677b807edebab31c822b288be45"
+    },
+    {
+      "path": "amadeus_schema/LICENSE",
+      "sha256": "65550b82260d6a62d7a0ad08041f8baeeed15f2749d83a6ffdfacc2064c61dca"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "971c7bb596335ee50f759c59956eccd79d425a7ef53ae47862e127011eab7b8e"
+    },
+    {
+      "path": "LICENSE.md",
+      "sha256": "196e0e7ad976ec1217fa13a0b687ee482a1444dee9fc70f0693d75db3a7eb11a"
+    },
+    {
+      "path": "global_dataset_catalogs/aqs.yaml",
+      "sha256": "aba1bfd507f5a267c6c42a5a58c3f58d04203304ac2699e7a526c73f4672fcde"
+    },
+    {
+      "path": "global_dataset_catalogs/cropscape.yaml",
+      "sha256": "0107090d9829a347b0a96d9f61fe46768fe884beb33c36c14b2a59d18d9ced74"
+    },
+    {
+      "path": "global_dataset_catalogs/drought.yaml",
+      "sha256": "6034f25a7a6a99b21a6ebd41a3f68ff24ef8cc22ac30557b1848eea0c208c561"
+    },
+    {
+      "path": "global_dataset_catalogs/ecoregion.yaml",
+      "sha256": "d5f94f8d4e1daa9489303eb92838cd624a658304a0bf2183a10f3984f807001e"
+    },
+    {
+      "path": "global_dataset_catalogs/edgar.yaml",
+      "sha256": "2227a25605b9a48e61d17970ca453c375de0458bbc2eeae642c5048e551d2659"
+    },
+    {
+      "path": "global_dataset_catalogs/geos.yaml",
+      "sha256": "58031bced49741923533a187ce74e094b33fc669ed8c1a5b77278161a5bb40dd"
+    },
+    {
+      "path": "global_dataset_catalogs/global_catalog.yaml",
+      "sha256": "be3613b5de2e92ccfce19ff24f38442070660d2f8f7d10ae3894db6eac7394a6"
+    },
+    {
+      "path": "global_dataset_catalogs/gmted.yaml",
+      "sha256": "603d6c12e7b9233a8003ad8ef8fb2cb6e775ee428effc6f18a2b2c0380c45a5c"
+    },
+    {
+      "path": "global_dataset_catalogs/gridmet.yaml",
+      "sha256": "89459eab520c284d731a1f798816a308c2f2103bb601327c75c3c6801f0c0921"
+    },
+    {
+      "path": "global_dataset_catalogs/groads.yaml",
+      "sha256": "61f85323785b8c3527fc15523baba36363c459c7dc35c7bcfffe4a7dfc8d6e65"
+    },
+    {
+      "path": "global_dataset_catalogs/hms.yaml",
+      "sha256": "480870d2b093878ed33662e8580724fb592015e94ad712f83f05004fd4f0b35f"
+    },
+    {
+      "path": "global_dataset_catalogs/huc.yaml",
+      "sha256": "1f9d151c47aa07d3bb830860b470e36b441e480224a9421b846548d13e8c41e8"
+    },
+    {
+      "path": "global_dataset_catalogs/improve.yaml",
+      "sha256": "9faa343f0848098c94070c1c589436f5cd3b490a2b9e2c55954193b403658d30"
+    },
+    {
+      "path": "global_dataset_catalogs/koppen_geiger.yaml",
+      "sha256": "933c26310e55ce7e9c5aff114415351c0c8920fccfb2e3a881f3868fa6a28b41"
+    },
+    {
+      "path": "global_dataset_catalogs/merra2.yaml",
+      "sha256": "d6aba7206805a2c34afe1e547458cf8baefb5455d9f0cd3fd6f3b6a549690c26"
+    },
+    {
+      "path": "global_dataset_catalogs/modis.yaml",
+      "sha256": "4584091f8c83b606d8415c329d9e4bf3614be96675bd5ec1624d422fbdf087db"
+    },
+    {
+      "path": "global_dataset_catalogs/narr.yaml",
+      "sha256": "dacbc8f7072d9ce112956576303b9f1543710bce19c92488188f83085b1f852f"
+    },
+    {
+      "path": "global_dataset_catalogs/nei.yaml",
+      "sha256": "8c58ad1b24413aa60300915ca31fa8e1bb88a90297c02a02aa8bd8258efbbd59"
+    },
+    {
+      "path": "global_dataset_catalogs/nlcd.yaml",
+      "sha256": "5eb930dd3579663136f790a0cfaacf46dc403c5b098dc0a9f1ddebc71b89bd61"
+    },
+    {
+      "path": "global_dataset_catalogs/olm.yaml",
+      "sha256": "3338c40c66df5d0469a3151c6d6d198d0f99026150d8ee34b9c5cfae262fd03f"
+    },
+    {
+      "path": "global_dataset_catalogs/population.yaml",
+      "sha256": "88e77d090298552017b74b143cb64ed653c93d76dd28b5acf4a463f9baa20663"
+    },
+    {
+      "path": "global_dataset_catalogs/prism.yaml",
+      "sha256": "21b7819dfc28abbabfd1fd6878a6b6b29bf06638d5ed276f7aad6d5fbba616c9"
+    },
+    {
+      "path": "global_dataset_catalogs/terraclimate.yaml",
+      "sha256": "bf241d38b3d8e61dfd1da42d47ae5d263b7243e061328a1b9efd499ba2fbb0f1"
+    },
+    {
+      "path": "global_dataset_catalogs/tri.yaml",
+      "sha256": "ca65daacee984f39ca485a05f5b37c0b58b21c65a46a54a480aefa50636258e0"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_catalog.yaml",
+      "sha256": "8a8ed1fe7e2cbdb731ae5fff6e9d053d986f5dfb4ddd355de3b8763edcd1f24c"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_common.yaml",
+      "sha256": "c63657de530f0b7c775056d98fc7f13e32f6b9a9b5125a2c76186aec50717f4c"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_provenance.yaml",
+      "sha256": "fcfbec8df00fb12c64de73ce6846f183215a071f181607d38f6a790ccde3295b"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_request.yaml",
+      "sha256": "3d130ec952b44e258f1fe92e0a8d657c99ddfb6ca2631c6ad7e5a5eba5347b07"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml",
+      "sha256": "a4fa06de0f04f1e3ba2fa91035dce55f80d6038e7e0b1ecb6ff28c54e59d7f02"
+    },
+    {
+      "path": "amadeus_schema/src/amadeus_schema/schema/amadeus_value.yaml",
+      "sha256": "8b6d5d640a18cb2c225b63b28c7ffc7503a8ac0f96b52453675dfb50f0b3e3fc"
+    }
+  ]
+}
