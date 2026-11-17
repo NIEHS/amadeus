@@ -1,0 +1,150 @@
+{
+  "status": "PASS",
+  "phase": "output_validation",
+  "validated_utc": "2026-11-17T19:41:38.583769+00:00",
+  "schema_file": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/amadeus_schema.schema.json",
+  "schema_sha256": "15c521e1a93d80c5438822843fb9499b8f94eb93cc19dcf5d43ca2b8dfe1cece",
+  "schema_source": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml",
+  "target_class": "AmadeusDatabase",
+  "source_documents_checked": 24,
+  "output_documents_checked": 24,
+  "documents": [
+    {
+      "document": "aqs",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "cropscape",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "drought",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "ecoregion",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "edgar",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "geos",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "global_catalog",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "gmted",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "gridmet",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "groads",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "hms",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "huc",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "improve",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "koppen_geiger",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "merra2",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "modis",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "narr",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "nei",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "nlcd",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "olm",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "population",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "prism",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "terraclimate",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    },
+    {
+      "document": "tri",
+      "json_schema": "PASS",
+      "references_and_parity": "PASS"
+    }
+  ],
+  "checks": {
+    "schema": "PASS",
+    "source_parity_and_relationships": "PASS",
+    "input_hashes": "PASS",
+    "scientific_provider_evidence": "NOT_RUN",
+    "rds_and_discovery_handles": "NOT_RUN"
+  },
+  "global_counts": {
+    "data_sources": 25,
+    "products": 209,
+    "grid_definitions": 38,
+    "canonical_variables": 1799,
+    "product_variables": 1957,
+    "assets": 124
+  },
+  "errors": [],
+  "scope": "Catalog structure, source parity and six-collection relationships. Not scientific correctness, native-array validation or R adapter certification."
+}

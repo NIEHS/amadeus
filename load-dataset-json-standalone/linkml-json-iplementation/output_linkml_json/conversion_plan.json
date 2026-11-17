@@ -1,0 +1,177 @@
+{
+  "target_class": "AmadeusDatabase",
+  "schema_source": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml",
+  "schema_file": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/amadeus_schema.schema.json",
+  "schema_sha256": "15c521e1a93d80c5438822843fb9499b8f94eb93cc19dcf5d43ca2b8dfe1cece",
+  "input_directory": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs",
+  "output_directory": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json",
+  "documents": [
+    {
+      "name": "aqs",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/aqs.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/aqs.json",
+      "sha256": "aba1bfd507f5a267c6c42a5a58c3f58d04203304ac2699e7a526c73f4672fcde"
+    },
+    {
+      "name": "cropscape",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/cropscape.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/cropscape.json",
+      "sha256": "0107090d9829a347b0a96d9f61fe46768fe884beb33c36c14b2a59d18d9ced74"
+    },
+    {
+      "name": "drought",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/drought.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/drought.json",
+      "sha256": "6034f25a7a6a99b21a6ebd41a3f68ff24ef8cc22ac30557b1848eea0c208c561"
+    },
+    {
+      "name": "ecoregion",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/ecoregion.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/ecoregion.json",
+      "sha256": "d5f94f8d4e1daa9489303eb92838cd624a658304a0bf2183a10f3984f807001e"
+    },
+    {
+      "name": "edgar",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/edgar.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/edgar.json",
+      "sha256": "2227a25605b9a48e61d17970ca453c375de0458bbc2eeae642c5048e551d2659"
+    },
+    {
+      "name": "geos",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/geos.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/geos.json",
+      "sha256": "58031bced49741923533a187ce74e094b33fc669ed8c1a5b77278161a5bb40dd"
+    },
+    {
+      "name": "global_catalog",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/global_catalog.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/global_catalog.json",
+      "sha256": "be3613b5de2e92ccfce19ff24f38442070660d2f8f7d10ae3894db6eac7394a6"
+    },
+    {
+      "name": "gmted",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/gmted.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/gmted.json",
+      "sha256": "603d6c12e7b9233a8003ad8ef8fb2cb6e775ee428effc6f18a2b2c0380c45a5c"
+    },
+    {
+      "name": "gridmet",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/gridmet.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/gridmet.json",
+      "sha256": "89459eab520c284d731a1f798816a308c2f2103bb601327c75c3c6801f0c0921"
+    },
+    {
+      "name": "groads",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/groads.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/groads.json",
+      "sha256": "61f85323785b8c3527fc15523baba36363c459c7dc35c7bcfffe4a7dfc8d6e65"
+    },
+    {
+      "name": "hms",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/hms.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/hms.json",
+      "sha256": "480870d2b093878ed33662e8580724fb592015e94ad712f83f05004fd4f0b35f"
+    },
+    {
+      "name": "huc",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/huc.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/huc.json",
+      "sha256": "1f9d151c47aa07d3bb830860b470e36b441e480224a9421b846548d13e8c41e8"
+    },
+    {
+      "name": "improve",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/improve.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/improve.json",
+      "sha256": "9faa343f0848098c94070c1c589436f5cd3b490a2b9e2c55954193b403658d30"
+    },
+    {
+      "name": "koppen_geiger",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/koppen_geiger.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/koppen_geiger.json",
+      "sha256": "933c26310e55ce7e9c5aff114415351c0c8920fccfb2e3a881f3868fa6a28b41"
+    },
+    {
+      "name": "merra2",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/merra2.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/merra2.json",
+      "sha256": "d6aba7206805a2c34afe1e547458cf8baefb5455d9f0cd3fd6f3b6a549690c26"
+    },
+    {
+      "name": "modis",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/modis.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/modis.json",
+      "sha256": "4584091f8c83b606d8415c329d9e4bf3614be96675bd5ec1624d422fbdf087db"
+    },
+    {
+      "name": "narr",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/narr.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/narr.json",
+      "sha256": "dacbc8f7072d9ce112956576303b9f1543710bce19c92488188f83085b1f852f"
+    },
+    {
+      "name": "nei",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/nei.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/nei.json",
+      "sha256": "8c58ad1b24413aa60300915ca31fa8e1bb88a90297c02a02aa8bd8258efbbd59"
+    },
+    {
+      "name": "nlcd",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/nlcd.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/nlcd.json",
+      "sha256": "5eb930dd3579663136f790a0cfaacf46dc403c5b098dc0a9f1ddebc71b89bd61"
+    },
+    {
+      "name": "olm",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/olm.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/olm.json",
+      "sha256": "3338c40c66df5d0469a3151c6d6d198d0f99026150d8ee34b9c5cfae262fd03f"
+    },
+    {
+      "name": "population",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/population.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/population.json",
+      "sha256": "88e77d090298552017b74b143cb64ed653c93d76dd28b5acf4a463f9baa20663"
+    },
+    {
+      "name": "prism",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/prism.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/prism.json",
+      "sha256": "21b7819dfc28abbabfd1fd6878a6b6b29bf06638d5ed276f7aad6d5fbba616c9"
+    },
+    {
+      "name": "terraclimate",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/terraclimate.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/terraclimate.json",
+      "sha256": "bf241d38b3d8e61dfd1da42d47ae5d263b7243e061328a1b9efd499ba2fbb0f1"
+    },
+    {
+      "name": "tri",
+      "input": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/global_dataset_catalogs/tri.yaml",
+      "output": "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/output_linkml_json/catalogs/tri.json",
+      "sha256": "ca65daacee984f39ca485a05f5b37c0b58b21c65a46a54a480aefa50636258e0"
+    }
+  ],
+  "dependency_sha256": {
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_catalog.yaml": "8a8ed1fe7e2cbdb731ae5fff6e9d053d986f5dfb4ddd355de3b8763edcd1f24c",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_common.yaml": "c63657de530f0b7c775056d98fc7f13e32f6b9a9b5125a2c76186aec50717f4c",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_provenance.yaml": "fcfbec8df00fb12c64de73ce6846f183215a071f181607d38f6a790ccde3295b",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_request.yaml": "3d130ec952b44e258f1fe92e0a8d657c99ddfb6ca2631c6ad7e5a5eba5347b07",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml": "a4fa06de0f04f1e3ba2fa91035dce55f80d6038e7e0b1ecb6ff28c54e59d7f02",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/amadeus_schema/src/amadeus_schema/schema/amadeus_value.yaml": "8b6d5d640a18cb2c225b63b28c7ffc7503a8ac0f96b52453675dfb50f0b3e3fc",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/run_pipeline.R": "16924b741ee224b90f36b945f1ab82e21c7072905ced997bea44d867132e9a3f",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/R/convert_catalog.R": "177153a0b5359928fd6ca776d965fff2842e96f4ec2c10aaa7e6bdfbc96066d5",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/python/linkml_bridge.py": "c1f17860ce4b3cae42d0fd3d37617b0ebc354931bd01bcb5d507256d92fcb90b",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/linkml-json-iplementation/requirements.txt": "6bd69438d2f5b36be32cd319cef91c41f36f0805748b5772ec5606eac1051cae",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/dataset_spec_objects/catalog_workflow.py": "468fbd61995a5d9dc7875405dd3d47cc0084cbf550b7ecae8c2045c408fdc257",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/dataset_spec_objects/catalog_updates_20261109/read_catalog.R": "11865e97e85c203f1f6b9f599a97d453885a9c90086e0b4eff3bc38b84437fcf",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/dataset_spec_objects/catalog_requirements.txt": "a3e50347ceb180c24d54af2c0d0100ab96cbfbd871e15ff541d496032c45fd92",
+    "/Users/tedlage/Desktop/amadeus/load-dataset-json-standalone/validated_catalog_handles/validate_catalogs.py": "3bcd8696fa27d5a48507173a756ccecb85132677b807edebab31c822b288be45"
+  },
+  "python_version": "3.12.15 (main, Oct 14 2026, 00:55:37) [Clang 23.1.3 ]",
+  "python_packages": {
+    "linkml": "1.12.1",
+    "linkml-runtime": "1.12.1",
+    "jsonschema": "4.26.0",
+    "PyYAML": "6.0.3"
+  }
+}

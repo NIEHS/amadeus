@@ -219,20 +219,89 @@ instance of the shared model, not a separate LinkML schema.
 edits will change those hashes. Keep reviewed catalogs as the source and
 regenerate JSON. Never hand-edit a validation receipt to claim success.
 
-## 5. Optional complete build and validation limits
+## 5. Generate all dataset and global JSON files
 
-All 24 YAML inputs are bundled, so the unchanged batch pipeline also works:
+Complete the dependency setup in section 1, then run the following in a
+**terminal**, from `load-dataset-json-standalone/`. The input folder is named
+`global_dataset_catalogs/` (not `global_datset_catalogs/`). It contains 23 dataset
+YAML catalogs and `global_catalog.yaml`; these are data instances validated
+against the shared LinkML model, rather than separate schema definitions.
+
+On macOS/Linux, generate and validate all 24 catalog JSON documents:
 
 ```sh
-Rscript --vanilla linkml-json-iplementation/run_pipeline.R --python .venv-catalog/bin/python
+Rscript --vanilla linkml-json-iplementation/run_pipeline.R \
+  --python .venv-catalog/bin/python \
+  --input-dir global_dataset_catalogs \
+  --output-dir linkml-json-iplementation/output
 ```
 
-It generates `output/catalogs/*.json`, `output/amadeus_schema.schema.json`,
-`conversion_plan.json`, `r_conversion_report.json`, `validation_report.json`,
-and `manifest.json` inside `linkml-json-iplementation/`. Expect 24 source and
-24 output documents checked with report status `PASS`. Plans and receipts
-contain absolute paths for the current run; regenerate them after moving the
-folder. Do not distribute a virtual environment or rely on old receipts.
+On Windows PowerShell, use the virtual environment's Windows interpreter:
+
+```powershell
+Rscript --vanilla linkml-json-iplementation/run_pipeline.R --python .venv-catalog/Scripts/python.exe --input-dir global_dataset_catalogs --output-dir linkml-json-iplementation/output
+```
+
+Alternatively, run from an **R session** whose working directory is the
+standalone folder:
+
+```r
+python <- ".venv-catalog/bin/python"  # Windows: .venv-catalog/Scripts/python.exe
+status <- system2(file.path(R.home("bin"), "Rscript"), c(
+  "--vanilla", "linkml-json-iplementation/run_pipeline.R",
+  "--python", shQuote(python),
+  "--input-dir", "global_dataset_catalogs",
+  "--output-dir", "linkml-json-iplementation/output"
+))
+stopifnot(status == 0L)
+```
+
+The pipeline performs three steps:
+
+1. The Python bridge compiles `amadeus_schema.yaml` and its imports into JSON
+   Schema, validates the source YAML catalogs and their references, and checks
+   that the global YAML equals the deduplicated dataset union.
+2. R converts each catalog to JSON, preserving schema-defined arrays, scalar
+   types, explicit nulls, and numeric precision.
+3. The bridge validates every resulting JSON document, checks equality with its
+   YAML source and the global union, and verifies input/dependency hashes before
+   recording the final validation report and manifest. Errors exit nonzero;
+   inspect the report rather than treating the presence of JSON as success.
+
+All outputs are under `linkml-json-iplementation/output/`:
+
+| Output | Contents |
+|---|---|
+| `catalogs/<dataset>.json` | One JSON document per dataset, such as `merra2.json` and `geos.json`. |
+| `catalogs/global_catalog.json` | The combined, deduplicated global catalog. |
+| `amadeus_schema.schema.json` | JSON Schema compiled from the shared LinkML model. |
+| `conversion_plan.json` | Input/output paths, dependency hashes, and conversion plan. |
+| `r_conversion_report.json` | Number of converted documents and R/package versions. |
+| `validation_report.json` | Final validation status, checks, errors, and catalog counts. |
+| `manifest.json` | Successful-build hashes and software versions. |
+
+Confirm success and read a generated catalog in R:
+
+```r
+output <- "linkml-json-iplementation/output"
+report <- jsonlite::read_json(file.path(output, "validation_report.json"))
+stopifnot(
+  identical(report$status, "PASS"),
+  report$source_documents_checked == 24L,
+  report$output_documents_checked == 24L
+)
+catalog <- jsonlite::read_json(
+  file.path(output, "catalogs/merra2.json"), simplifyVector = FALSE
+)
+```
+
+Both path options can point to other directories. Keep the complete registered
+dataset set and a matching global union in the selected input directory; the
+batch build rejects missing/extra dataset catalogs or a stale global YAML.
+It converts the existing global catalog rather than repairing or curating the
+YAML sources. Plans and receipts contain absolute paths for the current run;
+regenerate them after moving the folder. Do not distribute a virtual environment
+or rely on old receipts.
 
 Validation covers schema conformance, selected catalog relationships, source
 parity, and dependency hashes. Scientific/provider correctness is explicitly

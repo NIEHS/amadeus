@@ -1,0 +1,8 @@
+{
+  "documents_converted": 24,
+  "R_version": "4.6.0",
+  "packages": {
+    "yaml": "2.3.12",
+    "jsonlite": "2.0.0"
+  }
+}
