@@ -20,9 +20,6 @@ metadata_merra2 <- function(list = TRUE) {
     )
   )
   # ----------------------------------------------------------------------------
-  # Define regular expression for extracting esdt name.
-  chr_esdt <- ".*\\(([^()]{9})\\)\\s*$"
-  # ----------------------------------------------------------------------------
   # Extract metadata for each product; store as data.frame.
   df_merra2 <- do.call(
     rbind,
@@ -31,11 +28,6 @@ metadata_merra2 <- function(list = TRUE) {
       function(x) {
         data.frame(
           name = x$name,
-          esdt = ifelse(
-            grepl(chr_esdt, x$label),
-            sub(chr_esdt, "\\1", x$label),
-            NA_character_
-          ),
           doi = x$doi,
           crs = x$crs,
           temporal_coverage_start = x$temporal_coverage_start,
