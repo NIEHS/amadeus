@@ -4,6 +4,60 @@
 ################################################################################
 
 ################################################################################
+# {metadata} tier
+################################################################################
+#' Import MERRA2 metadata from validated schema.
+metadata_merra2 <- function(list = TRUE) {
+  # ----------------------------------------------------------------------------
+  # Import MERRA2 schema .json.
+  list_merra2 <- jsonlite::read_json(
+    system.file(
+      "extdata",
+      "schema",
+      "merra2.json",
+      package = "amadeus",
+      mustWork = TRUE
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Define regular expression for extracting esdt name.
+  chr_esdt <- ".*\\(([^()]{9})\\)\\s*$"
+  # ----------------------------------------------------------------------------
+  # Extract metadata for each product; store as data.frame.
+  df_merra2 <- do.call(
+    rbind,
+    lapply(
+      list_merra2$products,
+      function(x) {
+        data.frame(
+          name = x$name,
+          esdt = ifelse(
+            grepl(chr_esdt, x$label),
+            sub(chr_esdt, "\\1", x$label),
+            NA_character_
+          ),
+          doi = x$doi,
+          crs = x$crs,
+          temporal_coverage_start = x$temporal_coverage_start,
+          access_url = x$access_url,
+          product_version = x$product_version,
+          requires_token = TRUE,
+          native_format = switch(
+            x$native_format,
+            netcdf4_cf = ".nc4",
+            netcdf_cf = ".nc"
+          )
+        )
+      }
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Return list and data.frame.
+  if (list) return(list_merra2) else return(df_merra2)
+}
+
+
+################################################################################
 # {download} tier
 ################################################################################
 # nolint start
@@ -115,48 +169,7 @@
 #' @export
 # nolint end
 download_merra2 <- function(
-  collection = c(
-    "inst1_2d_asm_Nx",
-    "inst1_2d_int_Nx",
-    "inst1_2d_lfo_Nx",
-    "inst3_3d_asm_Np",
-    "inst3_3d_aer_Nv",
-    "inst3_3d_asm_Nv",
-    "inst3_3d_chm_Nv",
-    "inst3_3d_gas_Nv",
-    "inst3_2d_gas_Nx",
-    "inst6_3d_ana_Np",
-    "inst6_3d_ana_Nv",
-    "statD_2d_slv_Nx",
-    "tavg1_2d_adg_Nx",
-    "tavg1_2d_aer_Nx",
-    "tavg1_2d_chm_Nx",
-    "tavg1_2d_csp_Nx",
-    "tavg1_2d_flx_Nx",
-    "tavg1_2d_int_Nx",
-    "tavg1_2d_lfo_Nx",
-    "tavg1_2d_lnd_Nx",
-    "tavg1_2d_ocn_Nx",
-    "tavg1_2d_rad_Nx",
-    "tavg1_2d_slv_Nx",
-    "tavg3_3d_mst_Ne",
-    "tavg3_3d_trb_Ne",
-    "tavg3_3d_nav_Ne",
-    "tavg3_3d_cld_Np",
-    "tavg3_3d_mst_Np",
-    "tavg3_3d_rad_Np",
-    "tavg3_3d_tdt_Np",
-    "tavg3_3d_trb_Np",
-    "tavg3_3d_udt_Np",
-    "tavg3_3d_odt_Np",
-    "tavg3_3d_qdt_Np",
-    "tavg3_3d_asm_Nv",
-    "tavg3_3d_cld_Nv",
-    "tavg3_3d_mst_Nv",
-    "tavg3_3d_rad_Nv",
-    "tavg3_2d_glc_Nx",
-    "fwi"
-  ),
+  collection = .amadeus$df_merra2$name,
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
@@ -186,11 +199,16 @@ download_merra2 <- function(
   # ----------------------------------------------------------------------------
   # Check source-specific arguments.
   checkmate::assert_character(collection, min.char = 1L)
-  checkmate::assert_subset(collection, .amadeus$df_merra2$collection_id)
+  checkmate::assert_subset(collection, .amadeus$df_merra2$name)
+  # ----------------------------------------------------------------------------
+  # Extract schema metadata.
+  df_metadata <- .amadeus$df_merra2[
+    match(collection, .amadeus$df_merra2$name),
+  ]
   # ----------------------------------------------------------------------------
   # Check NASA EarthData token.
   chr_nasatoken <- NULL
-  if (any(!grepl("fwi", collection))) {
+  if (any(df_metadata$requires_token)) {
     chr_nasatoken <- get_token(
       token = nasa_earth_data_token,
       env_var = "NASA_EARTHDATA_TOKEN"
@@ -199,7 +217,11 @@ download_merra2 <- function(
   }
   # ----------------------------------------------------------------------------
   # Check `date` and generate sequence.
-  chr_dates <- sequence_dates(date, hyphen = FALSE)
+  chr_dates <- sequence_dates(
+    date,
+    hyphen = FALSE,
+    min = max(as.Date(df_metadata$temporal_coverage_start))
+  )
   # ----------------------------------------------------------------------------
   # Generate saving directory.
   chr_dir_to_save <- download_setup_dir(directory_to_save)
@@ -215,15 +237,11 @@ download_merra2 <- function(
       function(x) {
         # ----------------------------------------------------------------------
         # Extract collection-specific metadata.
-        df_p <- .amadeus$df_merra2[
-          match(x, .amadeus$df_merra2$collection_id),
-          ,
-          drop = FALSE
-        ]
+        df_p <- df_metadata[match(x, df_metadata$name), , drop = FALSE]
         # ----------------------------------------------------------------------
         # Expand collection and date combinations.
         df_x <- expand.grid(
-          base = df_p$base_url,
+          base = df_p$access_url,
           collection = x,
           date = chr_dates,
           dir = chr_dir_to_save,
@@ -240,7 +258,7 @@ download_merra2 <- function(
             paste0(
               "FWI.MERRA2.CORRECTED.Daily.Default.",
               date,
-              df_p$file_extension
+              df_p$native_format
             )
           )
           df_x$url <- with(df_x, paste0(base, year, "/", file))
@@ -249,20 +267,7 @@ download_merra2 <- function(
         }
         # ----------------------------------------------------------------------
         # Construct standard MERRA-2 monthly directory URLs.
-        df_x$base <- with(
-          df_x,
-          paste0(
-            base,
-            df_p$esdt_name,
-            ".",
-            df_p$version,
-            "/",
-            year,
-            "/",
-            month,
-            "/"
-          )
-        )
+        df_x$base <- with(df_x, paste0(base, year, "/", month, "/"))
         # ----------------------------------------------------------------------
         # Discover and filter daily URLs from monthly base directory.
         discover_merra2(

@@ -77,13 +77,6 @@
 #' @seealso [.amadeus], [download_merra2()]
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
-  .amadeus$df_merra2 <- read.csv(
-    system.file(
-      "extdata",
-      "df_merra2.csv",
-      package = pkgname,
-      lib.loc = libname,
-      mustWork = TRUE
-    )
-  )
+  .amadeus$list_merra2 <- metadata_merra2()
+  .amadeus$df_merra2 <- metadata_merra2(list = FALSE)
 }
