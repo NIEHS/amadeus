@@ -33,7 +33,9 @@ metadata_merra2 <- function(list = TRUE) {
           temporal_coverage_start = x$temporal_coverage_start,
           access_url = x$access_url,
           product_version = x$product_version,
-          requires_token = TRUE,
+          requires_token = list_merra2$data_sources[[
+            1
+          ]]$requires_authentication,
           native_format = switch(
             x$native_format,
             netcdf4_cf = ".nc4",
