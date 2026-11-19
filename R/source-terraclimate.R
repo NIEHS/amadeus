@@ -83,9 +83,11 @@ download_terraclimate <- function(
   chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Switch variables names to codes.
-  chr_variables <- amadeus::process_variable_codes(
-    variables = variables,
-    source = "terraclimate"
+  chr_variables <- unique(
+    amadeus::process_variable_codes(
+      variables = variables,
+      source = "terraclimate"
+    )
   )
   # ----------------------------------------------------------------------------
   # Apply URL formula for all variables.

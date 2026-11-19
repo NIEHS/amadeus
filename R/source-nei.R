@@ -128,7 +128,7 @@ download_nei <- function(
   # ----------------------------------------------------------------------------
   # Manage `year` argument.
   idx_year <- year %in% c(2008, 2011, 2014, 2017, 2020, 2023)
-  int_year <- year[idx_year]
+  int_year <- unique(year[idx_year])
   if (any(!idx_year)) {
     # --------------------------------------------------------------------------
     # If request includes any invalid years.

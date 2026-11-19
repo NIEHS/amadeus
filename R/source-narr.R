@@ -215,7 +215,7 @@ download_narr <- function(
   chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Store variables as `list`.
-  list_variables <- as.list(variables)
+  list_variables <- as.list(unique(variables))
   # ----------------------------------------------------------------------------
   # Generate download URLs, file names, and variable-specific directories.
   df_download <- do.call(

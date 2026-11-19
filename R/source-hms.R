@@ -147,7 +147,7 @@ download_hms <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

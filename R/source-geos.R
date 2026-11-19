@@ -124,7 +124,7 @@ download_geos <- function(
   chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Store collections as a `list`.
-  list_collections <- as.list(collection)
+  list_collections <- as.list(unique(collection))
   # ----------------------------------------------------------------------------
   # Generate download URLs, file names, and collection-specific directories.
   df_download <- do.call(
