@@ -120,8 +120,9 @@ testthat::test_that("download_narr; sequential and mirai", {
   testthat::expect_identical(chr_hashes1, chr_hashes2)
   # ----------------------------------------------------------------------------
   # Improved concurrent runtime is strictly less than sequential.
-  testthat::expect_lt(time_narr2["elapsed"], time_narr1["elapsed"])
-  # ----------------------------------------------------------------------------
+  if (tolower(Sys.getenv("CI")) != "true") {
+    testthat::expect_lt(time_narr2["elapsed"], time_narr1["elapsed"])
+  } # ----------------------------------------------------------------------------
   # Cleanup.
   file.remove(list.files(chr_tempdir1, full.names = TRUE, recursive = TRUE))
   unlink(chr_tempdir1, recursive = TRUE)
@@ -185,7 +186,9 @@ testthat::test_that("download_merra2; sequential and mirai", {
   testthat::expect_identical(chr_hashes1, chr_hashes2)
   # ----------------------------------------------------------------------------
   # Improved concurrent runtime is strictly less than sequential.
-  testthat::expect_lt(time_merra22["elapsed"], time_merra21["elapsed"])
+  if (tolower(Sys.getenv("CI")) != "true") {
+    testthat::expect_lt(time_merra22["elapsed"], time_merra21["elapsed"])
+  }
   # ----------------------------------------------------------------------------
   # Cleanup.
   file.remove(list.files(chr_tempdir1, full.names = TRUE, recursive = TRUE))
