@@ -80,7 +80,7 @@ reference:
   - -download_permit
   - -download_remove_command
   - -download_remove_zips
-  - -download_run
+  - -download_run_legacy
   - -download_run_method
   - -download_sanitize_path
   - -download_setup_dir

@@ -657,16 +657,16 @@ testthat::test_that("download_hash (LIVE)", {
 
 ################################################################################
 ##### download_run (DEPRECATED - but test for backward compatibility)
-testthat::test_that("download_run shows deprecation warning", {
+testthat::test_that("download_run_legacy shows deprecation warning", {
   withr::with_tempdir({
     # Create a dummy commands file
     writeLines("wget http://example.com", "commands.txt")
     # --------------------------------------------------------------------------
     # Reset the warning flag for this test
-    options(amadeus.download_run.warned = NULL)
+    options(amadeus.download_run_legacy.warned = NULL)
     # --------------------------------------------------------------------------
     testthat::expect_warning(
-      amadeus:::download_run(
+      amadeus:::download_run_legacy(
         download = FALSE,
         commands_txt = "commands.txt",
         remove = FALSE
@@ -2159,13 +2159,13 @@ testthat::test_that("check_urls method=SKIP returns NULL (covers lines 722-723)"
 ################################################################################
 ##### download_run download=TRUE path (covers lines 442-444)
 
-testthat::test_that("download_run download=TRUE executes commands", {
+testthat::test_that("download_run_legacy download=TRUE executes commands", {
   withr::with_tempdir({
     cmds_file <- "cmds.txt"
     writeLines("#!/bin/bash\n# empty", cmds_file)
     Sys.chmod(cmds_file, "755")
     suppressMessages(suppressWarnings(
-      amadeus:::download_run(
+      amadeus:::download_run_legacy(
         commands_txt = cmds_file,
         download = TRUE,
         remove = FALSE

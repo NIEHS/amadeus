@@ -13,22 +13,11 @@
 #' @export
 download_sanitize_path <- function(directory) {
   # ----------------------------------------------------------------------------
-  # Append a forward slash if the directory path does not end with one.
-  chars_dir <- nchar(directory)
-  if (
-    substr(
-      directory,
-      chars_dir,
-      chars_dir
-    ) !=
-      "/"
-  ) {
-    directory <-
-      paste(directory, "/", sep = "")
-  }
+  # Normalize path (e.g. full name).
+  directory <- normalizePath(directory, winslash = "/", mustWork = TRUE)
   # ----------------------------------------------------------------------------
-  # Return the directory path.
-  return(directory)
+  # Add "/" as last character if does not currently have.
+  paste0(sub("/+$", "", directory), "/")
 }
 
 ################################################################################
@@ -54,35 +43,27 @@ download_sanitize_path <- function(directory) {
 download_setup_dir <- function(directory, zip = FALSE) {
   # ----------------------------------------------------------------------------
   # Sanitize the download path and create missing parent directories.
-  chr_dir_sanitized <- download_sanitize_path(directory)
-  if (!dir.exists(chr_dir_sanitized)) {
-    dir.create(chr_dir_sanitized, recursive = TRUE)
+  if (!dir.exists(directory)) {
+    dir.create(directory, recursive = TRUE)
   }
+  chr_dir_sanitized <- download_sanitize_path(directory)
   # ----------------------------------------------------------------------------
   # Set up separate archive and data directories when requested.
   if (zip) {
     # --------------------------------------------------------------------------
     # Create the archive directory.
-    directory_zip <- download_sanitize_path(
-      paste0(
-        chr_dir_sanitized,
-        "zip_files"
-      )
-    )
+    directory_zip <- file.path(chr_dir_sanitized, "zip_files")
     if (!dir.exists(directory_zip)) {
       dir.create(directory_zip, recursive = TRUE)
     }
+    directory_zip <- download_sanitize_path(directory_zip)
     # --------------------------------------------------------------------------
     # Create the extracted data directory.
-    directory_data <- download_sanitize_path(
-      paste0(
-        chr_dir_sanitized,
-        "data_files"
-      )
-    )
+    directory_data <- file.path(chr_dir_sanitized, "data_files")
     if (!dir.exists(directory_data)) {
       dir.create(directory_data, recursive = TRUE)
     }
+    directory_data <- download_sanitize_path(directory_data)
     # --------------------------------------------------------------------------
     # Return the archive and data paths, in that order.
     return(c(directory_zip, directory_data))

@@ -125,7 +125,7 @@ extract_urls <- function(
 }
 
 ################################################################################
-#' Legacy download_run function for backwards compatibility
+#' Legacy download_run_legacy function for backwards compatibility
 #' @description
 #' **DEPRECATED**: This function is maintained for backwards compatibility.
 #' New code should use `download_run_method()` directly.
@@ -142,21 +142,21 @@ extract_urls <- function(
 #' \code{remove = TRUE}.
 #' @keywords internal
 #' @export
-download_run <- function(
+download_run_legacy <- function(
   download = FALSE,
   commands_txt = NULL,
   remove = FALSE
 ) {
   # ----------------------------------------------------------------------------
   # Warn about the legacy command runner once per session.
-  if (!isTRUE(getOption("amadeus.download_run.warned"))) {
+  if (!isTRUE(getOption("amadeus.download_run_legacy.warned"))) {
     warning(
       "download_run() is deprecated. Use download_run_method() instead.\n",
       "  Old: download_modis(..., download = TRUE)\n",
       "  New: download_modis(...) uses httr2 by default\n",
       call. = FALSE
     )
-    options(amadeus.download_run.warned = TRUE)
+    options(amadeus.download_run_legacy.warned = TRUE)
   }
   # ----------------------------------------------------------------------------
   # Prepare the command file and runner for the current operating system.
