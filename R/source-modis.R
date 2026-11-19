@@ -377,7 +377,7 @@ discover_modis <- function(
     }
     links[[1L]]$href
   }
-  chr_urls <- vapply(list_granules, first_data_url, character(1))
+  chr_urls <- unique(vapply(list_granules, first_data_url, character(1)))
   chr_urls <- chr_urls[!is.na(chr_urls)]
   if (length(chr_urls) == 0L) {
     stop("No granules found for the specified query parameters.\n")
@@ -404,6 +404,14 @@ discover_modis <- function(
     stringsAsFactors = FALSE
   )
   df_download$destfile <- with(df_download, paste0(vdir, file))
+  # ----------------------------------------------------------------------------
+  # Deduplicate identical rows.
+  if (anyDuplicated(df_download$destfile) > 0L) {
+    stop(
+      "Multiple MODIS URLs map to the same destination file.",
+      call. = FALSE
+    )
+  }
   # ----------------------------------------------------------------------------
   # Count files only: several tiles may share a date, and a filename date can
   # label a multi-day composite. File counts do not demonstrate completeness.

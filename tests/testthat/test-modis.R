@@ -3741,6 +3741,42 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
 
 
 ################################################################################
+##### MODIS discovery rejects conflicting destination filenames
+
+testthat::test_that(
+  "discover_modis(product=MOD09GA): rejects destination collisions",
+  {
+    filename <- "MOD09GA.A2020001.h10v05.061.2020001000000.hdf"
+    urls <- paste0(
+      c("https://example.org/primary/", "https://example.org/mirror/"),
+      filename
+    )
+    granules <- lapply(urls, function(url) {
+      list(links = list(list(
+        rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+        href = url
+      )))
+    })
+    testthat::local_mocked_bindings(
+      query_modis_granules = function(...) granules,
+      .package = "amadeus"
+    )
+
+    testthat::expect_error(
+      suppressMessages(amadeus:::discover_modis(
+        product = "MOD09GA",
+        version = "061",
+        date = c("2020-01-01", "2020-01-01"),
+        extent = c(-80, 30, -70, 40),
+        directory_to_save = paste0(withr::local_tempdir(), "/")
+      )),
+      "Multiple MODIS URLs map to the same destination file.",
+      fixed = TRUE
+    )
+  }
+)
+
+################################################################################
 ##### CMR pagination uses real response parsing without contacting NASA
 
 testthat::test_that("query_modis_granules(): combines pages using a cursor", {
