@@ -23,7 +23,7 @@ testthat::test_that("download_hms; sequential and mirai", {
   chr_tempdir2 <- file.path(tempdir(), "hms2")
   testthat::expect_no_error(
     time_hms2 <- system.time({
-      mirai::daemons(2)
+      mirai::daemons(5)
       list_hms2 <- amadeus::download_hms(
         date = chr_dates,
         directory_to_save = chr_tempdir2,
@@ -68,7 +68,7 @@ testthat::test_that("download_hms; sequential and mirai", {
 testthat::test_that("download_narr; sequential and mirai", {
   # ----------------------------------------------------------------------------
   # Common arguments
-  int_years <- 2022:2024
+  int_years <- 2020:2024
   # ----------------------------------------------------------------------------
   # Sequential download.
   chr_tempdir1 <- file.path(tempdir(), "narr1")
@@ -87,7 +87,7 @@ testthat::test_that("download_narr; sequential and mirai", {
   chr_tempdir2 <- file.path(tempdir(), "narr2")
   testthat::expect_no_error(
     time_narr2 <- system.time({
-      mirai::daemons(3)
+      mirai::daemons(5)
       list_narr2 <- amadeus::download_narr(
         variable = "air.sfc",
         year = int_years,
@@ -133,7 +133,7 @@ testthat::test_that("download_narr; sequential and mirai", {
 testthat::test_that("download_merra2; sequential and mirai", {
   # ----------------------------------------------------------------------------
   # Common arguments
-  chr_dates <- c("2022-06-01", "2022-06-04")
+  chr_dates <- c("2022-06-01", "2022-06-10")
   # ----------------------------------------------------------------------------
   # Sequential download.
   chr_tempdir1 <- file.path(tempdir(), "merra21")
@@ -152,7 +152,7 @@ testthat::test_that("download_merra2; sequential and mirai", {
   chr_tempdir2 <- file.path(tempdir(), "merra22")
   testthat::expect_no_error(
     time_merra22 <- system.time({
-      mirai::daemons(2)
+      mirai::daemons(5)
       list_merra22 <- amadeus::download_merra2(
         collection = "tavg1_2d_chm_Nx",
         date = chr_dates,
