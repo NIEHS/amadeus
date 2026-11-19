@@ -51,8 +51,10 @@ extraction and creation of the per-archive directories.}
 loop finishes. Default is \code{FALSE}. May be \code{TRUE} only when
 \code{unzip = TRUE}. No removal occurs when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show file download progress. Default is
-\code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{hash}{logical(1). Return a combined MD5 hash of the files under
 \verb{data_files/} instead of the download summary. Default is \code{FALSE}.
@@ -61,14 +63,16 @@ Ignored when \code{download = FALSE}.}
 \item{max_tries}{integer(1). Maximum attempts per file download request,
 including the initial attempt. Default is 20.}
 
-\item{rate_limit}{numeric(1). Non-negative throttling interval in seconds,
-passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 }
 \value{
 With \code{download = FALSE}, an invisible preview list containing \code{urls},
 \code{destfiles}, and \code{n_files}. Otherwise, after downloading and optional
 extraction, \code{hash = FALSE} returns the download summary from
-\code{\link[=download_run_method]{download_run_method()}} invisibly. With \code{hash = TRUE}, returns a visible
+\code{\link[=download_run]{download_run()}} invisibly. With \code{hash = TRUE}, returns a visible
 character scalar containing the combined MD5 hash of \verb{data_files/}.
 
 The download summary always contains \code{success}, \code{failed}, \code{skipped},
@@ -95,7 +99,7 @@ across inventories. Paths stored inside each archive are preserved.
 
 Preview destinations refer to the archives in \verb{zip_files/}, including
 files that already exist locally. For actual downloads,
-\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives; they are still
+\code{\link[=download_run]{download_run()}} skips existing non-empty archives; they are still
 passed to extraction when \code{unzip = TRUE}.
 Preview mode makes no network requests. Individual download failures are
 recorded by the shared runner during file transfers.
@@ -111,6 +115,25 @@ currently accepts only 2017 and 2020.
 \note{
 NEI data does not require authentication.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_nei(

@@ -34,9 +34,11 @@ highest density value.
 }
 \examples{
 hms <- process_hms(
+\dontrun{
   date = c("2018-12-30", "2019-01-01"),
   path = "../tests/testdata/hms/"
 )
+}
 }
 \author{
 Mitchell Manware

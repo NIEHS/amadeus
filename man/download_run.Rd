@@ -70,16 +70,6 @@ URL/destination pairs across those workers and combine their results.
 Otherwise, download sequentially in the calling process.
 }
 \details{
-Daemon creation and shutdown are managed by the caller using
-\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
-with \code{mirai::daemons(n, .compute = "default")} before calling this function.
-Daemon detection, counting, and task dispatch always use the \code{"default"}
-compute profile, regardless of the active profile. Daemon counting and rate
-scaling assume that the pool still contains the \code{n} workers configured by
-that call, with no workers added separately or pool resizing during downloads.
-Each worker receives one URL/destination pair per task; the remaining request
-arguments are constant across tasks.
-
 Workers must have access to compatible \code{amadeus} code and its dependencies,
 including internal helpers such as \code{\link[=download_report]{download_report()}}. Loading development
 code with \code{devtools::load_all()} in the calling process does not load it on
@@ -96,13 +86,33 @@ average request rate; token buckets can still allow bursts.
 
 Handled request failures are included in the returned summary. Concurrent
 results are collected without early stopping. After collection, mirai error
-values representing unexpected worker errors, worker interrupts, or connection
-failures are checked before aggregation. If any are present, the function
-stops with \code{"Download worker errors:"}, listing each affected destination path
-and its error message or code. No combined summary is printed or returned in
-this case. Otherwise, the results are combined and reported by
-\code{\link[=download_report]{download_report()}} in the calling process, then returned invisibly.
+values representing unexpected worker errors, worker interrupts, or
+connection failures are checked before aggregation. If any are present, the
+function stops with \code{"Download worker errors:"}, listing each affected
+destination path and its error message or code. No combined summary is
+printed or returned in this case. Otherwise, the results are combined and
+reported by \code{\link[=download_report]{download_report()}} in the calling process, then returned
+invisibly.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_run(

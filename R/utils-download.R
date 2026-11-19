@@ -221,7 +221,7 @@ check_urls <- function(
 #' * `destfiles`: the supplied destination file paths.
 #' * `n_files`: the number of supplied URLs, calculated as `length(urls)`.
 #' @author Mitchell Manware
-#' @seealso [download_run_method()]
+#' @seealso [download_run()], [download_run_method()]
 #' @keywords internal
 #' @examples
 #' download_preview(
@@ -276,17 +276,23 @@ download_preview <- function(urls, destfiles) {
 #'   CURLOPT_HTTP_VERSION: 1L = HTTP/1.0, 2L = HTTP/1.1, 3L = HTTP/2.
 #'   `NULL` (default) lets curl negotiate automatically. Passed unchanged to
 #'   [download_run_method()] in both execution modes.
-#' @details
+#' @section Concurrent downloads:
+#' File downloads use configured daemons in the `"default"` compute profile,
+#' or run sequentially when that profile has no configured daemons.
 #' Daemon creation and shutdown are managed by the caller using
 #' [mirai::daemons()]. For concurrent downloads, configure a fixed local pool
 #' with `mirai::daemons(n, .compute = "default")` before calling this function.
 #' Daemon detection, counting, and task dispatch always use the `"default"`
 #' compute profile, regardless of the active profile. Daemon counting and rate
 #' scaling assume that the pool still contains the `n` workers configured by
-#' that call, with no workers added separately or pool resizing during downloads.
-#' Each worker receives one URL/destination pair per task; the remaining request
-#' arguments are constant across tasks.
+#' that call, with no workers added separately or pool resizing during
+#' downloads. Each worker receives one URL/destination pair per task; the
+#' remaining request arguments are constant across tasks.
 #'
+#' Source-specific validation, URL discovery, archive extraction, and directory
+#' hashing run in the calling process. Only file downloads are dispatched to
+#' workers.
+#' @details
 #' Workers must have access to compatible `amadeus` code and its dependencies,
 #' including internal helpers such as [download_report()]. Loading development
 #' code with `devtools::load_all()` in the calling process does not load it on
@@ -303,12 +309,13 @@ download_preview <- function(urls, destfiles) {
 #'
 #' Handled request failures are included in the returned summary. Concurrent
 #' results are collected without early stopping. After collection, mirai error
-#' values representing unexpected worker errors, worker interrupts, or connection
-#' failures are checked before aggregation. If any are present, the function
-#' stops with `"Download worker errors:"`, listing each affected destination path
-#' and its error message or code. No combined summary is printed or returned in
-#' this case. Otherwise, the results are combined and reported by
-#' [download_report()] in the calling process, then returned invisibly.
+#' values representing unexpected worker errors, worker interrupts, or
+#' connection failures are checked before aggregation. If any are present, the
+#' function stops with `"Download worker errors:"`, listing each affected
+#' destination path and its error message or code. No combined summary is
+#' printed or returned in this case. Otherwise, the results are combined and
+#' reported by [download_report()] in the calling process, then returned
+#' invisibly.
 #' @return
 #' An invisible list containing:
 #' * `success`: number of files downloaded and found to be non-empty.
@@ -509,7 +516,7 @@ download_run_mirai <- function(
   list_summary <- list(
     success = sum(vapply(mirai_results, `[[`, numeric(1), "success")),
     failed = sum(vapply(mirai_results, `[[`, numeric(1), "failed")),
-    skipped = sum(vapply(mirai_results, `[[`, numeric(1), "skipped")),
+    skipped = sum(vapply(mirai_results, `[[`, integer(1), "skipped")),
     failed_urls = unlist(
       lapply(mirai_results, `[[`, "failed_urls"),
       use.names = FALSE
@@ -1115,7 +1122,8 @@ download_hash <- function(
 #' @description
 #' Return the download summary unchanged, or calculate a combined MD5 hash of
 #' the files in the output directory.
-#' @param results list. Download summary returned by [download_run_method()].
+#' @param results list. Download summary returned by [download_run()] or
+#'   [download_run_method()].
 #'   Contains `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`.
 #'   The two failure vectors are `character(0)` when no downloads failed,
 #'   including when every file was skipped. Used only when `hash = FALSE`.
@@ -1127,7 +1135,7 @@ download_hash <- function(
 #'   when `hash = TRUE`; the caller selects the directory to hash.
 #' @return `results`, returned invisibly when `hash = FALSE`; otherwise a
 #'   character scalar containing the combined MD5 hash from [download_hash()].
-#' @seealso [download_run_method()], [download_hash()]
+#' @seealso [download_run()], [download_run_method()], [download_hash()]
 #' @keywords internal
 #' @noRd
 download_return <- function(

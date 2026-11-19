@@ -25,14 +25,14 @@
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
-#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @inheritParams download_run rate_limit
 #' @author Mitchell Manware, Insang Song
 #' @return With `download = FALSE`, an invisible preview list containing
 #' `urls`, `destfiles`, and `n_files`. With `download = TRUE` and
-#' `hash = FALSE`, an invisible summary from [download_run_method()] containing
+#' `hash = FALSE`, an invisible summary from [download_run()] containing
 #' `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`. The two
 #' failure vectors are `character(0)` when no downloads failed, including when
 #' every file was skipped. With `download = TRUE` and `hash = TRUE`, a visible
@@ -58,6 +58,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_geos <- function(
   collection = c(
@@ -183,7 +184,7 @@ download_geos <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,

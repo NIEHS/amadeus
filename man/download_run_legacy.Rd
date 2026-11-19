@@ -22,7 +22,7 @@ command prompt (Windows) and removes \code{commands_txt} file if
 }
 \description{
 \strong{DEPRECATED}: This function is maintained for backwards compatibility.
-New code should use \code{download_run_method()} directly.
+New code should use \code{\link[=download_run]{download_run()}} for sequential or concurrent downloads.
 
 Execute or skip the commands listed in the ...wget/curl_commands.txt file
 produced by one of the data download functions.

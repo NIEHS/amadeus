@@ -1320,7 +1320,7 @@ testthat::test_that("download_edgar(temp_res=monthly, format=txt): errors", {
     download_run_method = function(...) stop("Unexpected invalid download."),
     .package = "amadeus"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A valid emissions selection isolates the unsupported monthly text format.
   testthat::expect_error(
     amadeus::download_edgar(

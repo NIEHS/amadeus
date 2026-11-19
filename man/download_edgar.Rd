@@ -109,21 +109,25 @@ under \verb{data_files/}, including previously extracted files.
 With \code{unzip = FALSE}, this still hashes \verb{data_files/}, not the archives.
 Default is \code{FALSE}; ignored when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show per-file download progress. Default
-is \code{TRUE}; summary messages may still be printed when \code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
 the initial attempt. Must be at least 1. Default is 20.}
 
-\item{rate_limit}{numeric(1). Non-negative request-throttling interval in
-seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 }
 \value{
 \itemize{
 \item With \code{download = FALSE}, an invisible list containing \code{urls},
 \code{destfiles}, and \code{n_files}, the number of planned archive downloads.
 \item With \code{download = TRUE} and \code{hash = FALSE}, the invisible summary from
-\code{\link[=download_run_method]{download_run_method()}} with \code{success}, \code{failed}, and \code{skipped} counts.
+\code{\link[=download_run]{download_run()}} with \code{success}, \code{failed}, and \code{skipped} counts.
 It always contains \code{failed_urls} and \code{failed_files} character vectors,
 both \code{character(0)} when no downloads failed, including when every file
 was skipped. These counts describe archives, not extracted files.
@@ -171,12 +175,31 @@ including existing files. A preview creates the output directories but
 makes no network requests and does not verify remote availability.
 No shell-command file is created.
 
-\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty destination files and
+\code{\link[=download_run]{download_run()}} skips existing non-empty destination files and
 records individual download failures in its summary. File downloads use
 the shared default timeout.
 Extraction and cleanup occur before returning, and extraction errors can
 prevent a normal return. Summary counts describe downloads, not extraction.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_edgar(
@@ -200,7 +223,7 @@ download_edgar(
 }
 }
 \seealso{
-\code{\link[=download_data]{download_data()}}, \code{\link[=download_run_method]{download_run_method()}}, \code{\link[=process_edgar]{process_edgar()}}
+\code{\link[=download_data]{download_data()}}, \code{\link[=download_run]{download_run()}}, \code{\link[=process_edgar]{process_edgar()}}
 }
 \author{
 Mariana Alifa Kassien

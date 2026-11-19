@@ -37,15 +37,13 @@
 #'   `zip_files/` directory, including remaining contents, after the extraction
 #'   loop finishes. Default is `FALSE`. May be `TRUE` only when
 #'   `unzip = TRUE`. No removal occurs when `download = FALSE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `data_files/` instead of the download summary. Default is `FALSE`.
 #'   Ignored when `download = FALSE`.
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
-#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
-#'   passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' A year-specific lookup selects the provider's archive path and filename.
 #' NEI releases use different version directories and naming conventions.
@@ -60,7 +58,7 @@
 #'
 #' Preview destinations refer to the archives in `zip_files/`, including
 #' files that already exist locally. For actual downloads,
-#' [download_run_method()] skips existing non-empty archives; they are still
+#' [download_run()] skips existing non-empty archives; they are still
 #' passed to extraction when `unzip = TRUE`.
 #' Preview mode makes no network requests. Individual download failures are
 #' recorded by the shared runner during file transfers.
@@ -77,7 +75,7 @@
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, after downloading and optional
 #' extraction, `hash = FALSE` returns the download summary from
-#' [download_run_method()] invisibly. With `hash = TRUE`, returns a visible
+#' [download_run()] invisibly. With `hash = TRUE`, returns a visible
 #' character scalar containing the combined MD5 hash of `data_files/`.
 #'
 #' The download summary always contains `success`, `failed`, `skipped`,
@@ -96,6 +94,7 @@
 #'   download = FALSE # Preview selected inventory URLs and archive paths.
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_nei <- function(
   year = c(2017L, 2020L),
@@ -196,7 +195,7 @@ download_nei <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

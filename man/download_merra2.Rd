@@ -67,9 +67,10 @@ by \code{\link[=download_hash]{download_hash()}} for all files under \code{direc
 metadata and files from earlier downloads. Default is \code{FALSE}. Ignored
 when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show per-file progress messages and download
-progress bars. Default is \code{TRUE}; summary and status messages may still be
-printed when \code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per listing or file request,
 including the initial attempt. Must be at least 1. Default is 20.}
@@ -108,13 +109,13 @@ constructed directly from the requested dates.
 
 Discovery stops before file downloads if a monthly listing cannot be read,
 a requested data date is missing, or different URLs in a listing would
-use the same local filename. Once discovery succeeds, \code{\link[=download_run_method]{download_run_method()}}
+use the same local filename. Once discovery succeeds, \code{\link[=download_run]{download_run()}}
 skips existing non-empty files and records individual download failures,
 warning after the remaining files have been attempted.
 
 Listing requests to the same host are spaced by at least \code{rate_limit}
 seconds; 0 disables listing throttling. File downloads use the host-based
-token bucket described in \code{\link[=download_run_method]{download_run_method()}}. Discovery and file
+token bucket described in \code{\link[=download_run]{download_run()}}. Discovery and file
 downloads use their default per-attempt timeout of 3600 seconds; this
 function does not expose a \code{timeout} argument.
 }
@@ -124,6 +125,25 @@ require a valid NASA Earthdata token for authentication. Use
 \code{\link[=setup_nasa_token]{setup_nasa_token()}} for setup. The \code{"fwi"} collection is hosted on the
 public GlobalFWI portal and does not require Earthdata authentication.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 # Configure NASA_EARTHDATA_TOKEN with setup_nasa_token() before downloading.
@@ -145,7 +165,7 @@ download_merra2(
 }
 }
 \seealso{
-\code{\link[=setup_nasa_token]{setup_nasa_token()}}, \code{\link[=get_token]{get_token()}}, \code{\link[=download_run_method]{download_run_method()}},
+\code{\link[=setup_nasa_token]{setup_nasa_token()}}, \code{\link[=get_token]{get_token()}}, \code{\link[=download_run]{download_run()}},
 \code{\link[=download_hash]{download_hash()}}, \code{\link[=process_merra2]{process_merra2()}}, \code{\link[=get_merra2_info]{get_merra2_info()}}
 }
 \author{

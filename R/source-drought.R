@@ -30,13 +30,10 @@
 #'   instead of the download summary. Uses `directory_to_save` for SPEI/EDDI
 #'   and `data_files/` for USDM, including existing files. Default is `FALSE`;
 #'   ignored when `download = FALSE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status and summary messages may still be printed when
-#'   `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per file request, including
 #'   the initial attempt. Must be at least 1. Default is `3L`.
-#' @param rate_limit numeric(1). Finite, non-negative request-throttling
-#'   interval in seconds, passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @param unzip logical(1). Extract USDM archives into `data_files/`.
 #'   Default is `TRUE`. Ignored for SPEI and EDDI.
 #' @param remove_zip logical(1). Remove USDM archives and their `zip_files/`
@@ -62,7 +59,7 @@
 #'
 #' Previews create the output directories but make no network requests.
 #' They include existing destination files. Actual downloads use
-#' [download_run_method()], which skips existing non-empty files and reports
+#' [download_run()], which skips existing non-empty files and reports
 #' individual failures. See the source functions for endpoint limitations
 #' and extraction behavior.
 #'
@@ -103,6 +100,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_drought <- function(
   source = c("spei", "eddi", "usdm"),

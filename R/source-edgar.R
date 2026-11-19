@@ -74,12 +74,10 @@
 #'   under `data_files/`, including previously extracted files.
 #'   With `unzip = FALSE`, this still hashes `data_files/`, not the archives.
 #'   Default is `FALSE`; ignored when `download = FALSE`.
-#' @param show_progress logical(1). Show per-file download progress. Default
-#'   is `TRUE`; summary messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per file request, including
 #'   the initial attempt. Must be at least 1. Default is 20.
-#' @param rate_limit numeric(1). Non-negative request-throttling interval in
-#'   seconds, passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' Scalar selectors `version`, `format`, and `output` use [base::match.arg()],
 #' allowing unambiguous partial matches. This also applies to `temp_res` for
@@ -116,7 +114,7 @@
 #' makes no network requests and does not verify remote availability.
 #' No shell-command file is created.
 #'
-#' [download_run_method()] skips existing non-empty destination files and
+#' [download_run()] skips existing non-empty destination files and
 #' records individual download failures in its summary. File downloads use
 #' the shared default timeout.
 #' Extraction and cleanup occur before returning, and extraction errors can
@@ -125,14 +123,14 @@
 #' * With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files`, the number of planned archive downloads.
 #' * With `download = TRUE` and `hash = FALSE`, the invisible summary from
-#'   [download_run_method()] with `success`, `failed`, and `skipped` counts.
+#'   [download_run()] with `success`, `failed`, and `skipped` counts.
 #'   It always contains `failed_urls` and `failed_files` character vectors,
 #'   both `character(0)` when no downloads failed, including when every file
 #'   was skipped. These counts describe archives, not extracted files.
 #' * With `download = TRUE` and `hash = TRUE`, a visible character(1) combined
 #'   MD5 hash of all files under `data_files/`, including existing files.
 #' @author Mariana Alifa Kassien
-#' @seealso [download_data()], [download_run_method()], [process_edgar()]
+#' @seealso [download_data()], [download_run()], [process_edgar()]
 #' @importFrom Rdpack reprompt
 #' @examples
 #' \dontrun{
@@ -155,6 +153,7 @@
 #'   download = FALSE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_edgar <- function(
   species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
@@ -487,7 +486,7 @@ download_edgar <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,

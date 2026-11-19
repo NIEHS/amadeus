@@ -128,7 +128,7 @@ extract_urls <- function(
 #' Legacy download_run_legacy function for backwards compatibility
 #' @description
 #' **DEPRECATED**: This function is maintained for backwards compatibility.
-#' New code should use `download_run_method()` directly.
+#' New code should use [download_run()] for sequential or concurrent downloads.
 #'
 #' Execute or skip the commands listed in the ...wget/curl_commands.txt file
 #' produced by one of the data download functions.

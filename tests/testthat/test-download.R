@@ -227,115 +227,6 @@ testthat::test_that("download_run_method(existing file): returns five fields", {
   })
 })
 
-################################################################################
-##### download_run_mirai: worker errors and handled download failures
-testthat::test_that(
-  "download_run_mirai(daemons=2): reports each worker error and destination",
-  {
-    destfiles <- file.path(
-      tempdir(),
-      c("success.nc", "exception.nc", "disconnected.nc")
-    )
-    urls <- paste0("https://example.com/", basename(destfiles))
-    results <- list(
-      list(
-        success = 1,
-        failed = 0,
-        skipped = 0,
-        failed_urls = character(0),
-        failed_files = character(0)
-      ),
-      structure(
-        "Worker helper unavailable",
-        class = c("miraiError", "errorValue")
-      ),
-      structure(19L, class = "errorValue")
-    )
-    # --------------------------------------------------------------------------
-    # Replace daemon operations; retain the real error-value classification.
-    testthat::local_mocked_bindings(
-      require_daemons = function(...) invisible(TRUE),
-      mirai_map = function(...) list(),
-      collect_mirai = function(x, options = NULL) {
-        # Collect without early stopping so other tasks can finish.
-        testthat::expect_null(options)
-        results
-      },
-      .package = "mirai"
-    )
-    # --------------------------------------------------------------------------
-    # Preserve both diagnostics and their input positions instead of failing
-    # during summary extraction or reporting only the first worker error.
-    testthat::expect_error(
-      suppressMessages(amadeus:::download_run_mirai(
-        urls = urls,
-        destfiles = destfiles,
-        timeout = 60,
-        http_version = NULL,
-        daemons = 2L
-      )),
-      regexp = paste(
-        "Download worker errors:",
-        paste0("  ", destfiles[2], ": Worker helper unavailable"),
-        paste0("  ", destfiles[3], ": 19"),
-        sep = "\n"
-      ),
-      fixed = TRUE
-    )
-  }
-)
-
-testthat::test_that(
-  "download_run_mirai(daemons=2): warns and returns a handled failure summary",
-  {
-    urls <- c("https://example.com/success.nc", "https://example.com/failed.nc")
-    destfiles <- file.path(tempdir(), c("success.nc", "failed.nc"))
-    results <- list(
-      list(
-        success = 1,
-        failed = 0,
-        skipped = 0,
-        failed_urls = character(0),
-        failed_files = character(0)
-      ),
-      list(
-        success = 0,
-        failed = 1,
-        skipped = 0,
-        failed_urls = urls[2],
-        failed_files = basename(destfiles[2])
-      )
-    )
-    testthat::local_mocked_bindings(
-      require_daemons = function(...) invisible(TRUE),
-      mirai_map = function(...) list(),
-      collect_mirai = function(x, options = NULL) results,
-      .package = "mirai"
-    )
-    # --------------------------------------------------------------------------
-    # A failure already handled by download_run_method is a valid summary,
-    # so the worker-error guard must allow aggregation and normal reporting.
-    testthat::expect_warning(
-      result <- suppressMessages(amadeus:::download_run_mirai(
-        urls = urls,
-        destfiles = destfiles,
-        timeout = 60,
-        http_version = NULL,
-        daemons = 2L
-      )),
-      regexp = "1 file(s) failed to download:\n  failed.nc",
-      fixed = TRUE
-    )
-    testthat::expect_identical(result, list(
-      success = 1,
-      failed = 1,
-      skipped = 0,
-      failed_urls = urls[2],
-      failed_files = basename(destfiles[2])
-    ))
-  }
-)
-
 testthat::test_that("get_token retrieves from environment variable", {
   withr::local_envvar(TEST_TOKEN = "env_token_value")
   # ----------------------------------------------------------------------------
@@ -1928,7 +1819,7 @@ testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
 
 testthat::test_that("download_run_method show_progress=TRUE success shows OK prefix", {
   skip_on_cran()
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     testthat::local_mocked_bindings(
       req_perform = function(req, path = NULL, ...) {
@@ -1946,7 +1837,7 @@ testthat::test_that("download_run_method show_progress=TRUE success shows OK pre
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     withCallingHandlers(
       {
@@ -1966,7 +1857,7 @@ testthat::test_that("download_run_method show_progress=TRUE success shows OK pre
         invokeRestart("muffleMessage")
       }
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$success, 2)
     testthat::expect_equal(result$failed, 0)
     testthat::expect_true(any(grepl(" OK ", msgs)))
@@ -1984,7 +1875,7 @@ testthat::test_that("download_run_method tryCatch error handler when req_perform
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     result <- suppressWarnings(
       withCallingHandlers(
@@ -2000,7 +1891,7 @@ testthat::test_that("download_run_method tryCatch error handler when req_perform
         }
       )
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$failed, 1)
     testthat::expect_equal(result$success, 0)
     testthat::expect_false(file.exists("error_test.bin"))
@@ -2016,7 +1907,7 @@ testthat::test_that("download_run_method tryCatch error handler show_progress=TR
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     result <- suppressWarnings(
       withCallingHandlers(
@@ -2032,7 +1923,7 @@ testthat::test_that("download_run_method tryCatch error handler show_progress=TR
         }
       )
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$failed, 1)
     testthat::expect_true(any(grepl(" FAIL ", msgs)))
   })

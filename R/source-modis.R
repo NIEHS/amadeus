@@ -28,8 +28,7 @@
 #'   after token lookup, directory creation, and discovery. Discovery still
 #'   queries CMR in preview mode; data files are not downloaded.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
-#' @param show_progress logical(1). Show per-file download progress. Discovery
-#'   and summary messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return the combined directory MD5 hash when `TRUE`.
 #'   Ignored when `download = FALSE`.
 #' @param max_tries integer(1). Maximum attempts per CMR or file request,
@@ -37,7 +36,7 @@
 #' @param rate_limit numeric(1). Non-negative request-throttling interval in
 #'   seconds, passed to discovery and downloads. Default is 2. Discovery uses
 #'   a capacity-one bucket; 0 disables discovery throttling. File downloads
-#'   follow the throttling policy in [download_run_method()].
+#'   follow the throttling policy in [download_run()].
 #' @details
 #' Product-specific version overrides and a CM1-to-A2 fallback are applied
 #' before filename date filtering. Files use a flat destination directory.
@@ -62,18 +61,18 @@
 #' completeness for tiled, swath, or composite products.
 #'
 #' Discovery keeps the existing 120-second per-attempt timeout; file downloads
-#' use [download_run_method()]'s default timeout.
+#' use [download_run()]'s default timeout.
 #' @return
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
-#' download summary from [download_run_method()]. With `hash = TRUE`, a visible
+#' download summary from [download_run()]. With `hash = TRUE`, a visible
 #' combined MD5 hash for all files under `directory_to_save`.
 #'
 #' The download summary always contains `success`, `failed`, `skipped`,
 #' `failed_urls`, and `failed_files`. The two failure vectors are
 #' `character(0)` when no files failed, including when every file was skipped.
 #' @author Mitchell Manware, Insang Song
-#' @seealso [download_data()], [download_merra2()], [download_run_method()]
+#' @seealso [download_data()], [download_merra2()], [download_run()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_mcd19a22021}{amadeus}
@@ -93,6 +92,7 @@
 #'   download = FALSE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_modis <- function(
   product = c(
@@ -244,7 +244,7 @@ download_modis <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download using the same retry and rate-limit inputs as discovery.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,
@@ -483,7 +483,7 @@ query_modis_granules <- function(
   chr_temporal <- paste(date, collapse = ",")
   chr_base <- "https://cmr.earthdata.nasa.gov/search/granules.json"
   int_page_size <- 2000L
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # CMR returns published URLs in JSON. Do not infer tile names, production
   # timestamps, or download-host directory layouts from dates.
   req <- httr2::request(chr_base) |>
@@ -497,7 +497,7 @@ query_modis_granules <- function(
     httr2::req_retry(max_tries = max_tries, retry_on_failure = TRUE) |>
     httr2::req_timeout(timeout) |>
     httr2::req_options(connecttimeout = min(30, timeout))
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Match MERRA-2 discovery's capacity-one throttle. A shared realm also
   # spaces the fallback and subsequent discovery calls to this CMR host.
   if (rate_limit > 0) {
@@ -508,7 +508,7 @@ query_modis_granules <- function(
       realm = paste0("amadeus:modis:", httr2::url_parse(chr_base)$hostname)
     )
   }
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Collect whole pages, then combine them once. Count raw granule records:
   # some records will later be excluded by the link or filename date filters.
   list_pages <- list()
@@ -516,7 +516,7 @@ query_modis_granules <- function(
   num_received <- 0
   num_hits <- NA_real_
   repeat {
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Every page uses the same request settings. A failure on any page stops
     # discovery so a partial set cannot reach the download or preview step.
     resp <- tryCatch(
@@ -531,7 +531,7 @@ query_modis_granules <- function(
         )
       }
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Read the total before filtering. If the catalog's reported total changes
     # between pages, ask for a fresh query instead of claiming completeness.
     chr_hits <- httr2::resp_header(resp, "CMR-Hits")
@@ -546,7 +546,7 @@ query_modis_granules <- function(
       }
       num_hits <- num_page_hits
     }
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Each page is a list of granule records, each with its own nested links.
     list_page <- httr2::resp_body_json(resp)$feed$entry
     int_count <- length(list_page)
@@ -554,7 +554,7 @@ query_modis_granules <- function(
       list_pages[[length(list_pages) + 1L]] <- list_page
     }
     num_received <- num_received + int_count
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # A short page ends the search. A known total also avoids an unnecessary
     # empty-page request when the final page contains exactly 2000 records.
     # The count check below rejects a short page that arrived prematurely.
@@ -564,7 +564,7 @@ query_modis_granules <- function(
     ) {
       break
     }
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # "Search after" identifies where the next batch starts. Keep this opaque
     # value exactly as supplied by CMR; do not parse or reconstruct its JSON.
     chr_cursor <- httr2::resp_header(resp, "CMR-Search-After")
@@ -574,7 +574,7 @@ query_modis_granules <- function(
         call. = FALSE
       )
     }
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Detect a repeated continuation value rather than requesting the same
     # batch indefinitely. Only this header changes for the next request.
     if (chr_cursor %in% chr_cursors) {
@@ -586,7 +586,7 @@ query_modis_granules <- function(
     chr_cursors <- c(chr_cursors, chr_cursor)
     req <- httr2::req_headers(req, `CMR-Search-After` = chr_cursor)
   }
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # The retrieved raw record count must match the advertised total, when
   # available. Do not compare CMR-Hits with the filtered number of file URLs.
   if (!is.na(num_hits) && num_received != num_hits) {
@@ -604,7 +604,7 @@ query_modis_granules <- function(
     num_received,
     product
   ))
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Concatenate only the page lists; preserve the nested metadata and links
   # within each granule. An empty query returns no entries for fallback logic.
   do.call(c, list_pages)
