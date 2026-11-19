@@ -498,34 +498,20 @@ download_run_method <- function(
     )
   }
   # ----------------------------------------------------------------------------
-  # Report the download totals.
-  message(sprintf(
-    "\n=== Download Summary ===\n%d succeeded, %d failed, %d skipped\n",
-    num_success,
-    num_failed,
-    sum(!idx_download)
-  ))
-  # ----------------------------------------------------------------------------
-  # Warn with the names of files that failed to download.
-  if (num_failed > 0) {
-    warning(
-      sprintf(
-        "%d file(s) failed to download:\n  %s\n",
-        num_failed,
-        paste(chr_failed_files, collapse = "\n  ")
-      ),
-      call. = FALSE
-    )
-  }
-  # ----------------------------------------------------------------------------
-  # Return the counts and failed file details invisibly.
-  invisible(list(
+  # Summarize download and report findings.
+  list_summary <- list(
     success = num_success,
     failed = num_failed,
     skipped = sum(!idx_download),
     failed_urls = chr_failed_urls,
     failed_files = chr_failed_files
-  ))
+  )
+  # ----------------------------------------------------------------------------
+  # Report the download totals.
+  amadeus:::download_report(list_summary)
+  # ----------------------------------------------------------------------------
+  # Return the counts and failed file details invisibly.
+  invisible(list_summary)
 }
 
 ################################################################################
