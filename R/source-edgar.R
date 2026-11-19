@@ -102,12 +102,19 @@
 #' raster files only, so this workbook cannot be passed through the
 #' `process_edgar()` and `calculate_edgar()` workflow.
 #'
-#' Local archive names retain the `edgar_<temp_res>_` prefix, or `edgar_voc_`
-#' when VOC speciation is requested with `temp_res = NULL`. Preview results
-#' include all constructed URLs and destination paths, including existing
-#' files. A preview creates the output directories but makes no network
-#' requests and does not verify remote availability. No shell-command file
-#' is created.
+#' Local archive names use `edgar_<label>_<species>_<provider filename>` for
+#' air pollutants and `edgar_<label>_voc<number>_<provider filename>` for VOC
+#' speciation. The label is `temp_res`, or `"voc"` for VOC speciation when
+#' `temp_res = NULL`. Including the species or VOC group keeps destinations
+#' distinct when provider filenames are shared across groups. Provider URLs
+#' and filenames inside the archives are unchanged. Archives saved under the
+#' previous naming scheme are not recognized as existing downloads and must
+#' be renamed to the corresponding new names to be reused.
+#'
+#' Preview results include all constructed URLs and destination paths,
+#' including existing files. A preview creates the output directories but
+#' makes no network requests and does not verify remote availability.
+#' No shell-command file is created.
 #'
 #' [download_run_method()] skips existing non-empty destination files and
 #' records individual download failures in its summary. File downloads use
@@ -203,6 +210,8 @@ download_edgar <- function(
     checkmate::assert_character(species, min.len = 1L, any.missing = FALSE)
     chr_species <- toupper(species)
     chr_species[chr_species == "NOX"] <- "NOx"
+    chr_species[chr_species == "PM25"] <- "PM2.5"
+    chr_species <- unique(chr_species)
     checkmate::assert_subset(
       chr_species,
       c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "PM25", "SO2")
@@ -216,7 +225,7 @@ download_edgar <- function(
       min.len = 1L,
       any.missing = FALSE
     )
-    int_voc <- as.integer(int_voc)
+    int_voc <- unique(as.integer(int_voc))
   }
   # ----------------------------------------------------------------------------
   # Select and check only the sectors used by this request.
@@ -272,6 +281,7 @@ download_edgar <- function(
     }
     checkmate::assert_subset(chr_sectors, chr_sector_choices)
   }
+  chr_sectors <- unique(chr_sectors)
   # ----------------------------------------------------------------------------
   # Reject unsupported output/format combinations.
   if (chr_output == "flx" && chr_format == "txt") {
@@ -453,10 +463,17 @@ download_edgar <- function(
   # ----------------------------------------------------------------------------
   # Generate download URLs and local archive filenames from the same rows.
   df_download$url <- paste0(df_download$base, df_download$file)
+  chr_identifier <- if (chr_version == "8.1") {
+    df_download$species
+  } else {
+    paste0("voc", df_download$voc)
+  }
   df_download$destfile <- paste0(
     chr_dir_to_download,
     "edgar_",
     chr_label,
+    "_",
+    chr_identifier,
     "_",
     df_download$file
   )

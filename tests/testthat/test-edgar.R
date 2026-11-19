@@ -294,6 +294,116 @@ testthat::test_that("download_edgar (timeseries)", {
 })
 
 ################################################################################
+##### download_edgar archive filename collisions (preview only)
+
+testthat::test_that(
+  paste0(
+    "download_edgar(species=c('BC', 'CO'), temp_res='yearly', ",
+    "year_range=NULL): keeps bundled destinations distinct"
+  ),
+  {
+    result <- edgar_discover(
+      species = c("BC", "CO"),
+      temp_res = "yearly",
+      year_range = NULL,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE
+    )
+
+    testthat::expect_identical(result$n_files, 2L)
+    testthat::expect_identical(anyDuplicated(result$destfiles), 0L)
+    testthat::expect_identical(
+      basename(result$destfiles),
+      c("edgar_yearly_BC_TOTALS_emi_nc.zip", "edgar_yearly_CO_TOTALS_emi_nc.zip")
+    )
+    testthat::expect_identical(
+      result$urls,
+      paste0(
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/",
+        "v81_FT2022_AP_new/",
+        c("BC/TOTALS/TOTALS_emi_nc.zip", "CO/TOTALS/TOTALS_emi_nc.zip")
+      )
+    )
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "download_edgar(species=c('BC', 'CO'), temp_res='monthly', ",
+    "sector_monthly='BUILDINGS'): keeps sector destinations distinct"
+  ),
+  {
+    result <- edgar_discover(
+      species = c("BC", "CO"),
+      temp_res = "monthly",
+      sector_monthly = "BUILDINGS",
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE
+    )
+
+    testthat::expect_identical(result$n_files, 2L)
+    testthat::expect_identical(anyDuplicated(result$destfiles), 0L)
+    testthat::expect_identical(
+      basename(result$destfiles),
+      c(
+        "edgar_monthly_BC_bkl_BUILDINGS_emi_nc.zip",
+        "edgar_monthly_CO_bkl_BUILDINGS_emi_nc.zip"
+      )
+    )
+    testthat::expect_identical(
+      result$urls,
+      paste0(
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/",
+        "v81_FT2022_AP_new/monthly/",
+        c(
+          "BC/bkl_BUILDINGS/bkl_BUILDINGS_emi_nc.zip",
+          "CO/bkl_BUILDINGS/bkl_BUILDINGS_emi_nc.zip"
+        )
+      )
+    )
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "download_edgar(version='8.1_voc', voc=1:2, ",
+    "sector_voc='AGRICULTURE', year_range=NULL): ",
+    "keeps bundled destinations distinct"
+  ),
+  {
+    result <- edgar_discover(
+      version = "8.1_voc",
+      voc = 1:2,
+      sector_voc = "AGRICULTURE",
+      year_range = NULL,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE
+    )
+
+    testthat::expect_identical(result$n_files, 2L)
+    testthat::expect_identical(anyDuplicated(result$destfiles), 0L)
+    testthat::expect_identical(
+      basename(result$destfiles),
+      c(
+        "edgar_voc_voc1_bkl_AGRICULTURE_emi_nc.zip",
+        "edgar_voc_voc2_bkl_AGRICULTURE_emi_nc.zip"
+      )
+    )
+    testthat::expect_identical(
+      result$urls,
+      paste0(
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/",
+        "v81_FT2022_VOC_spec/",
+        c(
+          "voc1/bkl_AGRICULTURE/bkl_AGRICULTURE_emi_nc.zip",
+          "voc2/bkl_AGRICULTURE/bkl_AGRICULTURE_emi_nc.zip"
+        )
+      )
+    )
+  }
+)
+
+################################################################################
 ##### download_edgar deprecation warnings
 
 testthat::test_that("download_edgar deprecation warnings", {

@@ -157,12 +157,19 @@ readme, even when \code{format = "nc"}. \code{\link[=process_edgar]{process_edga
 raster files only, so this workbook cannot be passed through the
 \code{process_edgar()} and \code{calculate_edgar()} workflow.
 
-Local archive names retain the \verb{edgar_<temp_res>_} prefix, or \code{edgar_voc_}
-when VOC speciation is requested with \code{temp_res = NULL}. Preview results
-include all constructed URLs and destination paths, including existing
-files. A preview creates the output directories but makes no network
-requests and does not verify remote availability. No shell-command file
-is created.
+Local archive names use \verb{edgar_<label>_<species>_<provider filename>} for
+air pollutants and \verb{edgar_<label>_voc<number>_<provider filename>} for VOC
+speciation. The label is \code{temp_res}, or \code{"voc"} for VOC speciation when
+\code{temp_res = NULL}. Including the species or VOC group keeps destinations
+distinct when provider filenames are shared across groups. Provider URLs
+and filenames inside the archives are unchanged. Archives saved under the
+previous naming scheme are not recognized as existing downloads and must
+be renamed to the corresponding new names to be reused.
+
+Preview results include all constructed URLs and destination paths,
+including existing files. A preview creates the output directories but
+makes no network requests and does not verify remote availability.
+No shell-command file is created.
 
 \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty destination files and
 records individual download failures in its summary. File downloads use
