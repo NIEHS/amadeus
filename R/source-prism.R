@@ -51,12 +51,10 @@
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `data_files/` instead of the download summary. Default is `FALSE`.
 #'   Ignored when `download = FALSE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
-#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
-#'   passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' `zip_files/` and `data_files/` are sibling directories created beneath
 #' `directory_to_save`, including for previews and when `unzip = FALSE`.
@@ -66,7 +64,7 @@
 #'
 #' After downloading, the destination archive is checked by listing its
 #' contents with [utils::unzip()]. This check also applies to existing
-#' non-empty archives skipped by [download_run_method()]. An unreadable ZIP
+#' non-empty archives skipped by [download_run()]. An unreadable ZIP
 #' raises an error, with a preview of the response text when available.
 #' Listing an archive does not fully verify its members or raster contents.
 #'
@@ -85,7 +83,7 @@
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, after downloading, validation, and
 #' optional extraction, `hash = FALSE` returns the download summary from
-#' [download_run_method()] invisibly. With `hash = TRUE`, returns a visible
+#' [download_run()] invisibly. With `hash = TRUE`, returns a visible
 #' character scalar containing the combined MD5 hash of `data_files/`.
 #'
 #' The download summary always contains `success`, `failed`, `skipped`,
@@ -110,6 +108,7 @@
 #'   download = FALSE # Preview the URL and zip_files/ destination.
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 # nolint end
 download_prism <- function(
@@ -231,7 +230,7 @@ download_prism <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

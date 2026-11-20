@@ -49,9 +49,7 @@
 #'   by [download_hash()] for all files under `directory_to_save`, including
 #'   metadata and files from earlier downloads. Default is `FALSE`. Ignored
 #'   when `download = FALSE`.
-#' @param show_progress logical(1). Show per-file progress messages and download
-#'   progress bars. Default is `TRUE`; summary and status messages may still be
-#'   printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per listing or file request,
 #'   including the initial attempt. Must be at least 1. Default is 20.
 #' @param rate_limit numeric(1). Non-negative request-throttling interval in
@@ -68,13 +66,13 @@
 #'
 #' Discovery stops before file downloads if a monthly listing cannot be read,
 #' a requested data date is missing, or different URLs in a listing would
-#' use the same local filename. Once discovery succeeds, [download_run_method()]
+#' use the same local filename. Once discovery succeeds, [download_run()]
 #' skips existing non-empty files and records individual download failures,
 #' warning after the remaining files have been attempted.
 #'
 #' Listing requests to the same host are spaced by at least `rate_limit`
 #' seconds; 0 disables listing throttling. File downloads use the host-based
-#' token bucket described in [download_run_method()]. Discovery and file
+#' token bucket described in [download_run()]. Discovery and file
 #' downloads use their default per-attempt timeout of 3600 seconds; this
 #' function does not expose a `timeout` argument.
 #' @author Mitchell Manware, Insang Song, Kyle Messier
@@ -90,7 +88,7 @@
 #'
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`, regardless of `hash`.
-#' @seealso [setup_nasa_token()], [get_token()], [download_run_method()],
+#' @seealso [setup_nasa_token()], [get_token()], [download_run()],
 #'   [download_hash()], [process_merra2()], [get_merra2_info()]
 #' @importFrom Rdpack reprompt
 #' @examples
@@ -112,6 +110,7 @@
 #'   max_tries = 3
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 # nolint end
 download_merra2 <- function(
@@ -284,7 +283,7 @@ download_merra2 <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,
@@ -345,7 +344,7 @@ download_merra2 <- function(
 #' retries, or different URLs in one listing share the same filename.
 #'
 #' Directory creation and data-file downloads are handled by
-#' [download_merra2()] and [download_run_method()].
+#' [download_merra2()] and [download_run()].
 #' @return
 #' A \code{data.frame} retaining the input columns, with one row per discovered
 #' data file or associated XML metadata file. The following columns are added
@@ -357,7 +356,7 @@ download_merra2 <- function(
 #'     subdirectory.}
 #'   \item{destfile}{Local file path formed from \code{vdir} and \code{file}.}
 #' }
-#' @seealso [download_merra2()], [download_run_method()]
+#' @seealso [download_merra2()], [download_run()]
 #' @examples
 #' \dontrun{
 #' df <- data.frame(

@@ -7,7 +7,7 @@ testthat::test_that("download_data(dataset_name=drought aliases): dispatches wit
     },
     .package = "amadeus"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   for (source in c("spei", "eddi", "usdm")) {
     result <- download_data(
       dataset_name = "drought",
@@ -17,14 +17,14 @@ testthat::test_that("download_data(dataset_name=drought aliases): dispatches wit
     )
     testthat::expect_identical(result, source)
   }
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   result <- download_data(
     dataset_name = "drought",
     directory_to_save = withr::local_tempdir(),
     acknowledgement = TRUE,
     source = "usdm"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   testthat::expect_identical(result, "usdm")
   testthat::expect_identical(
     unlist(calls, use.names = FALSE),
@@ -41,7 +41,7 @@ testthat::test_that("download_data(dataset_name=cropscape aliases): dispatches t
     },
     .package = "amadeus"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   cropscape_result <- download_data(
     dataset_name = "cropscape",
     directory_to_save = withr::local_tempdir(),
@@ -56,7 +56,7 @@ testthat::test_that("download_data(dataset_name=cropscape aliases): dispatches t
     year = 2020,
     source = "USDA"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   testthat::expect_identical(cropscape_result, "2019:GMU")
   testthat::expect_identical(cdl_result, "2020:USDA")
   testthat::expect_length(calls, 2L)

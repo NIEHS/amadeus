@@ -74,12 +74,10 @@
 #'   under `data_files/`, including previously extracted files.
 #'   With `unzip = FALSE`, this still hashes `data_files/`, not the archives.
 #'   Default is `FALSE`; ignored when `download = FALSE`.
-#' @param show_progress logical(1). Show per-file download progress. Default
-#'   is `TRUE`; summary messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per file request, including
 #'   the initial attempt. Must be at least 1. Default is 20.
-#' @param rate_limit numeric(1). Non-negative request-throttling interval in
-#'   seconds, passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' Scalar selectors `version`, `format`, and `output` use [base::match.arg()],
 #' allowing unambiguous partial matches. This also applies to `temp_res` for
@@ -102,14 +100,21 @@
 #' raster files only, so this workbook cannot be passed through the
 #' `process_edgar()` and `calculate_edgar()` workflow.
 #'
-#' Local archive names retain the `edgar_<temp_res>_` prefix, or `edgar_voc_`
-#' when VOC speciation is requested with `temp_res = NULL`. Preview results
-#' include all constructed URLs and destination paths, including existing
-#' files. A preview creates the output directories but makes no network
-#' requests and does not verify remote availability. No shell-command file
-#' is created.
+#' Local archive names use `edgar_<label>_<species>_<provider filename>` for
+#' air pollutants and `edgar_<label>_voc<number>_<provider filename>` for VOC
+#' speciation. The label is `temp_res`, or `"voc"` for VOC speciation when
+#' `temp_res = NULL`. Including the species or VOC group keeps destinations
+#' distinct when provider filenames are shared across groups. Provider URLs
+#' and filenames inside the archives are unchanged. Archives saved under the
+#' previous naming scheme are not recognized as existing downloads and must
+#' be renamed to the corresponding new names to be reused.
 #'
-#' [download_run_method()] skips existing non-empty destination files and
+#' Preview results include all constructed URLs and destination paths,
+#' including existing files. A preview creates the output directories but
+#' makes no network requests and does not verify remote availability.
+#' No shell-command file is created.
+#'
+#' [download_run()] skips existing non-empty destination files and
 #' records individual download failures in its summary. File downloads use
 #' the shared default timeout.
 #' Extraction and cleanup occur before returning, and extraction errors can
@@ -118,14 +123,14 @@
 #' * With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files`, the number of planned archive downloads.
 #' * With `download = TRUE` and `hash = FALSE`, the invisible summary from
-#'   [download_run_method()] with `success`, `failed`, and `skipped` counts.
+#'   [download_run()] with `success`, `failed`, and `skipped` counts.
 #'   It always contains `failed_urls` and `failed_files` character vectors,
 #'   both `character(0)` when no downloads failed, including when every file
 #'   was skipped. These counts describe archives, not extracted files.
 #' * With `download = TRUE` and `hash = TRUE`, a visible character(1) combined
 #'   MD5 hash of all files under `data_files/`, including existing files.
 #' @author Mariana Alifa Kassien
-#' @seealso [download_data()], [download_run_method()], [process_edgar()]
+#' @seealso [download_data()], [download_run()], [process_edgar()]
 #' @importFrom Rdpack reprompt
 #' @examples
 #' \dontrun{
@@ -148,6 +153,7 @@
 #'   download = FALSE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_edgar <- function(
   species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
@@ -203,6 +209,8 @@ download_edgar <- function(
     checkmate::assert_character(species, min.len = 1L, any.missing = FALSE)
     chr_species <- toupper(species)
     chr_species[chr_species == "NOX"] <- "NOx"
+    chr_species[chr_species == "PM25"] <- "PM2.5"
+    chr_species <- unique(chr_species)
     checkmate::assert_subset(
       chr_species,
       c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "PM25", "SO2")
@@ -216,7 +224,7 @@ download_edgar <- function(
       min.len = 1L,
       any.missing = FALSE
     )
-    int_voc <- as.integer(int_voc)
+    int_voc <- unique(as.integer(int_voc))
   }
   # ----------------------------------------------------------------------------
   # Select and check only the sectors used by this request.
@@ -272,6 +280,7 @@ download_edgar <- function(
     }
     checkmate::assert_subset(chr_sectors, chr_sector_choices)
   }
+  chr_sectors <- unique(chr_sectors)
   # ----------------------------------------------------------------------------
   # Reject unsupported output/format combinations.
   if (chr_output == "flx" && chr_format == "txt") {
@@ -453,10 +462,17 @@ download_edgar <- function(
   # ----------------------------------------------------------------------------
   # Generate download URLs and local archive filenames from the same rows.
   df_download$url <- paste0(df_download$base, df_download$file)
+  chr_identifier <- if (chr_version == "8.1") {
+    df_download$species
+  } else {
+    paste0("voc", df_download$voc)
+  }
   df_download$destfile <- paste0(
     chr_dir_to_download,
     "edgar_",
     chr_label,
+    "_",
+    chr_identifier,
     "_",
     df_download$file
   )
@@ -470,7 +486,7 @@ download_edgar <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,

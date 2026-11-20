@@ -44,15 +44,18 @@ under \verb{data_files/}, including existing files, instead of the download
 summary. Default is \code{FALSE}; ignored when \code{download = FALSE}.
 With \code{unzip = FALSE}, hashing still uses \verb{data_files/}, not the archives.}
 
-\item{show_progress}{logical(1). Show file download progress. Default is
-\code{TRUE}. Other status and summary messages may still be printed when
-\code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
 the initial attempt. Must be at least 1. Default is \code{3L}.}
 
-\item{rate_limit}{numeric(1). Finite, non-negative request-throttling
-interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 
 \item{unzip}{logical(1). Extract downloaded or existing archives into
 \verb{data_files/}. Default is \code{TRUE}; \code{FALSE} skips extraction.}
@@ -67,7 +70,7 @@ No cleanup occurs during previews.}
 \value{
 With \code{download = FALSE}, an invisible list containing \code{urls},
 archive \code{destfiles}, and \code{n_files}. Otherwise, after optional extraction
-and cleanup, an invisible summary from \code{\link[=download_run_method]{download_run_method()}} when
+and cleanup, an invisible summary from \code{\link[=download_run]{download_run()}} when
 \code{hash = FALSE}, or a visible character scalar containing the combined
 MD5 hash of \verb{data_files/} when \code{hash = TRUE}.
 
@@ -88,13 +91,32 @@ Both \verb{zip_files/} and \verb{data_files/} are created before a preview retur
 including when extraction is disabled. Preview results include existing
 archive paths and require no network requests.
 
-\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives and records
+\code{\link[=download_run]{download_run()}} skips existing non-empty archives and records
 individual download failures. All planned archives are subsequently passed
 to \code{\link[=download_unzip]{download_unzip()}}, including existing archives, with the selected
 \code{unzip} flag. Paths inside archives are preserved. Extraction errors can
 prevent a normal return; download summary counts do not report extraction
 success. Pass \verb{data_files/} to \code{\link[=process_drought]{process_drought()}} for USDM processing.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_usdm(

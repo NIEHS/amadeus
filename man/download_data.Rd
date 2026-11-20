@@ -9,7 +9,7 @@ download_data(
     "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
     "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
     "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve", "drought", "spei", "eddi", "usdm"),
+    "improve", "drought", "spei", "eddi", "usdm", "hrrr"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -75,6 +75,12 @@ This wrapper selects a downloader and forwards arguments. The source function
 performs validation, directory setup, discovery, downloading, and extraction.
 Previews and directory layouts follow that function's behavior.
 
+Sources using \code{\link[=download_run]{download_run()}} download files concurrently when the caller
+has configured a fixed \code{"default"} mirai pool, and sequentially otherwise.
+AQS currently downloads sequentially. Discovery and archive extraction run
+in the calling process. See \code{\link[=download_run]{download_run()}} for daemon setup, worker
+requirements, progress reporting, and rate scaling.
+
 The \code{"drought"} alias calls \code{\link[=download_drought]{download_drought()}} with its default SPEI source
 unless \code{source} is supplied. The \code{"spei"}, \code{"eddi"}, and \code{"usdm"} aliases
 call \code{\link[=download_spei]{download_spei()}}, \code{\link[=download_eddi]{download_eddi()}}, and \code{\link[=download_usdm]{download_usdm()}} directly.
@@ -129,6 +135,7 @@ Please refer to:
 \item \code{\link{download_spei}}: \code{"spei"}
 \item \code{\link{download_eddi}}: \code{"eddi"}
 \item \code{\link{download_usdm}}: \code{"usdm"}
+\item \code{\link{download_hrrr}}: \code{"HRRR"}, \code{"hrrr"}
 }
 }
 \author{

@@ -199,7 +199,7 @@ jobs:
           ref: gh-pages
 
       - name: Patch comparison
-        if: steps.coverage.outcome == 'success'
+        if: github.event_name == 'pull_request' && steps.coverage.outcome == 'success'
         id: patch-comparison
         shell: bash
         run: |
@@ -223,14 +223,11 @@ jobs:
           cov_floor=$(echo "$cov_current - $tolerance" | bc -l)
           if (( $(echo "$cov_patch > 99.5" | bc -l) )); then
             echo "✓ Patch coverage ($cov_patch%) exceeds 99.5% threshold."
-            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
           elif (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "✓ Patch coverage ($cov_patch%) is greater than or equal to current coverage ($cov_current%)."
-            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
           elif (( $(echo "$cov_patch >= $cov_floor" | bc -l) )); then
             echo "::warning::Patch coverage ($cov_patch%) is below current coverage ($cov_current%)"
             echo "::warning::but within allowed tolerance ($tolerance%)."
-            echo "cov_update=$cov_current" >> $GITHUB_OUTPUT
           else
             echo "::error::Patch coverage ($cov_patch%) is less than"
             echo "::error::current coverage floor ($cov_floor%) and below 99.5%."
@@ -239,10 +236,15 @@ jobs:
           fi
 
       - name: Overwrite cov_current.Rout
-        if: ${{ github.event_name == 'push' && steps.coverage.outcome == 'success' }}
+        id: update-coverage
+        if: >-
+          github.event_name != 'pull_request' &&
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
+          steps.coverage.outcome == 'success' &&
+          steps.checkout-gh-pages.outcome == 'success'
         shell: bash
         run: |
-          cov_update="${{ steps.patch-comparison.outputs.cov_update }}"
+          cov_update="${{ steps.get-values.outputs.coverage }}"
           touch cov_current.Rout
           echo "$cov_update" > cov_current.Rout
           echo "Updated cov_current.Rout with: $cov_update"
@@ -271,7 +273,7 @@ jobs:
           badgen -j coverage -s "$COV%" -c "$COLOR" > badges/coverage.svg
   
       - name: Deploy Badges
-        if: ${{ github.event_name != 'pull_request' && steps.coverage.outcome == 'success' }}
+        if: steps.update-coverage.outcome == 'success'
         continue-on-error: true
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

@@ -37,7 +37,7 @@ download_preview(
 )
 }
 \seealso{
-\code{\link[=download_run_method]{download_run_method()}}
+\code{\link[=download_run]{download_run()}}, \code{\link[=download_run_method]{download_run_method()}}
 }
 \author{
 Mitchell Manware

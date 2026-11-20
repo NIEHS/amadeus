@@ -31,17 +31,17 @@
 #'   `zip_files/` directory recursively, including remaining contents, after
 #'   the extraction loop finishes. Default is `FALSE`; requires `unzip = TRUE`.
 #'   No archive cleanup is performed for KML downloads.
-#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return a combined MD5 hash of all files recursively
 #'   under `data_files/`, including existing files. Default is `FALSE`; ignored
 #'   when `download = FALSE`. With Shapefile downloads and `unzip = FALSE`,
 #'   hashing still uses `data_files/`, which may be empty or contain older data.
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @inheritParams download_run rate_limit
 #' @author Mitchell Manware, Insang Song
 #' @return With `download = FALSE`, an invisible preview list containing
 #' `urls`, `destfiles`, and `n_files`. With `download = TRUE` and
-#' `hash = FALSE`, an invisible summary from [download_run_method()] containing
+#' `hash = FALSE`, an invisible summary from [download_run()] containing
 #' `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`. The two
 #' failure vectors are `character(0)` when no downloads failed, including when
 #' every file was skipped. With `download = TRUE` and `hash = TRUE`, a visible
@@ -59,6 +59,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_hms <- function(
   data_format = "Shapefile",
@@ -147,7 +148,7 @@ download_hms <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -194,10 +195,12 @@ download_hms <- function(
 #' If multiple density polygons overlap, the function will return the
 #' highest density value.
 #' @examples
+#' \dontrun{
 #' hms <- process_hms(
 #'   date = c("2018-12-30", "2019-01-01"),
 #'   path = "../tests/testdata/hms/"
 #' )
+#' }
 # nolint end
 #' @author Mitchell Manware
 #' @return a `SpatVector` or character object

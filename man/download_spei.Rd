@@ -48,22 +48,25 @@ No command file is generated. Default is \code{FALSE}.}
 \code{directory_to_save}, including existing files, instead of the download
 summary. Default is \code{FALSE}; ignored when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show file download progress. Default is
-\code{TRUE}. Other status and summary messages may still be printed when
-\code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
 the initial attempt. Must be at least 1. Default is \code{3L}.}
 
-\item{rate_limit}{numeric(1). Finite, non-negative request-throttling
-interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 
 \item{...}{Reserved for future use; currently ignored.}
 }
 \value{
 With \code{download = FALSE}, an invisible list containing \code{urls},
 \code{destfiles}, and \code{n_files} (one). Otherwise, an invisible download summary
-from \code{\link[=download_run_method]{download_run_method()}} when \code{hash = FALSE}, or a visible character
+from \code{\link[=download_run]{download_run()}} when \code{hash = FALSE}, or a visible character
 scalar containing the output-directory MD5 hash when \code{hash = TRUE}.
 
 The download summary always contains \code{success}, \code{failed}, \code{skipped},
@@ -87,10 +90,29 @@ when retaining multiple versions.
 
 A preview creates the output directory and returns the URL and destination
 without contacting the server. Existing files remain in the preview.
-Actual downloads use \code{\link[=download_run_method]{download_run_method()}}, which skips existing
+Actual downloads use \code{\link[=download_run]{download_run()}}, which skips existing
 non-empty files and reports failures without selecting another database
 version.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_spei(

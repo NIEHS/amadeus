@@ -39,13 +39,10 @@
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `data_files/` instead of the download summary when `download = TRUE`.
 #'   Ignored when `download = FALSE`. Default is `FALSE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
-#' @param rate_limit numeric(1). Request-throttling interval in seconds,
-#'   passed to [download_run_method()]. Controls the average request rate,
-#'   rather than guaranteeing a minimum gap between requests. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' `region` and `type` each select one value. Matching is case-sensitive, and
 #' unambiguous abbreviations are accepted. If omitted, each argument uses its
@@ -56,7 +53,7 @@
 #' Preview mode returns the planned archive even if it already exists locally
 #' and does not check remote availability.
 #'
-#' During downloading, [download_run_method()] skips an existing non-empty
+#' During downloading, [download_run()] skips an existing non-empty
 #' archive in `zip_files/`. That archive is still passed to extraction when
 #' `unzip = TRUE`. Existing extracted data alone do not cause a download to
 #' be skipped. Archive member names and paths are preserved beneath
@@ -71,7 +68,7 @@
 #' and `n_files = 1` is returned regardless of `hash`.
 #'
 #' When `download = TRUE` and `hash = FALSE`, returns the download summary from
-#' [download_run_method()] invisibly, including `success`, `failed`, and
+#' [download_run()] invisibly, including `success`, `failed`, and
 #' `skipped` file counts. The summary always contains `failed_urls` and
 #' `failed_files` character vectors, both `character(0)` when no downloads
 #' failed, including when every file was skipped. Counts describe archive
@@ -95,6 +92,7 @@
 #' )
 #' }
 # nolint end
+#' @inheritSection download_run Concurrent downloads
 #' @export
 # @importFrom archive archive_extract
 download_huc <- function(
@@ -165,7 +163,7 @@ download_huc <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_url,
     destfiles = chr_filename,
     token = NULL,

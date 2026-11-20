@@ -1,6 +1,6 @@
 Package: amadeus
 Title: Accessing and Analyzing Large-Scale Environmental Data
-Version: 2.1.0
+Version: 2.1.2
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -13,24 +13,25 @@ Maintainer: Kyle Messier <kyle.messier@nih.gov>
 Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calculate_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For sum_edc() method details, see Messier, Akita, and Serre (2012) <doi:10.1021/es203152a>.
 Depends: R (>= 4.2.0)
 Imports:
+    archive,
     checkmate,
+    collapse,
+    data.table,
     dplyr,
+    exactextractr,
+    httr2,
+    methods,
+    mirai (>= 2.4.0),
+    Rdpack,
+    rlang,
     sf,
     sftime,
-    stats,
-    terra (>= 1.8-42),
-    methods,
-    data.table,
-    httr2,
-    exactextractr,
-    utils,
-    stringi,
     stars,
+    stats,
+    stringi,
+    terra (>= 1.8-42),
     tidyr,
-    rlang,
-    archive,
-    collapse,
-    Rdpack,
+    utils,
     xml2
 Suggests:
     covr,
@@ -43,7 +44,6 @@ Suggests:
     knitr,
     lwgeom,
     maps,
-    mirai,
     rmarkdown,
     spelling,
     stringr,

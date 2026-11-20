@@ -167,7 +167,7 @@ download_olm <- function(
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  download_run(
+  download_run_legacy(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -201,7 +201,8 @@ download_olm <- function(
 #' @importFrom rstac links
 list_stac_files <-
   function(
-    stac_json = paste0( # nolint: line_length_linter.
+    stac_json = paste0(
+      # nolint: line_length_linter.
       "https://s3.eu-central-1.wasabisys.com/stac/",
       "openlandmap/catalog.json"
     ),
