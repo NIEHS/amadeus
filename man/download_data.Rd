@@ -9,7 +9,7 @@ download_data(
     "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
     "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
     "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve", "drought", "spei", "eddi", "usdm"),
+    "improve", "drought", "spei", "eddi", "usdm", "hrrr"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -129,6 +129,7 @@ Please refer to:
 \item \code{\link{download_spei}}: \code{"spei"}
 \item \code{\link{download_eddi}}: \code{"eddi"}
 \item \code{\link{download_usdm}}: \code{"usdm"}
+\item \code{\link{download_hrrr}}: \code{"HRRR"}, \code{"hrrr"}
 }
 }
 \author{

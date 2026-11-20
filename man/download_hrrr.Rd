@@ -12,6 +12,8 @@ download_hrrr(
   forecast_hour = 0:18,
   directory_to_save = NULL,
   acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,

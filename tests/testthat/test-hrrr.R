@@ -2,6 +2,28 @@
 ##### unit and integration tests for NOAA HRRR functions
 
 ################################################################################
+testthat::test_that("download_hrrr(download = FALSE): warns about deprecation", {
+  testthat::local_mocked_bindings(
+    download_run = function(...) stop("Unexpected download in preview mode"),
+    .package = "amadeus"
+  )
+  directory_to_save <- withr::local_tempdir()
+  testthat::expect_warning(
+    suppressMessages(
+      download_hrrr(
+        date = "2021-05-04",
+        product = "2d surface",
+        cycle_runtime = 0L,
+        forecast_hour = 0L,
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    ),
+    regexp = "download=FALSE is deprecated"
+  )
+})
+
 testthat::test_that("download_hrrr (expected errors)", {
   # input year instead of date
   testthat::expect_error(

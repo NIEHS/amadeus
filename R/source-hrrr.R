@@ -132,6 +132,8 @@ download_hrrr <- function(
   forecast_hour = 0:18,
   directory_to_save = NULL,
   acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
@@ -142,8 +144,8 @@ download_hrrr <- function(
   amadeus:::download_check(
     dataset_name = "hrrr",
     acknowledgement = acknowledgement,
-    download = TRUE,
-    remove_command = FALSE,
+    download = download,
+    remove_command = remove_command,
     unzip = FALSE,
     remove_zip = FALSE,
     directory_to_save = directory_to_save,
@@ -234,6 +236,14 @@ download_hrrr <- function(
       )
     )
   )
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    return(invisible(download_preview(
+      df_download$url,
+      df_download$destfile
+    )))
+  }
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- download_run(

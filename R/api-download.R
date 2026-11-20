@@ -79,6 +79,7 @@
 #' * \code{\link{download_spei}}: `"spei"`
 #' * \code{\link{download_eddi}}: `"eddi"`
 #' * \code{\link{download_usdm}}: `"usdm"`
+#' * \code{\link{download_hrrr}}: `"HRRR"`, `"hrrr"`
 #' @return
 #' The selected downloader's return value, with its visibility preserved:
 #' * With `download = FALSE`, an invisible preview list containing `urls`,
@@ -137,7 +138,8 @@ download_data <- function(
     "drought",
     "spei",
     "eddi",
-    "usdm"
+    "usdm",
+    "hrrr"
   ),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -188,7 +190,8 @@ download_data <- function(
     drought = amadeus::download_drought,
     spei = amadeus::download_spei,
     eddi = amadeus::download_eddi,
-    usdm = amadeus::download_usdm
+    usdm = amadeus::download_usdm,
+    hrrr = amadeus::download_hrrr
   )
   # ----------------------------------------------------------------------------
   # Forward shared controls together with the source-specific arguments.
