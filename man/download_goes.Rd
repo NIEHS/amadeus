@@ -42,9 +42,10 @@ Discovery still queries S3 listings in preview mode. Default is \code{TRUE}.}
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
 Default is \code{FALSE}.}
 
-\item{show_progress}{logical(1). Show per-file download progress. Default
-is \code{TRUE}; discovery and summary messages may still be printed when
-\code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{hash}{logical(1). Return the combined directory MD5 hash when \code{TRUE}.
 Default is \code{FALSE}. Ignored when \code{download = FALSE}.}
@@ -55,12 +56,12 @@ including the initial attempt. Default is 20.}
 \item{rate_limit}{numeric(1). Non-negative request-throttling interval in
 seconds, passed to discovery and downloads. Default is 2. Discovery uses
 a capacity-one bucket; 0 disables discovery throttling. File downloads
-follow the throttling policy in \code{\link[=download_run_method]{download_run_method()}}.}
+follow the throttling policy in \code{\link[=download_run]{download_run()}}.}
 }
 \value{
 With \code{download = FALSE}, an invisible preview list containing \code{urls},
 \code{destfiles}, and \code{n_files}. Otherwise, with \code{hash = FALSE}, the invisible
-summary from \code{\link[=download_run_method]{download_run_method()}}, including \code{success}, \code{failed}, and
+summary from \code{\link[=download_run]{download_run()}}, including \code{success}, \code{failed}, and
 \code{skipped} counts. With \code{hash = TRUE}, a visible combined MD5 hash for all
 files under \code{directory_to_save}, including previously downloaded files.
 
@@ -83,7 +84,7 @@ S3 prefixes \code{"ABI-L2-ADPC"}, \code{"ABI-L2-ADPF"}, and \code{"ABI-L2-ADPM"}
 Daily listings supply the actual file names. Files are saved under
 \verb{directory_to_save/<product-prefix>/<year>/<day-of-year>/<hour>/<filename>}.
 The day of year uses three digits, such as \code{"001"}. Existing non-empty
-destination files are skipped by \code{\link[=download_run_method]{download_run_method()}}; preview results
+destination files are skipped by \code{\link[=download_run]{download_run()}}; preview results
 include them because discovery does not filter local files.
 
 Discovery requests one S3 listing page of up to 1000 keys per day and keeps
@@ -93,12 +94,12 @@ be incomplete when a daily listing spans multiple pages.
 A successfully retrieved listing with no matching files emits a message
 and contributes no rows. Errors while requesting, parsing, or processing
 any listing stop discovery before downloading. Files are not required for
-every requested date. If all listings are empty, \code{download = TRUE} errors
-with \code{"No URLs provided for download."}, whereas \code{download = FALSE} returns
-an empty preview.
+every requested date. If all listings are empty, \code{download = TRUE} fails
+the non-empty URL assertion in \code{\link[=download_run]{download_run()}}, whereas \code{download = FALSE}
+returns an empty preview.
 
 Discovery uses a 60-second timeout per request attempt. File downloads use
-\code{\link[=download_run_method]{download_run_method()}}'s default timeout of 3600 seconds.
+\code{\link[=download_run]{download_run()}}'s default timeout of 3600 seconds.
 }
 \note{
 \itemize{
@@ -109,6 +110,25 @@ A single day may contain several hundred files.
 \code{process_goes()} to load and reproject to EPSG:4326.
 }
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_goes(
@@ -121,7 +141,7 @@ download_goes(
 }
 }
 \seealso{
-\code{\link[=download_data]{download_data()}}, \code{\link[=process_goes]{process_goes()}}, \code{\link[=download_run_method]{download_run_method()}},
+\code{\link[=download_data]{download_data()}}, \code{\link[=process_goes]{process_goes()}}, \code{\link[=download_run]{download_run()}},
 \code{\link[=download_preview]{download_preview()}}
 }
 \author{

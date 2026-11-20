@@ -33,11 +33,11 @@
 #'
 #' A preview creates the output directory and returns all planned URLs and
 #' destinations, including existing files, without contacting the provider.
-#' Actual downloads use [download_run_method()], which skips existing non-empty
+#' Actual downloads use [download_run()], which skips existing non-empty
 #' files and records individual transfer failures.
 #' @return With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files`. Otherwise, an invisible download summary from
-#'   [download_run_method()] when `hash = FALSE`, or a visible character scalar
+#'   [download_run()] when `hash = FALSE`, or a visible character scalar
 #'   containing the output-directory MD5 hash when `hash = TRUE`.
 #'
 #' The download summary always contains `success`, `failed`, `skipped`,
@@ -54,6 +54,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_eddi <- function(
   date,
@@ -133,7 +134,7 @@ download_eddi <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,

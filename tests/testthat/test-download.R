@@ -657,16 +657,16 @@ testthat::test_that("download_hash (LIVE)", {
 
 ################################################################################
 ##### download_run (DEPRECATED - but test for backward compatibility)
-testthat::test_that("download_run shows deprecation warning", {
+testthat::test_that("download_run_legacy shows deprecation warning", {
   withr::with_tempdir({
     # Create a dummy commands file
     writeLines("wget http://example.com", "commands.txt")
     # --------------------------------------------------------------------------
     # Reset the warning flag for this test
-    options(amadeus.download_run.warned = NULL)
+    options(amadeus.download_run_legacy.warned = NULL)
     # --------------------------------------------------------------------------
     testthat::expect_warning(
-      amadeus:::download_run(
+      amadeus:::download_run_legacy(
         download = FALSE,
         commands_txt = "commands.txt",
         remove = FALSE
@@ -1472,13 +1472,15 @@ testthat::test_that("download_setup_dir creates zip subdirectories", {
 ################################################################################
 ##### Test download_sanitize_path
 testthat::test_that("download_sanitize_path adds trailing slash", {
-  result <- amadeus:::download_sanitize_path("/path/without/slash")
-  testthat::expect_equal(result, "/path/without/slash/")
+  chr_tempdir <- tempdir()
+  result <- amadeus:::download_sanitize_path(chr_tempdir)
+  testthat::expect_equal(result, paste0(chr_tempdir, "/"))
 })
 
 testthat::test_that("download_sanitize_path preserves trailing slash", {
-  result <- amadeus:::download_sanitize_path("/path/with/slash/")
-  testthat::expect_equal(result, "/path/with/slash/")
+  chr_tempdir <- paste0(tempdir(), "/")
+  result <- amadeus:::download_sanitize_path(chr_tempdir)
+  testthat::expect_equal(result, chr_tempdir)
 })
 
 ################################################################################
@@ -1817,7 +1819,7 @@ testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
 
 testthat::test_that("download_run_method show_progress=TRUE success shows OK prefix", {
   skip_on_cran()
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   withr::with_tempdir({
     testthat::local_mocked_bindings(
       req_perform = function(req, path = NULL, ...) {
@@ -1835,7 +1837,7 @@ testthat::test_that("download_run_method show_progress=TRUE success shows OK pre
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     withCallingHandlers(
       {
@@ -1855,7 +1857,7 @@ testthat::test_that("download_run_method show_progress=TRUE success shows OK pre
         invokeRestart("muffleMessage")
       }
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$success, 2)
     testthat::expect_equal(result$failed, 0)
     testthat::expect_true(any(grepl(" OK ", msgs)))
@@ -1873,7 +1875,7 @@ testthat::test_that("download_run_method tryCatch error handler when req_perform
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     result <- suppressWarnings(
       withCallingHandlers(
@@ -1889,7 +1891,7 @@ testthat::test_that("download_run_method tryCatch error handler when req_perform
         }
       )
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$failed, 1)
     testthat::expect_equal(result$success, 0)
     testthat::expect_false(file.exists("error_test.bin"))
@@ -1905,7 +1907,7 @@ testthat::test_that("download_run_method tryCatch error handler show_progress=TR
       },
       .package = "httr2"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     msgs <- character(0)
     result <- suppressWarnings(
       withCallingHandlers(
@@ -1921,7 +1923,7 @@ testthat::test_that("download_run_method tryCatch error handler show_progress=TR
         }
       )
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     testthat::expect_equal(result$failed, 1)
     testthat::expect_true(any(grepl(" FAIL ", msgs)))
   })
@@ -2159,13 +2161,13 @@ testthat::test_that("check_urls method=SKIP returns NULL (covers lines 722-723)"
 ################################################################################
 ##### download_run download=TRUE path (covers lines 442-444)
 
-testthat::test_that("download_run download=TRUE executes commands", {
+testthat::test_that("download_run_legacy download=TRUE executes commands", {
   withr::with_tempdir({
     cmds_file <- "cmds.txt"
     writeLines("#!/bin/bash\n# empty", cmds_file)
     Sys.chmod(cmds_file, "755")
     suppressMessages(suppressWarnings(
-      amadeus:::download_run(
+      amadeus:::download_run_legacy(
         commands_txt = cmds_file,
         download = TRUE,
         remove = FALSE

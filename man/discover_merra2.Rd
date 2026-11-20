@@ -71,7 +71,7 @@ Discovery stops if data dates are missing, a listing request fails after
 retries, or different URLs in one listing share the same filename.
 
 Directory creation and data-file downloads are handled by
-\code{\link[=download_merra2]{download_merra2()}} and \code{\link[=download_run_method]{download_run_method()}}.
+\code{\link[=download_merra2]{download_merra2()}} and \code{\link[=download_run]{download_run()}}.
 }
 \examples{
 \dontrun{
@@ -92,6 +92,6 @@ discover_merra2(
 }
 }
 \seealso{
-\code{\link[=download_merra2]{download_merra2()}}, \code{\link[=download_run_method]{download_run_method()}}
+\code{\link[=download_merra2]{download_merra2()}}, \code{\link[=download_run]{download_run()}}
 }
 \keyword{internal}

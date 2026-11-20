@@ -619,7 +619,7 @@ testthat::test_that("download_nei(year=c(2017, 2019)): plans supported years", {
     download_run_method = function(...) stop("Unexpected preview download."),
     .package = "amadeus"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Retain both the deprecation warning and the unsupported-year explanation.
   result <- withVisible(withCallingHandlers(
     suppressMessages(amadeus::download_nei(
@@ -633,7 +633,7 @@ testthat::test_that("download_nei(year=c(2017, 2019)): plans supported years", {
       invokeRestart("muffleWarning")
     }
   ))
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A mixed request must retain its supported inventory and matching filename.
   testthat::expect_length(warnings, 2L)
   testthat::expect_match(

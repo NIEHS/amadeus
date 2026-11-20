@@ -1055,7 +1055,7 @@ testthat::test_that("discover_goes(): preserves empty listing columns", {
     product = "ADP-C", date = "20200101", dir = "data/",
     prefix = "ABI-L2-ADPC/2020/001/"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A successful but empty listing returns a typed table for callers to handle.
   testthat::expect_message(
     result <- amadeus:::discover_goes(df, rate_limit = 0),
@@ -1094,7 +1094,7 @@ testthat::test_that("discover_goes(): classifies transient statuses", {
     prefix = "ABI-L2-ADPC/2020/001/"
   )
   result <- amadeus:::discover_goes(df, max_tries = 3L, rate_limit = 0)
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Exercise the installed predicate without sleeping or performing retries.
   is_transient <- request$policies$retry_is_transient
   statuses <- c(429L, 503L, 504L, 200L, 404L)

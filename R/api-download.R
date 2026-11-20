@@ -41,6 +41,12 @@
 #' performs validation, directory setup, discovery, downloading, and extraction.
 #' Previews and directory layouts follow that function's behavior.
 #'
+#' Sources using [download_run()] download files concurrently when the caller
+#' has configured a fixed `"default"` mirai pool, and sequentially otherwise.
+#' AQS currently downloads sequentially. Discovery and archive extraction run
+#' in the calling process. See [download_run()] for daemon setup, worker
+#' requirements, progress reporting, and rate scaling.
+#'
 #' The `"drought"` alias calls [download_drought()] with its default SPEI source
 #' unless `source` is supplied. The `"spei"`, `"eddi"`, and `"usdm"` aliases
 #' call [download_spei()], [download_eddi()], and [download_usdm()] directly.

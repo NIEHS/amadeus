@@ -42,15 +42,13 @@
 #'   `zip_files/` directory, including remaining contents, after the extraction
 #'   loop finishes. Default is `FALSE`. May be `TRUE` only when
 #'   `unzip = TRUE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `data_files/` instead of the download summary when `download = TRUE`.
 #'   Ignored when `download = FALSE`. Default is `FALSE`.
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
-#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
-#'   passed to [download_run_method()]. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' The selected product determines the filename prefix. For example,
 #' `product = "raw"` and `year = 2022` request `IMPAER_2022.txt.zip`.
@@ -58,7 +56,7 @@
 #' `directory_to_save`, including when `unzip = FALSE` or `download = FALSE`.
 #'
 #' Preview mode creates the output directories and makes no network requests.
-#' Individual download failures are recorded by [download_run_method()] during
+#' Individual download failures are recorded by [download_run()] during
 #' file transfers.
 #'
 #' All archives share `data_files/` as their extraction destination. Names
@@ -66,7 +64,7 @@
 #' containing the extracted `PREFIX_YYYY.txt` files, normally `data_files/`,
 #' as `path` to [process_improve()].
 #'
-#' [download_run_method()] skips existing non-empty archives in `zip_files/`.
+#' [download_run()] skips existing non-empty archives in `zip_files/`.
 #' Those archives are still passed to extraction when `unzip = TRUE`.
 #' Existing extracted `.txt` files alone do not cause a download to be skipped.
 #'
@@ -82,7 +80,7 @@
 #' number of planned URLs.
 #'
 #' When `download = TRUE`, after downloading and optional extraction,
-#' `hash = FALSE` returns the download summary from [download_run_method()]
+#' `hash = FALSE` returns the download summary from [download_run()]
 #' invisibly, including counts of successful, failed, and skipped files.
 #' With `hash = TRUE`, returns a visible character scalar containing the
 #' combined MD5 hash of `data_files/`.
@@ -101,6 +99,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 # nolint end
 download_improve <- function(
@@ -175,7 +174,7 @@ download_improve <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

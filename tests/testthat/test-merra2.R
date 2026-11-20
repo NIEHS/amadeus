@@ -1391,7 +1391,7 @@ testthat::test_that("discover_merra2(base): rejects non-directory HTTP URLs", {
     req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Reject unsupported schemes and paths that are not directory URLs.
   bases <- c("ftp://example.org/data/", "https://example.org/data/file.nc4")
   for (base in bases) {
@@ -1408,7 +1408,7 @@ testthat::test_that("discover_merra2(date): rejects invalid dates", {
     req_perform = function(...) stop("Invalid discovery inputs reached HTTP."),
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Both formatting errors and impossible calendar dates fail before HTTP.
   for (date in c("2020-01-01", "20200230", "20201301")) {
     df <- data.frame(
@@ -1430,7 +1430,7 @@ testthat::test_that("discover_merra2(df): rejects conflicting destinations", {
     base = "https://example.org/data/", date = "20200101",
     vdir = c("first/", "second/")
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # One base/date pair cannot identify two different destinations.
   testthat::expect_error(
     amadeus:::discover_merra2(df, collection = "inst1_2d_asm_Nx"),
@@ -1459,7 +1459,7 @@ testthat::test_that("discover_merra2(): requires data for every date", {
     base = "https://example.org/data/",
     date = c("20200101", "20200102"), vdir = "data/"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Metadata alone cannot satisfy the requested day's required .nc4 file.
   testthat::expect_error(
     amadeus:::discover_merra2(
@@ -1492,7 +1492,7 @@ testthat::test_that("discover_merra2(): rejects conflicting filenames", {
   df <- data.frame(
     base = "https://example.org/data/", date = "20200101", vdir = "data/"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Different remote paths must not silently overwrite the same local file.
   testthat::expect_error(
     amadeus:::discover_merra2(

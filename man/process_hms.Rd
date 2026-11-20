@@ -33,10 +33,12 @@ If multiple density polygons overlap, the function will return the
 highest density value.
 }
 \examples{
+\dontrun{
 hms <- process_hms(
   date = c("2018-12-30", "2019-01-01"),
   path = "../tests/testdata/hms/"
 )
+}
 }
 \author{
 Mitchell Manware

@@ -144,14 +144,14 @@
 #' @param acknowledgement logical(1). Must be TRUE to proceed with download.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). DEPRECATED, ignored.
-#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum download retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @inheritParams download_run rate_limit
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return With `download = FALSE`, an invisible preview list containing
 #' `urls`, `destfiles`, and `n_files`. With `download = TRUE` and
-#' `hash = FALSE`, an invisible summary from [download_run_method()] containing
+#' `hash = FALSE`, an invisible summary from [download_run()] containing
 #' `success`, `failed`, `skipped`, `failed_urls`, and `failed_files`. The two
 #' failure vectors are `character(0)` when no downloads failed, including when
 #' every file was skipped. With `download = TRUE` and `hash = TRUE`, a visible
@@ -176,6 +176,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_narr <- function(
   variables = NULL,
@@ -215,7 +216,7 @@ download_narr <- function(
   chr_dir_to_save <- download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Store variables as `list`.
-  list_variables <- as.list(variables)
+  list_variables <- as.list(unique(variables))
   # ----------------------------------------------------------------------------
   # Generate download URLs, file names, and variable-specific directories.
   df_download <- do.call(
@@ -254,7 +255,7 @@ download_narr <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,

@@ -39,14 +39,13 @@
 #' @param remove_zip logical(1). Remove archives and their `zip_files/`
 #'   directory recursively, including remaining contents, after the extraction
 #'   loop finishes. Default is `FALSE`; requires `unzip = TRUE`.
-#' @param show_progress logical(1). Show download progress? Default is
-#' \code{TRUE}.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return a combined MD5 hash of all files recursively
 #'   under `data_files/`, including existing files. Default is `FALSE`; ignored
 #'   when `download = FALSE`. With `unzip = FALSE`, hashing still uses
 #'   `data_files/`, which may be empty or contain previously extracted data.
 #' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @inheritParams download_run rate_limit
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -85,6 +84,7 @@
 #'   remove_zip = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_nlcd <- function(
   product = "Land Cover",
@@ -172,7 +172,7 @@ download_nlcd <- function(
   # Run download.
   # http_version = 2L forces HTTP/1.1 to avoid nghttp2 PROTOCOL_ERRORs from
   # www.mrlc.gov, which drops HTTP/2 connections mid-transfer.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
