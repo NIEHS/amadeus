@@ -42,6 +42,11 @@
 #'   sector-specific subdirectory are created automatically.
 #' @param acknowledgement logical(1). Must be `TRUE` to acknowledge the
 #'   download before data are retrieved.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
+#'   a download preview. Argument validation, directory creation, and URL
+#'   construction still run before returning.
+#' @param remove_command logical(1). Deprecated and ignored. `TRUE` emits a
+#'   warning.
 #' @param show_progress logical(1). Show per-file messages and progress bars
 #'   during sequential downloads. Defaults to `TRUE`. Ignored during
 #'   concurrent downloads, where per-file progress is disabled. Status and
@@ -141,7 +146,7 @@ download_hrrr <- function(
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
-  amadeus:::download_check(
+  download_check(
     dataset_name = "hrrr",
     acknowledgement = acknowledgement,
     download = download,

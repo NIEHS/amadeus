@@ -58,6 +58,13 @@ sector-specific subdirectory are created automatically.}
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to acknowledge the
 download before data are retrieved.}
 
+\item{download}{logical(1). Deprecated. \code{FALSE} emits a warning and returns
+a download preview. Argument validation, directory creation, and URL
+construction still run before returning.}
+
+\item{remove_command}{logical(1). Deprecated and ignored. \code{TRUE} emits a
+warning.}
+
 \item{show_progress}{logical(1). Show per-file messages and progress bars
 during sequential downloads. Defaults to \code{TRUE}. Ignored during
 concurrent downloads, where per-file progress is disabled. Status and

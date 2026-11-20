@@ -61,7 +61,6 @@ testthat::test_that(
       sector = "conus",
       cycle_runtime = 0L,
       forecast_hour = 1L,
-      date = "2021-04-05",
       directory_to_save = dir,
       acknowledgement = TRUE
     )
