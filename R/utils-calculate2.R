@@ -183,11 +183,7 @@ process_locs_radius_sf <- function(
   if (radius == 0) {
     locs
   } else if (radius > 0) {
-    sf::st_buffer(
-      locs,
-      radius,
-      nQuadSegs = 180L
-    )
+    sf::st_as_sf(terra::buffer(terra::vect(locs), radius, quadsegs = 180L))
   }
 }
 
