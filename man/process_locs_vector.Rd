@@ -2,28 +2,44 @@
 % Please edit documentation in R/utils-process.R
 \name{process_locs_vector}
 \alias{process_locs_vector}
-\title{Process locations as \code{SpatVector}}
+\title{Prepare extraction locations as a SpatVector}
 \usage{
 process_locs_vector(locs, crs, radius)
 }
 \arguments{
-\item{locs}{data.frame(1). Data frame containing columns for unique
-identifier, latitude, and longitude. Latitude and longitude columns \strong{must}
-be named "lat" and "lon", respectively.}
+\item{locs}{SpatVector, sf, or data.frame. Extraction locations. Data frames,
+including data.table objects, must contain \code{lon} and \code{lat} columns in
+longitude and latitude degrees (EPSG:4326). Spatial inputs use their
+existing coordinate reference system.}
 
-\item{crs}{Coordinate reference system (CRS) description utilizing
-\code{terra::crs()}.}
+\item{crs}{character(1). Target coordinate reference system accepted by
+\code{\link[terra:project]{terra::project()}}, such as an EPSG code or WKT string.}
 
-\item{radius}{integer(1). Circular buffer size (meters).}
+\item{radius}{numeric(1). Non-negative buffer distance passed to
+\code{\link[=process_locs_radius]{process_locs_radius()}} after projection. Zero retains unbuffered geometry.
+Positive distances are in meters for longitude/latitude coordinates and
+in the target CRS map units for projected coordinates.}
 }
 \value{
-a \code{SpatVector} object
+A \code{SpatVector} in the requested CRS, buffered when \code{radius > 0}.
+A message identifies the input type; unsupported types or data frames
+missing coordinate columns raise an error.
 }
 \description{
-Detect \code{SpatVector} object, or convert locations from class \code{sf},
-\code{data.frame} or \code{data.table} to
-\code{SpatVector} object, project to coordinate reference system, and apply
-circular buffer.
+Convert supported locations to a \code{SpatVector}, project them to the requested
+coordinate reference system, and apply an optional buffer.
+}
+\examples{
+process_locs_vector(
+  data.frame(site_id = "A", lon = -78.8, lat = 35.9),
+  crs = "EPSG:4326", radius = 0
+)
+}
+\seealso{
+\code{\link[=process_locs_radius]{process_locs_radius()}}, \code{\link[terra:vect]{terra::vect()}}, \code{\link[terra:project]{terra::project()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}

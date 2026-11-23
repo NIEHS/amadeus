@@ -2,23 +2,34 @@
 % Please edit documentation in R/utils-process.R
 \name{is_date_proper}
 \alias{is_date_proper}
-\title{Check date format}
+\title{Check whether date input can be formatted}
 \usage{
 is_date_proper(instr = NULL, format = "\%Y-\%m-\%d")
 }
 \arguments{
-\item{instr}{character(1). String to check.}
+\item{instr}{character, Date, or POSIXt. Date values passed to
+\code{\link[base:strftime]{base::strftime()}}. The default is \code{NULL}.}
 
-\item{format}{character(1). Matching format to be checked.
-Default is \code{"\%Y-\%m-\%d"}, which can detect \verb{"\%Y/\%m/\%d}.
-See \code{\link{strftime}} for details of formatting this string.}
+\item{format}{character(1). Output format passed to \code{\link[base:strftime]{base::strftime()}}.
+Defaults to \code{"\%Y-\%m-\%d"}.}
 }
 \value{
-No returning value. It stops the function if \code{instr} doesn't
-conform to the \code{format}.
+\code{NULL}, invisibly, when formatting succeeds; otherwise an error.
 }
 \description{
-Check date input strings conform to the required format.
+Attempt to format date input with \code{\link[base:strftime]{base::strftime()}} and stop if that
+operation raises an error.
+}
+\details{
+This helper checks whether formatting raises an error. It does not enforce
+an exact input spelling, compare the formatted output with the input, or
+reject missing results produced without an error.
+}
+\examples{
+is_date_proper("2021-05-04")
+}
+\seealso{
+\code{\link[=sequence_dates]{sequence_dates()}}, \code{\link[base:strftime]{base::strftime()}}
 }
 \author{
 Insang Song

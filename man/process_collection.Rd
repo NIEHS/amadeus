@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-process.R
 \name{process_collection}
 \alias{process_collection}
-\title{Process GEOS-CF and MERRA2 collection codes}
+\title{Read GEOS-CF and MERRA2 metadata from filenames}
 \usage{
 process_collection(
   path,
@@ -13,24 +13,53 @@ process_collection(
 )
 }
 \arguments{
-\item{path}{character(1). File path to data file.}
+\item{path}{character. File path to inspect. GEOS-CF paths can also be
+supplied as a vector; supply one path at a time for MERRA2 and GlobalFWI.}
 
-\item{source}{character(1). "geos" for GEOS-CF or "merra2" for MERRA2}
+\item{source}{character(1). \code{"geos"} or \code{"merra2"}. Accepted aliases are
+\code{"GEOS"}, \code{"geos-cf"}, \code{"GEOS-CF"}, \code{"merra"}, \code{"MERRA"}, and \code{"MERRA2"}.}
 
-\item{collection}{logical(1). Identifies and returns collection
-name(s) based on provided file path(s).}
+\item{collection}{logical(1). Return the collection name.
+Defaults to \code{FALSE}.}
 
-\item{date}{logical(1). Identifies and returns date sequence (YYYYMMDD) based
-on provided file path(s).}
+\item{date}{logical(1). Return the date code as \code{"YYYYMMDD"}.
+Defaults to \code{FALSE}.}
 
-\item{datetime}{logical(1). Identifies and returns date time sequence
-(YYYYMoMoDDHHMiMi) based on provided file path(s).}
+\item{datetime}{logical(1). Return the GEOS-CF time code as \code{"YYYYMMDDHHMM"}.
+Defaults to \code{FALSE}. For GlobalFWI files this returns only \code{"YYYYMMDD"};
+ordinary MERRA2 filenames support \code{collection} or \code{date} instead.}
 }
 \value{
-character
+A character vector containing the requested collection or time code.
+Time codes are strings, not Date or POSIXct objects.
 }
 \description{
-Identify the GEOS-CF or MERRA2 collection based on the file path.
+Extract a collection name or time code from supported GEOS-CF, MERRA2,
+or GlobalFWI filenames without opening the files.
+}
+\details{
+Select one of \code{collection}, \code{date}, or \code{datetime}. Selecting more than one
+raises an error. Parsing depends on the source's filename convention;
+the helper does not check file existence or read file metadata.
+
+GlobalFWI filenames beginning with \code{"FWI."} are handled with
+\code{source = "merra2"} and return \code{"fwi"} as their collection.
+}
+\examples{
+process_collection(
+  "GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20210504_0030z.nc4",
+  source = "geos", datetime = TRUE
+)
+process_collection(
+  "MERRA2_400.tavg1_2d_slv_Nx.20210504.nc4",
+  source = "merra2", collection = TRUE
+)
+}
+\seealso{
+\code{\link[=process_geos]{process_geos()}}, \code{\link[=process_merra2]{process_merra2()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}

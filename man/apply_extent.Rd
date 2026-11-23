@@ -2,24 +2,46 @@
 % Please edit documentation in R/utils-process.R
 \name{apply_extent}
 \alias{apply_extent}
-\title{Apply extent to the processed data}
+\title{Select spatial features within an extent}
 \usage{
 apply_extent(data, extent, geom)
 }
 \arguments{
-\item{data}{sf/terra object.}
+\item{data}{sf, SpatVector, or data.frame. Spatial features to select.}
 
-\item{extent}{numeric(4). Extent to filter the data.
-Should be ordered as c(xmin, xmax, ymin, ymax).}
+\item{extent}{numeric(4) or SpatExtent. Bounds ordered as
+\code{c(xmin, xmax, ymin, ymax)} in the same CRS as \code{data}. For data-frame
+inputs, bounds and coordinates are interpreted as EPSG:4326.}
 
-\item{geom}{character(1 or 2). Geometry type for if \code{data} is \code{data.frame}.
-One of "geometry" or c("lon", "lat").}
+\item{geom}{character(1) or character(2). Geometry column for WKT data, or
+coordinate columns such as \code{c("lon", "lat")}. Passed to \code{\link[terra:vect]{terra::vect()}}
+only for data-frame inputs; it can be omitted for spatial inputs.}
 }
 \value{
-sf/terra object with the extent applied.
+An sf object for sf inputs, or a \code{SpatVector} for SpatVector and
+data-frame inputs, containing the selected features.
 }
 \description{
-User-defined extent is used to filter the data.
+Apply an extent through spatial subsetting, converting data-frame inputs
+to a \code{SpatVector} before selection.
+}
+\details{
+The extent is assigned the input CRS for sf inputs. No coordinate
+transformation is performed. Selection uses \code{data[extent, ]} and follows
+the spatial subsetting behavior of the input class.
+}
+\examples{
+apply_extent(
+  data.frame(lon = c(-78.8, -90), lat = c(35.9, 40)),
+  extent = c(-80, -77, 34, 37),
+  geom = c("lon", "lat")
+)
+}
+\seealso{
+\code{\link[terra:ext]{terra::ext()}}, \code{\link[terra:vect]{terra::vect()}}, \code{\link[sf:st_filter]{sf::st_filter()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}

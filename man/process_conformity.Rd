@@ -2,26 +2,35 @@
 % Please edit documentation in R/utils-process.R
 \name{process_conformity}
 \alias{process_conformity}
-\title{Check input assumptions}
+\title{Check location columns and convert to a SpatVector}
 \usage{
 process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 }
 \arguments{
-\item{locs}{Data. \link[sf:st_as_sf]{sf},
-\link[terra:vect]{SpatVector}, or \link{data.frame}}
+\item{locs}{sf, SpatVector, or data.frame. Locations containing \code{lon} and
+\code{lat} columns, plus \code{time} when \code{check_time = TRUE}. These columns are
+required even when the input already has a spatial geometry.}
 
-\item{check_time}{logical(1). Whether \code{"time"} exists in column names.}
+\item{check_time}{logical(1). Require a column named \code{time}.
+Defaults to \code{FALSE}; time values are not parsed or validated.}
 
-\item{locs_epsg}{character(1). \code{"{authority}:{code}"} or
-Well-Known Text format for coordinate reference system definition.}
+\item{locs_epsg}{character(1). Coordinate reference system assigned when
+converting a data frame. Defaults to \code{"EPSG:4326"}. Existing spatial
+inputs retain their coordinate reference system.}
 }
 \value{
-a \code{SpatVector} object
+A \code{SpatVector} for supported inputs. Missing required columns
+raise an error.
 }
 \description{
-Check if all of \code{"lon"}, \code{"lat"}, and \code{"time"}
-(only if \code{check_time = TRUE}) then convert inputs into a
-\code{SpatVector} object.
+Require longitude, latitude, and optionally time columns before converting
+supported location inputs to a \code{SpatVector}.
+}
+\examples{
+process_conformity(data.frame(lon = -78.8, lat = 35.9))
+}
+\seealso{
+\code{\link[=process_locs_vector]{process_locs_vector()}}, \code{\link[terra:vect]{terra::vect()}}
 }
 \author{
 Insang Song

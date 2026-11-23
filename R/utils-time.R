@@ -190,7 +190,7 @@ sequence_times <- function(
 #'   first and last subsets of `dates`. Character input returns a character
 #'   vector; list input returns a list. No character coercion is performed.
 #'
-#' @seealso [amadeus::sequence_dates()], [sedona_geos()], [sedona_hms()]
+#' @seealso [sequence_dates()]
 #' @keywords internal
 #' @examples
 #' fl_dates(c("2024-01-01", "2024-01-02", "2024-01-03"))

@@ -1,3 +1,196 @@
+################################################################################
+# {amadeus} functions for
+################################################################################
+
+################################################################################
+# {metadata} tier
+################################################################################
+#' Get HRRR variable lookup information
+#'
+#' @description
+#' Read a bundled catalogue of HRRR variable short names, descriptions,
+#' vertical levels, and reference raster labels. No downloaded HRRR files or
+#' internet connection are required. Supply a unique short name to identify
+#' a field, or a variable code and optional levels to select related fields.
+#' Omit both arguments to browse the complete catalogue.
+#'
+#' @param variable character vector or `NULL`. Unique field short names such
+#'   as `"TMP_2MAGL"`, `"TMP_SFC"`, or `"TMP_850MB"`, or NCEP variable codes
+#'   such as `"TMP"`, `"DPT"`, or `"UGRD"`. A variable code selects every
+#'   catalogued level for that variable, subject to `level`. Matching is
+#'   case-insensitive. The default `NULL` includes all fields. Unknown names
+#'   raise an error. Selections follow the requested order; overlapping or
+#'   repeated selections return each field once, at its first occurrence.
+#' @param level character vector or `NULL`. Exact catalogue level labels,
+#'   such as `"2 m above ground"`, `"surface"`, `"850 mb"`, or
+#'   `"1 hybrid level"`. Matching is case-insensitive. The default `NULL`
+#'   retains all levels for the selected variables. Unknown levels, or
+#'   requested variables with none of the selected levels, raise an error.
+#'
+#' @details
+#' The standalone table is installed at `extdata/hrrr_variables.csv`. It
+#' contains one row per variable-level combination, combining the NCEP CONUS
+#' pressure, native, surface, and sub-hourly forecast-hour-02 inventories
+#' retrieved on 2026-11-23. It is a reference catalogue, not a full historical
+#' inventory or a guarantee that a field exists for every product, date,
+#' initialization cycle, or forecast hour.
+#'
+#' `short_name` uniquely identifies a variable-level combination within the
+#' catalogue. It combines the original NCEP code, retained in `variable`,
+#' with a level label separated by one underscore. Examples are
+#' `"TMP_2MAGL"` (2 m above ground), `"TMP_SFC"` (surface), `"TMP_850MB"`
+#' (850 mb), and `"TMP_HYBRID1"` (hybrid level 1). These are amadeus field
+#' identifiers, not native NCEP variable codes. Numeric labels use `P` for
+#' decimal points and `TO` for layer bounds, for example `"TMP_1013P2MB"`.
+#' `MAGL` and `MBGL` distinguish metres above and below ground; `MBAGL`
+#' denotes pressure differences above ground in millibars. The complete
+#' level description remains in `level`.
+#'
+#' The identifiers use uppercase letters and digits with exactly one
+#' underscore. Appending `"_YYYYMMDD_HHMM"` therefore gives separate
+#' variable, level, date, and time components for layer and column names.
+#' Short names distinguish levels, but do not identify initialization cycles,
+#' forecast leads, or statistical intervals.
+#'
+#' `long_name`, `level`, and `units` describe the published field.
+#' `layer_name` is its full reference terra layer name, including the level,
+#' GDAL variable description, and GDAL units. Names combine descriptors from
+#' 2021-05-04 files read using GDAL 3.0.4 with the inventory's level values.
+#' They were checked against sampled surface, pressure, native, and
+#' sub-hourly fields. Published names and GDAL labels can differ. GDAL labels
+#' can also vary between versions; processors must check the actual file
+#' metadata before selecting layers. Reference labels retain GDAL's
+#' spelling, including any errors, for matching purposes.
+#'
+#' Match `layer_name` against complete terra layer names, as shown below.
+#' This distinguishes 2 m temperature from surface and pressure-level
+#' temperature, as well as dew point and potential temperature. Omitting
+#' `level` returns every catalogued level for the selected variable. A field
+#' can still occur at several forecast times or with different statistical
+#' intervals: this lookup does not choose a forecast or provide stable band
+#' numbers. Product membership is recorded separately for each variable and
+#' level, not inferred from the other levels of that variable.
+#'
+#' `units` are the published GRIB units, not necessarily the units returned
+#' by GDAL. For example, temperatures are published in kelvin but GDAL
+#' normally exposes them in degrees Celsius. Processing must use the actual
+#' raster units.
+#'
+#' @return
+#' A data.frame with character columns `short_name` (unique variable-level
+#' identifier), `variable` (original NCEP code), `long_name`
+#' (published description without units), `level` (published vertical level
+#' or layer), `units` (published units), `layer_name` (full reference terra
+#' layer name, including level and GDAL units), and
+#' `products` (semicolon-separated file codes: `prs`, `nat`, `sfc`, `subh`).
+#' With `variable = NULL`, rows follow the catalogue's fixed short-name
+#' order. Within each variable-code selection, fields retain catalogue order.
+#'
+#' @source
+#' NCEP HRRR product inventories:
+#' <https://www.nco.ncep.noaa.gov/pmb/products/hrrr/>.
+#' GDAL GRIB metadata and unit handling:
+#' <https://gdal.org/en/stable/drivers/raster/grib.html>.
+#'
+#' @author Mitchell Manware
+#' @seealso [download_hrrr()], [terra::rast()]
+#' @examples
+#' metadata_hrrr()
+#' metadata_hrrr(c("TMP", "DPT", "UGRD"))
+#' metadata_hrrr(c("TMP_2MAGL", "TMP_SFC", "TMP_850MB"))
+#' metadata_hrrr("TMP", level = "850 mb")
+#'
+#' # Resolve a unique short name to its full reference layer name.
+#' temperature <- metadata_hrrr("tmp_2magl")
+#' temperature[, c("short_name", "long_name", "level")]
+#' layer_names <- c(
+#'   "2[m] HTGL=Specified height level above ground; Temperature [C]",
+#'   "2[m] HTGL=Specified height level above ground; Dew point temperature [C]",
+#'   "85000[Pa] ISBL=Isobaric surface; Temperature [C]"
+#' )
+#' which(layer_names %in% temperature$layer_name)
+#' paste0(temperature$short_name, "_20210504_0200")
+#'
+#' # Access the standalone CSV directly.
+#' system.file("extdata", "hrrr_variables.csv", package = "amadeus")
+#'
+#' @export
+metadata_hrrr <- function(variable = NULL, level = NULL) {
+  # ----------------------------------------------------------------------------
+  # Check optional variable and level selectors.
+  checkmate::assert_character(
+    variable,
+    min.len = 1L,
+    min.chars = 1L,
+    any.missing = FALSE,
+    null.ok = TRUE
+  )
+  checkmate::assert_character(
+    level,
+    min.len = 1L,
+    min.chars = 1L,
+    any.missing = FALSE,
+    null.ok = TRUE
+  )
+  # ----------------------------------------------------------------------------
+  # Read the standalone catalogue without inspecting data files.
+  df_variables <- utils::read.csv(
+    system.file(
+      "extdata",
+      "hrrr_variables.csv",
+      package = "amadeus",
+      mustWork = TRUE
+    ),
+    stringsAsFactors = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Resolve field identifiers or variable codes in the requested order.
+  if (!is.null(variable)) {
+    variable <- unique(toupper(variable))
+    checkmate::assert_subset(
+      variable,
+      c(df_variables$short_name, df_variables$variable)
+    )
+    int_rows <- unique(unlist(
+      lapply(variable, function(x) {
+        which(df_variables$short_name == x | df_variables$variable == x)
+      }),
+      use.names = FALSE
+    ))
+    df_variables <- df_variables[int_rows, , drop = FALSE]
+  }
+  # ----------------------------------------------------------------------------
+  # Select levels without dropping their variable identity.
+  if (!is.null(level)) {
+    level <- unique(tolower(level))
+    checkmate::assert_subset(level, tolower(df_variables$level))
+    df_variables <- df_variables[
+      tolower(df_variables$level) %in% level,
+      ,
+      drop = FALSE
+    ]
+    missing_variables <- setdiff(
+      variable,
+      c(df_variables$short_name, df_variables$variable)
+    )
+    if (length(missing_variables) > 0L) {
+      stop(
+        "No requested levels found for variable(s): ",
+        paste(missing_variables, collapse = ", "),
+        ".",
+        call. = FALSE
+      )
+    }
+  }
+  # ----------------------------------------------------------------------------
+  # Return a consistently shaped lookup table.
+  rownames(df_variables) <- NULL
+  df_variables
+}
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download NOAA High-Resolution Rapid Refresh (HRRR) data
 #'
 #' @description
@@ -265,185 +458,115 @@ download_hrrr <- function(
 }
 
 ################################################################################
-#' Get HRRR variable lookup information
-#'
-#' @description
-#' Read a bundled catalogue of HRRR variable short names, descriptions,
-#' vertical levels, and reference raster labels. No downloaded HRRR files or
-#' internet connection are required. Supply a unique short name to identify
-#' a field, or a variable code and optional levels to select related fields.
-#' Omit both arguments to browse the complete catalogue.
-#'
-#' @param variable character vector or `NULL`. Unique field short names such
-#'   as `"TMP_2MAGL"`, `"TMP_SFC"`, or `"TMP_850MB"`, or NCEP variable codes
-#'   such as `"TMP"`, `"DPT"`, or `"UGRD"`. A variable code selects every
-#'   catalogued level for that variable, subject to `level`. Matching is
-#'   case-insensitive. The default `NULL` includes all fields. Unknown names
-#'   raise an error. Selections follow the requested order; overlapping or
-#'   repeated selections return each field once, at its first occurrence.
-#' @param level character vector or `NULL`. Exact catalogue level labels,
-#'   such as `"2 m above ground"`, `"surface"`, `"850 mb"`, or
-#'   `"1 hybrid level"`. Matching is case-insensitive. The default `NULL`
-#'   retains all levels for the selected variables. Unknown levels, or
-#'   requested variables with none of the selected levels, raise an error.
-#'
-#' @details
-#' The standalone table is installed at `extdata/hrrr_variables.csv`. It
-#' contains one row per variable-level combination, combining the NCEP CONUS
-#' pressure, native, surface, and sub-hourly forecast-hour-02 inventories
-#' retrieved on 2026-11-23. It is a reference catalogue, not a full historical
-#' inventory or a guarantee that a field exists for every product, date,
-#' initialization cycle, or forecast hour.
-#'
-#' `short_name` uniquely identifies a variable-level combination within the
-#' catalogue. It combines the original NCEP code, retained in `variable`,
-#' with a level label separated by one underscore. Examples are
-#' `"TMP_2MAGL"` (2 m above ground), `"TMP_SFC"` (surface), `"TMP_850MB"`
-#' (850 mb), and `"TMP_HYBRID1"` (hybrid level 1). These are amadeus field
-#' identifiers, not native NCEP variable codes. Numeric labels use `P` for
-#' decimal points and `TO` for layer bounds, for example `"TMP_1013P2MB"`.
-#' `MAGL` and `MBGL` distinguish metres above and below ground; `MBAGL`
-#' denotes pressure differences above ground in millibars. The complete
-#' level description remains in `level`.
-#'
-#' The identifiers use uppercase letters and digits with exactly one
-#' underscore. Appending `"_YYYYMMDD_HHMM"` therefore gives separate
-#' variable, level, date, and time components for layer and column names.
-#' Short names distinguish levels, but do not identify initialization cycles,
-#' forecast leads, or statistical intervals.
-#'
-#' `long_name`, `level`, and `units` describe the published field.
-#' `layer_name` is its full reference terra layer name, including the level,
-#' GDAL variable description, and GDAL units. Names combine descriptors from
-#' 2021-05-04 files read using GDAL 3.0.4 with the inventory's level values.
-#' They were checked against sampled surface, pressure, native, and
-#' sub-hourly fields. Published names and GDAL labels can differ. GDAL labels
-#' can also vary between versions; processors must check the actual file
-#' metadata before selecting layers. Reference labels retain GDAL's
-#' spelling, including any errors, for matching purposes.
-#'
-#' Match `layer_name` against complete terra layer names, as shown below.
-#' This distinguishes 2 m temperature from surface and pressure-level
-#' temperature, as well as dew point and potential temperature. Omitting
-#' `level` returns every catalogued level for the selected variable. A field
-#' can still occur at several forecast times or with different statistical
-#' intervals: this lookup does not choose a forecast or provide stable band
-#' numbers. Product membership is recorded separately for each variable and
-#' level, not inferred from the other levels of that variable.
-#'
-#' `units` are the published GRIB units, not necessarily the units returned
-#' by GDAL. For example, temperatures are published in kelvin but GDAL
-#' normally exposes them in degrees Celsius. Processing must use the actual
-#' raster units.
-#'
-#' @return
-#' A data.frame with character columns `short_name` (unique variable-level
-#' identifier), `variable` (original NCEP code), `long_name`
-#' (published description without units), `level` (published vertical level
-#' or layer), `units` (published units), `layer_name` (full reference terra
-#' layer name, including level and GDAL units), and
-#' `products` (semicolon-separated file codes: `prs`, `nat`, `sfc`, `subh`).
-#' With `variable = NULL`, rows follow the catalogue's fixed short-name
-#' order. Within each variable-code selection, fields retain catalogue order.
-#'
-#' @source
-#' NCEP HRRR product inventories:
-#' <https://www.nco.ncep.noaa.gov/pmb/products/hrrr/>.
-#' GDAL GRIB metadata and unit handling:
-#' <https://gdal.org/en/stable/drivers/raster/grib.html>.
-#'
-#' @author Mitchell Manware
-#' @seealso [download_hrrr()], [terra::rast()]
-#' @examples
-#' metadata_hrrr()
-#' metadata_hrrr(c("TMP", "DPT", "UGRD"))
-#' metadata_hrrr(c("TMP_2MAGL", "TMP_SFC", "TMP_850MB"))
-#' metadata_hrrr("TMP", level = "850 mb")
-#'
-#' # Resolve a unique short name to its full reference layer name.
-#' temperature <- metadata_hrrr("tmp_2magl")
-#' temperature[, c("short_name", "long_name", "level")]
-#' layer_names <- c(
-#'   "2[m] HTGL=Specified height level above ground; Temperature [C]",
-#'   "2[m] HTGL=Specified height level above ground; Dew point temperature [C]",
-#'   "85000[Pa] ISBL=Isobaric surface; Temperature [C]"
-#' )
-#' which(layer_names %in% temperature$layer_name)
-#' paste0(temperature$short_name, "_20210504_0200")
-#'
-#' # Access the standalone CSV directly.
-#' system.file("extdata", "hrrr_variables.csv", package = "amadeus")
-#'
-#' @export
-metadata_hrrr <- function(variable = NULL, level = NULL) {
+# {process} tier
+################################################################################
+process_hrrr <- function(
+  date = c("2021-05-04", "2021-05-04"),
+  variable = NULL,
+  forecast_hour = 0,
+  path = NULL,
+  extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
+  ...
+) {
   # ----------------------------------------------------------------------------
-  # Check optional variable and level selectors.
-  checkmate::assert_character(
-    variable,
-    min.len = 1L,
-    min.chars = 1L,
-    any.missing = FALSE,
-    null.ok = TRUE
-  )
-  checkmate::assert_character(
-    level,
-    min.len = 1L,
-    min.chars = 1L,
-    any.missing = FALSE,
-    null.ok = TRUE
+  # Check common arguments.
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  checkmate::assert_choice(variable, .amadeus$df_hrrr$layer_name)
+  checkmate::assert_integerish(
+    forecast_hour,
+    lower = 0L,
+    upper = 48L,
+    len = 1L,
+    any.missing = FALSE
   )
   # ----------------------------------------------------------------------------
-  # Read the standalone catalogue without inspecting data files.
-  df_variables <- utils::read.csv(
-    system.file(
-      "extdata",
-      "hrrr_variables.csv",
-      package = "amadeus",
-      mustWork = TRUE
+  # Coerce `date` to vector of 2 if not already.
+  date <- fl_dates(sequence_dates(date, hyphen = TRUE))
+  # ----------------------------------------------------------------------------
+  # Identify time-relevant HRRR file paths in `path`.
+  chr_datapaths <- resolve_paths(
+    date = date,
+    path = path,
+    pattern = paste0(
+      "^hrrr\\.[0-9]{8}\\.t[0-9]{2}z\\.wrf",
+      "(prs|nat|sfc|subh)f",
+      sprintf("%02d", forecast_hour),
+      "\\.grib2$"
     ),
-    stringsAsFactors = FALSE
+    hyphen = FALSE
   )
   # ----------------------------------------------------------------------------
-  # Resolve field identifiers or variable codes in the requested order.
-  if (!is.null(variable)) {
-    variable <- unique(toupper(variable))
-    checkmate::assert_subset(
-      variable,
-      c(df_variables$short_name, df_variables$variable)
-    )
-    int_rows <- unique(unlist(
-      lapply(variable, function(x) {
-        which(df_variables$short_name == x | df_variables$variable == x)
-      }),
-      use.names = FALSE
-    ))
-    df_variables <- df_variables[int_rows, , drop = FALSE]
-  }
-  # ----------------------------------------------------------------------------
-  # Select levels without dropping their variable identity.
-  if (!is.null(level)) {
-    level <- unique(tolower(level))
-    checkmate::assert_subset(level, tolower(df_variables$level))
-    df_variables <- df_variables[
-      tolower(df_variables$level) %in% level,
-      ,
-      drop = FALSE
-    ]
-    missing_variables <- setdiff(
-      variable,
-      c(df_variables$short_name, df_variables$variable)
-    )
-    if (length(missing_variables) > 0L) {
-      stop(
-        "No requested levels found for variable(s): ",
-        paste(missing_variables, collapse = ", "),
-        ".",
-        call. = FALSE
-      )
-    }
-  }
-  # ----------------------------------------------------------------------------
-  # Return a consistently shaped lookup table.
-  rownames(df_variables) <- NULL
-  df_variables
+  # Import, clean, and stack hourly files; return raster.
+  stack_hourly(
+    paths = chr_datapaths,
+    extent = extent,
+    variable = variable,
+    short = .amadeus$df_hrrr$short_name[.amadeus$df_hrrr$layer_name == variable]
+  )
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+calculate_hrrr <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  .by_time = NULL,
+  ...
+) {
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  # ----------------------------------------------------------------------------
+  # Perform extraction/zonal statistics.
+  sf_extracted <- calc_worker_mirai(
+    dataset = "hrrr",
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    variable = 1,
+    level = 2,
+    time = c(3, 4),
+    time_type = "hour",
+    radius = radius,
+    fun = fun,
+    weights = weights,
+    geom = geom,
+    ...
+  )
+  # ----------------------------------------------------------------------------
+  # Summarize by time if requested.
+  lgl_summarized <- FALSE
+  if (!is.null(.by_time)) {
+    sf_extracted <- amadeus::calc_summarize_by(
+      covar = sf_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = "level"
+    )
+    lgl_summarized <- TRUE
+  }
+  if (lgl_summarized && "time" %in% names(sf_extracted)) {
+    sf_extracted$time <- as.POSIXct(sf_extracted$time, tz = "UTC")
+  }
+  # ----------------------------------------------------------------------------
+  # Return cleaned output.
+  amadeus::calc_return_locs(
+    covar = sf_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+}
+
+################################################################################

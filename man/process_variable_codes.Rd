@@ -2,22 +2,40 @@
 % Please edit documentation in R/utils-process.R
 \name{process_variable_codes}
 \alias{process_variable_codes}
-\title{Filter gridMET and terraClimate variable names and variable codes}
+\title{Resolve gridMET and TerraClimate variable codes}
 \usage{
 process_variable_codes(variables, source = c("gridmet", "terraclimate"))
 }
 \arguments{
-\item{variables}{character(1). Data variables. (Passed from download_* or
-process_*).}
+\item{variables}{character. A vector of variable codes or a vector of
+descriptive names. Matching is case-insensitive; names and codes should
+not be mixed in the same call.}
 
-\item{source}{character(1). Data source for selected variables ("gridMET" or
-"TerraClimate").}
+\item{source}{character(1). Supply either \code{"gridmet"} or \code{"terraclimate"}.}
 }
 \value{
-character
+A character vector of variable codes. Code inputs use the lookup
+table's capitalization; codes resolved from descriptive names are
+converted to lowercase.
 }
 \description{
-Check user defined variables for gridMET and TerraClimate functions.
+Match variable codes or descriptive names against the source-specific
+lookup table for download and processing functions.
+}
+\details{
+For gridMET, the code aliases \code{"spei"} and \code{"eddi"} select \code{"spei30d"} and
+\code{"eddi30d"}, respectively. Unknown variables raise an error. Input order
+and repeated selections are preserved.
+}
+\examples{
+process_variable_codes(c("pr", "tmmx"), source = "gridmet")
+process_variable_codes("Precipitation", source = "terraclimate")
+}
+\seealso{
+\code{\link[=process_gridmet_codes]{process_gridmet_codes()}}, \code{\link[=process_terraclimate_codes]{process_terraclimate_codes()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}

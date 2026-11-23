@@ -11,18 +11,33 @@ process_parse_ncdf_day_codes(
 )
 }
 \arguments{
-\item{layer_names}{character. Layer names.}
+\item{layer_names}{character. Names ending in an equals sign followed by
+a non-negative integer day code. Bare numeric strings are also accepted.}
 
-\item{source}{character(1). Source label used in error messages.}
+\item{source}{character(1). Source label used in parsing errors.
+Defaults to \code{"gridmet"}.}
 
-\item{origin}{character(1). Date origin for numeric day codes.}
+\item{origin}{character(1) or Date(1). Origin for numeric day codes,
+passed to \code{\link[base:as.Date]{base::as.Date()}}. Defaults to \code{"1900-01-01"}.}
 }
 \value{
-Date vector.
+A Date vector in the same order as \code{layer_names}. An error is raised
+if any name cannot be parsed as a non-negative integer day code.
 }
 \description{
-Parse day-code suffixes from netCDF layer names such as
-\code{"precipitation_amount_day=43101"} and convert to \code{Date}.
+Convert numeric day codes in layer names, such as
+\code{"precipitation_amount_day=43101"}, to dates relative to an origin.
+}
+\examples{
+process_parse_ncdf_day_codes(
+  c("precipitation_amount_day=43101", "precipitation_amount_day=43102")
+)
+}
+\seealso{
+\code{\link[=process_gridmet]{process_gridmet()}}, \code{\link[base:as.Date]{base::as.Date()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}

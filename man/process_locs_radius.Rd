@@ -2,23 +2,40 @@
 % Please edit documentation in R/utils-process.R
 \name{process_locs_radius}
 \alias{process_locs_radius}
-\title{Process locations buffer}
+\title{Buffer extraction locations}
 \usage{
 process_locs_radius(locs, radius)
 }
 \arguments{
-\item{locs}{SpatVector(1). SpatVector object with point geometry}
+\item{locs}{SpatVector. Extraction locations with a defined CRS.}
 
-\item{radius}{integer(1). Circular buffer size (meters).}
+\item{radius}{numeric(1). Non-negative buffer distance. Units are meters
+for longitude/latitude coordinates and map units for projected coordinates.}
 }
 \value{
-a \code{SpatVector} object
+A \code{SpatVector}: the original locations when \code{radius = 0}, or their
+buffers when \code{radius > 0}.
 }
 \description{
-Create circular buffer around locations based on user defined radius.
-
-Creates a circular buffer around points if \code{radius} is > 0.
-Returns points if \code{radius} is 0.
+Return locations unchanged for a zero radius, or buffer their geometry
+with \code{\link[terra:buffer]{terra::buffer()}} for a positive radius.
+}
+\details{
+Positive buffers use \code{quadsegs = 180L} to approximate curved boundaries.
+Input type and radius validation are left to the caller.
+}
+\examples{
+sites <- terra::vect(
+  data.frame(lon = -78.8, lat = 35.9),
+  geom = c("lon", "lat"), crs = "EPSG:4326"
+)
+process_locs_radius(sites, radius = 1000)
+}
+\seealso{
+\code{\link[=process_locs_vector]{process_locs_vector()}}, \code{\link[terra:buffer]{terra::buffer()}}
+}
+\author{
+amadeus contributors
 }
 \keyword{auxiliary}
 \keyword{internal}
