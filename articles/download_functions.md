@@ -659,7 +659,7 @@ download_hms
 #>     if (!isTRUE(download)) {
 #>         return(invisible(download_preview(chr_urls, chr_filenames)))
 #>     }
-#>     download_result <- download_run_method(urls = chr_urls, destfiles = chr_filenames, 
+#>     download_result <- download_run(urls = chr_urls, destfiles = chr_filenames, 
 #>         token = NULL, show_progress = show_progress, max_tries = max_tries, 
 #>         rate_limit = rate_limit)
 #>     if (chr_format == "Shapefile") {
@@ -668,6 +668,6 @@ download_hms
 #>     }
 #>     download_return(download_result, hash, chr_dir_to_save)
 #> }
-#> <bytecode: 0x6245d70a0bf0>
+#> <bytecode: 0x6219f1ecccf8>
 #> <environment: namespace:amadeus>
 ```

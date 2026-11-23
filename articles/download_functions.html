@@ -19,7 +19,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -836,7 +836,7 @@ retained.</p>
 <span><span class="co">#&gt;     if (!isTRUE(download)) {</span></span>
 <span><span class="co">#&gt;         return(invisible(download_preview(chr_urls, chr_filenames)))</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     download_result &lt;- download_run_method(urls = chr_urls, destfiles = chr_filenames, </span></span>
+<span><span class="co">#&gt;     download_result &lt;- download_run(urls = chr_urls, destfiles = chr_filenames, </span></span>
 <span><span class="co">#&gt;         token = NULL, show_progress = show_progress, max_tries = max_tries, </span></span>
 <span><span class="co">#&gt;         rate_limit = rate_limit)</span></span>
 <span><span class="co">#&gt;     if (chr_format == "Shapefile") {</span></span>
@@ -845,7 +845,7 @@ retained.</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     download_return(download_result, hash, chr_dir_to_save)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x6245d70a0bf0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x6219f1ecccf8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

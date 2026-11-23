@@ -11,7 +11,7 @@ sources."><meta property="og:image" content="https://niehs.github.io/amadeus/log
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@ sources.</p>
 <span>    <span class="st">"koppen"</span>, <span class="st">"koppengeiger"</span>, <span class="st">"merra2"</span>, <span class="st">"merra"</span>, <span class="st">"modis"</span>, <span class="st">"narr"</span>, <span class="st">"nlcd"</span>, <span class="st">"noaa"</span>,</span>
 <span>    <span class="st">"sedac_groads"</span>, <span class="st">"sedac_population"</span>, <span class="st">"groads"</span>, <span class="st">"population"</span>, <span class="st">"hms"</span>, <span class="st">"smoke"</span>, <span class="st">"tri"</span>,</span>
 <span>    <span class="st">"nei"</span>, <span class="st">"gridmet"</span>, <span class="st">"terraclimate"</span>, <span class="st">"huc"</span>, <span class="st">"cropscape"</span>, <span class="st">"cdl"</span>, <span class="st">"prism"</span>, <span class="st">"edgar"</span>,</span>
-<span>    <span class="st">"improve"</span>, <span class="st">"drought"</span>, <span class="st">"spei"</span>, <span class="st">"eddi"</span>, <span class="st">"usdm"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"improve"</span>, <span class="st">"drought"</span>, <span class="st">"spei"</span>, <span class="st">"eddi"</span>, <span class="st">"usdm"</span>, <span class="st">"hrrr"</span><span class="op">)</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  hash <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -158,6 +158,11 @@ containing the combined MD5 hash of the source's output directory.</p></li>
     <p>This wrapper selects a downloader and forwards arguments. The source function
 performs validation, directory setup, discovery, downloading, and extraction.
 Previews and directory layouts follow that function's behavior.</p>
+<p>Sources using <code><a href="download_run.html">download_run()</a></code> download files concurrently when the caller
+has configured a fixed <code>"default"</code> mirai pool, and sequentially otherwise.
+AQS currently downloads sequentially. Discovery and archive extraction run
+in the calling process. See <code><a href="download_run.html">download_run()</a></code> for daemon setup, worker
+requirements, progress reporting, and rate scaling.</p>
 <p>The <code>"drought"</code> alias calls <code><a href="download_drought.html">download_drought()</a></code> with its default SPEI source
 unless <code>source</code> is supplied. The <code>"spei"</code>, <code>"eddi"</code>, and <code>"usdm"</code> aliases
 call <code><a href="download_spei.html">download_spei()</a></code>, <code><a href="download_eddi.html">download_eddi()</a></code>, and <code><a href="download_usdm.html">download_usdm()</a></code> directly.
@@ -199,6 +204,7 @@ Please refer to:</p><ul><li><p><code><a href="download_aqs.html">download_aqs</a
 <li><p><code><a href="download_spei.html">download_spei</a></code>: <code>"spei"</code></p></li>
 <li><p><code><a href="download_eddi.html">download_eddi</a></code>: <code>"eddi"</code></p></li>
 <li><p><code><a href="download_usdm.html">download_usdm</a></code>: <code>"usdm"</code></p></li>
+<li><p><code><a href="download_hrrr.html">download_hrrr</a></code>: <code>"HRRR"</code>, <code>"hrrr"</code></p></li>
 </ul></div>
     </div>
     <div class="section level2">

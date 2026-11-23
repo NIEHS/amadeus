@@ -67,8 +67,10 @@ download_tri(
 
 - show_progress:
 
-  logical(1). Show file download progress. Default is `TRUE`. Other
-  status messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - hash:
 
@@ -84,10 +86,12 @@ download_tri(
 
 - rate_limit:
 
-  numeric(1). Request-throttling interval in seconds, passed to
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
-  Controls the average request rate, rather than guaranteeing a minimum
-  gap between requests. Default is 2.
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 ## Value
 
@@ -98,7 +102,7 @@ locally.
 
 When `download = TRUE` and `hash = FALSE`, returns the download summary
 from
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 invisibly, including `success`, `failed`, and `skipped` file counts. The
 summary always contains `failed_urls` and `failed_files` character
 vectors, both `character(0)` when no downloads failed, including when
@@ -118,12 +122,12 @@ use lowercase `tbl`, while local file names use uppercase `TBL`.
 The output directory is created before returning a preview or
 downloading. Preview mode makes no network requests. Individual download
 failures are recorded by
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 during file transfers.
 
 Previews include all planned files, including those already present
 locally. During downloading,
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 skips existing non-empty files; missing or empty destination files are
 downloaded.
 
@@ -137,6 +141,25 @@ TRI data does not require authentication. State and tribal downloads are
 saved with jurisdiction-specific file names, while the U.S.-wide
 download keeps the historical `tri_raw_<year>.csv` naming pattern.
 
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
+
 ## References
 
 United States Environmental Protection Agency (2024). “TRI Basic Data
@@ -145,7 +168,7 @@ Files: Calendar Years 1987 – Present.”
 
 ## See also
 
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 [`process_tri()`](https://niehs.github.io/amadeus/reference/process_tri.md)
 
 ## Author

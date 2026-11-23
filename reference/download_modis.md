@@ -79,7 +79,9 @@ download_modis(
 
 - show_progress:
 
-  logical(1). Show per-file download progress. Discovery and summary
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
   messages may still be printed when `FALSE`.
 
 - hash:
@@ -98,14 +100,14 @@ download_modis(
   passed to discovery and downloads. Default is 2. Discovery uses a
   capacity-one bucket; 0 disables discovery throttling. File downloads
   follow the throttling policy in
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+  [`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md).
 
 ## Value
 
 With `download = FALSE`, an invisible preview list containing `urls`,
 `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the
 invisible download summary from
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md).
 With `hash = TRUE`, a visible combined MD5 hash for all files under
 `directory_to_save`.
 
@@ -142,8 +144,27 @@ completeness for tiled, swath, or composite products.
 
 Discovery keeps the existing 120-second per-attempt timeout; file
 downloads use
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)'s
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)'s
 default timeout.
+
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
 
 ## References
 
@@ -182,7 +203,7 @@ Sensing of Environment*, **210**, 113–143. ISSN 00344257.
 
 [`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md),
 [`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md),
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 
 ## Author
 

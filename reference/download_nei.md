@@ -73,8 +73,10 @@ download_nei(
 
 - show_progress:
 
-  logical(1). Show file download progress. Default is `TRUE`. Other
-  status messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - hash:
 
@@ -89,16 +91,19 @@ download_nei(
 
 - rate_limit:
 
-  numeric(1). Non-negative throttling interval in seconds, passed to
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
-  Default is 2.
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 ## Value
 
 With `download = FALSE`, an invisible preview list containing `urls`,
 `destfiles`, and `n_files`. Otherwise, after downloading and optional
 extraction, `hash = FALSE` returns the download summary from
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 invisibly. With `hash = TRUE`, returns a visible character scalar
 containing the combined MD5 hash of `data_files/`.
 
@@ -122,7 +127,7 @@ across inventories. Paths stored inside each archive are preserved.
 
 Preview destinations refer to the archives in `zip_files/`, including
 files that already exist locally. For actual downloads,
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 skips existing non-empty archives; they are still passed to extraction
 when `unzip = TRUE`. Preview mode makes no network requests. Individual
 download failures are recorded by the shared runner during file
@@ -140,6 +145,25 @@ which currently accepts only 2017 and 2020.
 ## Note
 
 NEI data does not require authentication.
+
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
 
 ## References
 

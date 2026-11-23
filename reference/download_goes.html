@@ -13,7 +13,7 @@ Files are in NetCDF format and contain aerosol detection variables
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,9 +136,10 @@ Default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
-<dd><p>logical(1). Show per-file download progress. Default
-is <code>TRUE</code>; discovery and summary messages may still be printed when
-<code>FALSE</code>.</p></dd>
+<dd><p>logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is <code>TRUE</code>. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
@@ -155,14 +156,14 @@ including the initial attempt. Default is 20.</p></dd>
 <dd><p>numeric(1). Non-negative request-throttling interval in
 seconds, passed to discovery and downloads. Default is 2. Discovery uses
 a capacity-one bucket; 0 disables discovery throttling. File downloads
-follow the throttling policy in <code><a href="download_run_method.html">download_run_method()</a></code>.</p></dd>
+follow the throttling policy in <code><a href="download_run.html">download_run()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>With <code>download = FALSE</code>, an invisible preview list containing <code>urls</code>,
 <code>destfiles</code>, and <code>n_files</code>. Otherwise, with <code>hash = FALSE</code>, the invisible
-summary from <code><a href="download_run_method.html">download_run_method()</a></code>, including <code>success</code>, <code>failed</code>, and
+summary from <code><a href="download_run.html">download_run()</a></code>, including <code>success</code>, <code>failed</code>, and
 <code>skipped</code> counts. With <code>hash = TRUE</code>, a visible combined MD5 hash for all
 files under <code>directory_to_save</code>, including previously downloaded files.</p>
 <p>The download summary always contains <code>success</code>, <code>failed</code>, <code>skipped</code>,
@@ -178,7 +179,7 @@ S3 prefixes <code>"ABI-L2-ADPC"</code>, <code>"ABI-L2-ADPF"</code>, and <code>"A
 <p>Daily listings supply the actual file names. Files are saved under
 <code>directory_to_save/&lt;product-prefix&gt;/&lt;year&gt;/&lt;day-of-year&gt;/&lt;hour&gt;/&lt;filename&gt;</code>.
 The day of year uses three digits, such as <code>"001"</code>. Existing non-empty
-destination files are skipped by <code><a href="download_run_method.html">download_run_method()</a></code>; preview results
+destination files are skipped by <code><a href="download_run.html">download_run()</a></code>; preview results
 include them because discovery does not filter local files.</p>
 <p>Discovery requests one S3 listing page of up to 1000 keys per day and keeps
 keys ending in <code>.nc</code>. Continuation tokens are not followed, so results can
@@ -186,11 +187,11 @@ be incomplete when a daily listing spans multiple pages.</p>
 <p>A successfully retrieved listing with no matching files emits a message
 and contributes no rows. Errors while requesting, parsing, or processing
 any listing stop discovery before downloading. Files are not required for
-every requested date. If all listings are empty, <code>download = TRUE</code> errors
-with <code>"No URLs provided for download."</code>, whereas <code>download = FALSE</code> returns
-an empty preview.</p>
+every requested date. If all listings are empty, <code>download = TRUE</code> fails
+the non-empty URL assertion in <code><a href="download_run.html">download_run()</a></code>, whereas <code>download = FALSE</code>
+returns an empty preview.</p>
 <p>Discovery uses a 60-second timeout per request attempt. File downloads use
-<code><a href="download_run_method.html">download_run_method()</a></code>'s default timeout of 3600 seconds.</p>
+<code><a href="download_run.html">download_run()</a></code>'s default timeout of 3600 seconds.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -202,8 +203,27 @@ A single day may contain several hundred files.</p></li>
 <code><a href="process_goes.html">process_goes()</a></code> to load and reproject to EPSG:4326.</p></li>
 </ul></div>
     <div class="section level2">
+    <h2 id="concurrent-downloads">Concurrent downloads<a class="anchor" aria-label="anchor" href="#concurrent-downloads"></a></h2>
+
+
+<p>File downloads use configured daemons in the <code>"default"</code> compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>. For concurrent downloads, configure a fixed local pool
+with <code>mirai::daemons(n, .compute = "default")</code> before calling this function.
+Daemon detection, counting, and task dispatch always use the <code>"default"</code>
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the <code>n</code> workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.</p>
+<p>Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="download_data.html">download_data()</a></code>, <code><a href="process_goes.html">process_goes()</a></code>, <code><a href="download_run_method.html">download_run_method()</a></code>,
+    <div class="dont-index"><p><code><a href="download_data.html">download_data()</a></code>, <code><a href="process_goes.html">process_goes()</a></code>, <code><a href="download_run.html">download_run()</a></code>,
 <code><a href="download_preview.html">download_preview()</a></code></p></div>
     </div>
     <div class="section level2">

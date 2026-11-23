@@ -108,6 +108,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_groads.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_hash.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_hms.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_hrrr.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_huc.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_improve.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger.html</loc></url>
@@ -122,8 +123,11 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_prism.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_remove_command.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_remove_zips.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_report.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_run.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_run_legacy.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_run_method.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_run_mirai.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_sanitize_path.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_setup_dir.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_sink.html</loc></url>

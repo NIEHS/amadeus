@@ -74,8 +74,10 @@ download_huc(
 
 - show_progress:
 
-  logical(1). Show file download progress. Default is `TRUE`. Other
-  status messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - max_tries:
 
@@ -84,10 +86,12 @@ download_huc(
 
 - rate_limit:
 
-  numeric(1). Request-throttling interval in seconds, passed to
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
-  Controls the average request rate, rather than guaranteeing a minimum
-  gap between requests. Default is 2.
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 ## Value
 
@@ -96,7 +100,7 @@ When `download = FALSE`, an invisible list containing `urls`,
 
 When `download = TRUE` and `hash = FALSE`, returns the download summary
 from
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 invisibly, including `success`, `failed`, and `skipped` file counts. The
 summary always contains `failed_urls` and `failed_files` character
 vectors, both `character(0)` when no downloads failed, including when
@@ -119,7 +123,7 @@ uses its first listed choice.
 already exists locally and does not check remote availability.
 
 During downloading,
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 skips an existing non-empty archive in `zip_files/`. That archive is
 still passed to extraction when `unzip = TRUE`. Existing extracted data
 alone do not cause a download to be skipped. Archive member names and
@@ -139,6 +143,25 @@ geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10,
 etc. For whom wants to download a specific region, please visit [Get
 NHDPlus
 Data](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas)
+
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
 
 ## References
 

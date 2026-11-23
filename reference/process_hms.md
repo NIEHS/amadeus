@@ -49,9 +49,10 @@ Mitchell Manware
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 hms <- process_hms(
   date = c("2018-12-30", "2019-01-01"),
   path = "../tests/testdata/hms/"
 )
-#> Smoke plume polygons absent from 2018-12-30 to 2019-01-01. Returning vector of dates.
+} # }
 ```

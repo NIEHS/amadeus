@@ -39,6 +39,7 @@ handles the `download = FALSE` condition and exits using
 
 ## See also
 
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
 
 ## Author
@@ -57,7 +58,7 @@ download_preview(
 #> [1] "https://example.com/data.zip"
 #> 
 #> $destfiles
-#> [1] "/tmp/Rtmp9SZkBx/data.zip"
+#> [1] "/tmp/Rtmp62PB4F/data.zip"
 #> 
 #> $n_files
 #> [1] 1

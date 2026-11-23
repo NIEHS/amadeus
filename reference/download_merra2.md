@@ -95,9 +95,10 @@ download_merra2(
 
 - show_progress:
 
-  logical(1). Show per-file progress messages and download progress
-  bars. Default is `TRUE`; summary and status messages may still be
-  printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - max_tries:
 
@@ -138,14 +139,14 @@ URLs are constructed directly from the requested dates.
 Discovery stops before file downloads if a monthly listing cannot be
 read, a requested data date is missing, or different URLs in a listing
 would use the same local filename. Once discovery succeeds,
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 skips existing non-empty files and records individual download failures,
 warning after the remaining files have been attempted.
 
 Listing requests to the same host are spaced by at least `rate_limit`
 seconds; 0 disables listing throttling. File downloads use the
 host-based token bucket described in
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md).
 Discovery and file downloads use their default per-attempt timeout of
 3600 seconds; this function does not expose a `timeout` argument.
 
@@ -157,11 +158,30 @@ require a valid NASA Earthdata token for authentication. Use
 for setup. The `"fwi"` collection is hosted on the public GlobalFWI
 portal and does not require Earthdata authentication.
 
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
+
 ## See also
 
 [`setup_nasa_token()`](https://niehs.github.io/amadeus/reference/setup_nasa_token.md),
 [`get_token()`](https://niehs.github.io/amadeus/reference/get_token.md),
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 [`download_hash()`](https://niehs.github.io/amadeus/reference/download_hash.md),
 [`process_merra2()`](https://niehs.github.io/amadeus/reference/process_merra2.md),
 [`get_merra2_info()`](https://niehs.github.io/amadeus/reference/get_merra2_info.md)

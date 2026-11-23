@@ -11,7 +11,7 @@ Climatology Lab's gridMET dataset."><meta property="og:image" content="https://n
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,7 +124,10 @@ For SPEI/EDDI, complete multi-year files are downloaded regardless of
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
-<dd><p>logical(1). Show download progress (default TRUE)</p></dd>
+<dd><p>logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is <code>TRUE</code>. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
@@ -136,14 +139,17 @@ For SPEI/EDDI, complete multi-year files are downloaded regardless of
 
 
 <dt id="arg-rate-limit">rate_limit<a class="anchor" aria-label="anchor" href="#arg-rate-limit"></a></dt>
-<dd><p>numeric(1). Minimum seconds between requests (default 2)</p></dd>
+<dd><p>numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to <code><a href="download_run_method.html">download_run_method()</a></code> for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the <code>"default"</code> compute profile before being passed to each worker.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>With <code>download = FALSE</code>, an invisible preview list containing
 <code>urls</code>, <code>destfiles</code>, and <code>n_files</code>. With <code>download = TRUE</code> and
-<code>hash = FALSE</code>, an invisible summary from <code><a href="download_run_method.html">download_run_method()</a></code> containing
+<code>hash = FALSE</code>, an invisible summary from <code><a href="download_run.html">download_run()</a></code> containing
 <code>success</code>, <code>failed</code>, <code>skipped</code>, <code>failed_urls</code>, and <code>failed_files</code>. The two
 failure vectors are <code>character(0)</code> when no downloads failed, including when
 every file was skipped. With <code>download = TRUE</code> and <code>hash = TRUE</code>, a visible
@@ -173,6 +179,25 @@ See <a href="https://www.northwestknowledge.net/metdata/data/" class="external-l
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>gridMET data does not require authentication.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="concurrent-downloads">Concurrent downloads<a class="anchor" aria-label="anchor" href="#concurrent-downloads"></a></h2>
+
+
+<p>File downloads use configured daemons in the <code>"default"</code> compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>. For concurrent downloads, configure a fixed local pool
+with <code>mirai::daemons(n, .compute = "default")</code> before calling this function.
+Daemon detection, counting, and task dispatch always use the <code>"default"</code>
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the <code>n</code> workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.</p>
+<p>Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

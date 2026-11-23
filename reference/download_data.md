@@ -12,7 +12,7 @@ download_data(
     "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
     "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
     "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve", "drought", "spei", "eddi", "usdm"),
+    "improve", "drought", "spei", "eddi", "usdm", "hrrr"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -92,6 +92,16 @@ This wrapper selects a downloader and forwards arguments. The source
 function performs validation, directory setup, discovery, downloading,
 and extraction. Previews and directory layouts follow that function's
 behavior.
+
+Sources using
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
+download files concurrently when the caller has configured a fixed
+`"default"` mirai pool, and sequentially otherwise. AQS currently
+downloads sequentially. Discovery and archive extraction run in the
+calling process. See
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
+for daemon setup, worker requirements, progress reporting, and rate
+scaling.
 
 The `"drought"` alias calls
 [`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md)
@@ -190,6 +200,9 @@ For details of each download function per dataset, Please refer to:
 
 - [`download_usdm`](https://niehs.github.io/amadeus/reference/download_usdm.md):
   `"usdm"`
+
+- [`download_hrrr`](https://niehs.github.io/amadeus/reference/download_hrrr.md):
+  `"HRRR"`, `"hrrr"`
 
 ## Author
 

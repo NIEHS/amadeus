@@ -84,7 +84,10 @@ download_nlcd(
 
 - show_progress:
 
-  logical(1). Show download progress? Default is `TRUE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - hash:
 
@@ -100,7 +103,12 @@ download_nlcd(
 
 - rate_limit:
 
-  numeric(1). Minimum seconds between requests (default 2)
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 ## Value
 
@@ -119,6 +127,25 @@ of `hash`.
 When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5
 hash of the files in the `data_files` directory is returned instead of a
 list.
+
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
 
 ## References
 

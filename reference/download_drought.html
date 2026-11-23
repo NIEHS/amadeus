@@ -11,7 +11,7 @@ and handles previews, downloads, optional extraction, and return values."><meta 
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,9 +138,10 @@ ignored when <code>download = FALSE</code>.</p></dd>
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
-<dd><p>logical(1). Show file download progress. Default is
-<code>TRUE</code>. Other status and summary messages may still be printed when
-<code>FALSE</code>.</p></dd>
+<dd><p>logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is <code>TRUE</code>. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-max-tries">max_tries<a class="anchor" aria-label="anchor" href="#arg-max-tries"></a></dt>
@@ -149,8 +150,10 @@ the initial attempt. Must be at least 1. Default is <code>3L</code>.</p></dd>
 
 
 <dt id="arg-rate-limit">rate_limit<a class="anchor" aria-label="anchor" href="#arg-rate-limit"></a></dt>
-<dd><p>numeric(1). Finite, non-negative request-throttling
-interval in seconds, passed to <code><a href="download_run_method.html">download_run_method()</a></code>. Default is 2.</p></dd>
+<dd><p>numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to <code><a href="download_run_method.html">download_run_method()</a></code> for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the <code>"default"</code> compute profile before being passed to each worker.</p></dd>
 
 
 <dt id="arg-unzip">unzip<a class="anchor" aria-label="anchor" href="#arg-unzip"></a></dt>
@@ -209,7 +212,7 @@ validation occurs once in the source function; this wrapper does not
 repeat validation, directory creation, or download execution.</p>
 <p>Previews create the output directories but make no network requests.
 They include existing destination files. Actual downloads use
-<code><a href="download_run_method.html">download_run_method()</a></code>, which skips existing non-empty files and reports
+<code><a href="download_run.html">download_run()</a></code>, which skips existing non-empty files and reports
 individual failures. See the source functions for endpoint limitations
 and extraction behavior.</p>
 <p>SPEI retains the flat <code>speiNN.nc</code> filename across versions for compatibility
@@ -221,6 +224,25 @@ performed during processing.</p>
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>No authentication is required. SPEI and EDDI provide raster inputs;
 USDM provides polygon inputs for the downstream drought workflow.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="concurrent-downloads">Concurrent downloads<a class="anchor" aria-label="anchor" href="#concurrent-downloads"></a></h2>
+
+
+<p>File downloads use configured daemons in the <code>"default"</code> compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>. For concurrent downloads, configure a fixed local pool
+with <code>mirai::daemons(n, .compute = "default")</code> before calling this function.
+Daemon detection, counting, and task dispatch always use the <code>"default"</code>
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the <code>n</code> workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.</p>
+<p>Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

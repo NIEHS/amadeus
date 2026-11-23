@@ -73,8 +73,10 @@ download_drought(
 
 - show_progress:
 
-  logical(1). Show file download progress. Default is `TRUE`. Other
-  status and summary messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - max_tries:
 
@@ -83,10 +85,12 @@ download_drought(
 
 - rate_limit:
 
-  numeric(1). Finite, non-negative request-throttling interval in
-  seconds, passed to
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
-  Default is 2.
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 - unzip:
 
@@ -150,7 +154,7 @@ repeat validation, directory creation, or download execution.
 
 Previews create the output directories but make no network requests.
 They include existing destination files. Actual downloads use
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 which skips existing non-empty files and reports individual failures.
 See the source functions for endpoint limitations and extraction
 behavior.
@@ -166,6 +170,25 @@ processing.
 
 No authentication is required. SPEI and EDDI provide raster inputs; USDM
 provides polygon inputs for the downstream drought workflow.
+
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
 
 ## See also
 

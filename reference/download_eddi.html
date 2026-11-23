@@ -9,7 +9,7 @@ download the selected accumulation timescale using the shared workflow."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,9 +135,10 @@ summary. Default is <code>FALSE</code>; ignored when <code>download = FALSE</cod
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
-<dd><p>logical(1). Show file download progress. Default is
-<code>TRUE</code>. Other status and summary messages may still be printed when
-<code>FALSE</code>.</p></dd>
+<dd><p>logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is <code>TRUE</code>. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-max-tries">max_tries<a class="anchor" aria-label="anchor" href="#arg-max-tries"></a></dt>
@@ -146,8 +147,10 @@ the initial attempt. Must be at least 1. Default is <code>3L</code>.</p></dd>
 
 
 <dt id="arg-rate-limit">rate_limit<a class="anchor" aria-label="anchor" href="#arg-rate-limit"></a></dt>
-<dd><p>numeric(1). Finite, non-negative request-throttling
-interval in seconds, passed to <code><a href="download_run_method.html">download_run_method()</a></code>. Default is 2.</p></dd>
+<dd><p>numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to <code><a href="download_run_method.html">download_run_method()</a></code> for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the <code>"default"</code> compute profile before being passed to each worker.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -158,7 +161,7 @@ interval in seconds, passed to <code><a href="download_run_method.html">download
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>With <code>download = FALSE</code>, an invisible list containing <code>urls</code>,
 <code>destfiles</code>, and <code>n_files</code>. Otherwise, an invisible download summary from
-<code><a href="download_run_method.html">download_run_method()</a></code> when <code>hash = FALSE</code>, or a visible character scalar
+<code><a href="download_run.html">download_run()</a></code> when <code>hash = FALSE</code>, or a visible character scalar
 containing the output-directory MD5 hash when <code>hash = TRUE</code>.</p>
 <p>The download summary always contains <code>success</code>, <code>failed</code>, <code>skipped</code>,
 <code>failed_urls</code>, and <code>failed_files</code>. The two failure vectors are
@@ -172,8 +175,27 @@ All requested Tuesdays are included in the plan; remote availability is
 not discovered from directory listings.</p>
 <p>A preview creates the output directory and returns all planned URLs and
 destinations, including existing files, without contacting the provider.
-Actual downloads use <code><a href="download_run_method.html">download_run_method()</a></code>, which skips existing non-empty
+Actual downloads use <code><a href="download_run.html">download_run()</a></code>, which skips existing non-empty
 files and records individual transfer failures.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="concurrent-downloads">Concurrent downloads<a class="anchor" aria-label="anchor" href="#concurrent-downloads"></a></h2>
+
+
+<p>File downloads use configured daemons in the <code>"default"</code> compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>. For concurrent downloads, configure a fixed local pool
+with <code>mirai::daemons(n, .compute = "default")</code> before calling this function.
+Daemon detection, counting, and task dispatch always use the <code>"default"</code>
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the <code>n</code> workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.</p>
+<p>Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

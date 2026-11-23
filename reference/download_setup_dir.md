@@ -37,8 +37,8 @@ already existed or were newly created.
 ``` r
 directory <- file.path(tempdir(), "amadeus_downloads")
 download_setup_dir(directory)
-#> [1] "/tmp/Rtmp9SZkBx/amadeus_downloads/"
+#> [1] "/tmp/Rtmp62PB4F/amadeus_downloads/"
 download_setup_dir(directory, zip = TRUE)
-#> [1] "/tmp/Rtmp9SZkBx/amadeus_downloads/zip_files/" 
-#> [2] "/tmp/Rtmp9SZkBx/amadeus_downloads/data_files/"
+#> [1] "/tmp/Rtmp62PB4F/amadeus_downloads/zip_files/" 
+#> [2] "/tmp/Rtmp62PB4F/amadeus_downloads/data_files/"
 ```

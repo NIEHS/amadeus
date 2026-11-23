@@ -354,6 +354,8 @@ Functions which download data from URLs
   : Download roads data
 - [`download_hms()`](https://niehs.github.io/amadeus/reference/download_hms.md)
   : Download wildfire smoke data
+- [`download_hrrr()`](https://niehs.github.io/amadeus/reference/download_hrrr.md)
+  : Download NOAA High-Resolution Rapid Refresh (HRRR) data
 - [`download_huc()`](https://niehs.github.io/amadeus/reference/download_huc.md)
   : Download National Hydrography Dataset Plus (NHDPlus) data
 - [`download_improve()`](https://niehs.github.io/amadeus/reference/download_improve.md)

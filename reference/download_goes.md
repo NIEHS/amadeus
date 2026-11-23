@@ -62,8 +62,10 @@ download_goes(
 
 - show_progress:
 
-  logical(1). Show per-file download progress. Default is `TRUE`;
-  discovery and summary messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - hash:
 
@@ -81,14 +83,14 @@ download_goes(
   passed to discovery and downloads. Default is 2. Discovery uses a
   capacity-one bucket; 0 disables discovery throttling. File downloads
   follow the throttling policy in
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+  [`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md).
 
 ## Value
 
 With `download = FALSE`, an invisible preview list containing `urls`,
 `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the
 invisible summary from
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 including `success`, `failed`, and `skipped` counts. With `hash = TRUE`,
 a visible combined MD5 hash for all files under `directory_to_save`,
 including previously downloaded files.
@@ -111,7 +113,7 @@ Daily listings supply the actual file names. Files are saved under
 `directory_to_save/<product-prefix>/<year>/<day-of-year>/<hour>/<filename>`.
 The day of year uses three digits, such as `"001"`. Existing non-empty
 destination files are skipped by
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md);
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md);
 preview results include them because discovery does not filter local
 files.
 
@@ -123,12 +125,13 @@ A successfully retrieved listing with no matching files emits a message
 and contributes no rows. Errors while requesting, parsing, or processing
 any listing stop discovery before downloading. Files are not required
 for every requested date. If all listings are empty, `download = TRUE`
-errors with `"No URLs provided for download."`, whereas
-`download = FALSE` returns an empty preview.
+fails the non-empty URL assertion in
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
+whereas `download = FALSE` returns an empty preview.
 
 Discovery uses a 60-second timeout per request attempt. File downloads
 use
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)'s
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)'s
 default timeout of 3600 seconds.
 
 ## Note
@@ -142,11 +145,30 @@ default timeout of 3600 seconds.
   [`process_goes()`](https://niehs.github.io/amadeus/reference/process_goes.md)
   to load and reproject to EPSG:4326.
 
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
+
 ## See also
 
 [`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md),
 [`process_goes()`](https://niehs.github.io/amadeus/reference/process_goes.md),
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 [`download_preview()`](https://niehs.github.io/amadeus/reference/download_preview.md)
 
 ## Author

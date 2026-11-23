@@ -148,8 +148,10 @@ download_edgar(
 
 - show_progress:
 
-  logical(1). Show per-file download progress. Default is `TRUE`;
-  summary messages may still be printed when `FALSE`.
+  logical(1). Show per-file messages and download progress bars during
+  sequential downloads. Default is `TRUE`. Ignored during concurrent
+  downloads, where per-file progress is disabled. Status and summary
+  messages may still be printed when `FALSE`.
 
 - max_tries:
 
@@ -158,10 +160,12 @@ download_edgar(
 
 - rate_limit:
 
-  numeric(1). Non-negative request-throttling interval in seconds,
-  passed to
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
-  Default is 2.
+  numeric(1). Request-throttling interval in seconds. Default is 2.
+  Passed unchanged to
+  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  for sequential downloads. For concurrent downloads, multiplied by the
+  configured daemon count for the `"default"` compute profile before
+  being passed to each worker.
 
 ## Value
 
@@ -169,7 +173,7 @@ download_edgar(
   `destfiles`, and `n_files`, the number of planned archive downloads.
 
 - With `download = TRUE` and `hash = FALSE`, the invisible summary from
-  [`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+  [`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
   with `success`, `failed`, and `skipped` counts. It always contains
   `failed_urls` and `failed_files` character vectors, both
   `character(0)` when no downloads failed, including when every file was
@@ -208,24 +212,51 @@ and
 [`calculate_edgar()`](https://niehs.github.io/amadeus/reference/calculate_edgar.md)
 workflow.
 
-Local archive names retain the `edgar_<temp_res>_` prefix, or
-`edgar_voc_` when VOC speciation is requested with `temp_res = NULL`.
+Local archive names use `edgar_<label>_<species>_<provider filename>`
+for air pollutants and `edgar_<label>_voc<number>_<provider filename>`
+for VOC speciation. The label is `temp_res`, or `"voc"` for VOC
+speciation when `temp_res = NULL`. Including the species or VOC group
+keeps destinations distinct when provider filenames are shared across
+groups. Provider URLs and filenames inside the archives are unchanged.
+Archives saved under the previous naming scheme are not recognized as
+existing downloads and must be renamed to the corresponding new names to
+be reused.
+
 Preview results include all constructed URLs and destination paths,
 including existing files. A preview creates the output directories but
 makes no network requests and does not verify remote availability. No
 shell-command file is created.
 
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 skips existing non-empty destination files and records individual
 download failures in its summary. File downloads use the shared default
 timeout. Extraction and cleanup occur before returning, and extraction
 errors can prevent a normal return. Summary counts describe downloads,
 not extraction.
 
+## Concurrent downloads
+
+File downloads use configured daemons in the `"default"` compute
+profile, or run sequentially when that profile has no configured
+daemons. Daemon creation and shutdown are managed by the caller using
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+For concurrent downloads, configure a fixed local pool with
+`mirai::daemons(n, .compute = "default")` before calling this function.
+Daemon detection, counting, and task dispatch always use the `"default"`
+compute profile, regardless of the active profile. Daemon counting and
+rate scaling assume that the pool still contains the `n` workers
+configured by that call, with no workers added separately or pool
+resizing during downloads. Each worker receives one URL/destination pair
+per task; the remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and
+directory hashing run in the calling process. Only file downloads are
+dispatched to workers.
+
 ## See also
 
 [`download_data()`](https://niehs.github.io/amadeus/reference/download_data.md),
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md),
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md),
 [`process_edgar()`](https://niehs.github.io/amadeus/reference/process_edgar.md)
 
 ## Author

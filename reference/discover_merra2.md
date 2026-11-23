@@ -102,12 +102,12 @@ filename.
 Directory creation and data-file downloads are handled by
 [`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md)
 and
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md).
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md).
 
 ## See also
 
 [`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md),
-[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+[`download_run()`](https://niehs.github.io/amadeus/reference/download_run.md)
 
 ## Examples
 

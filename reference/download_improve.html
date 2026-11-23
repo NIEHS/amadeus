@@ -13,7 +13,7 @@ extracted to pipe-delimited .txt files using the shared download workflow."><met
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,8 +150,10 @@ loop finishes. Default is <code>FALSE</code>. May be <code>TRUE</code> only when
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
-<dd><p>logical(1). Show file download progress. Default is
-<code>TRUE</code>. Other status messages may still be printed when <code>FALSE</code>.</p></dd>
+<dd><p>logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is <code>TRUE</code>. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
@@ -166,8 +168,10 @@ including the initial attempt. Default is 20.</p></dd>
 
 
 <dt id="arg-rate-limit">rate_limit<a class="anchor" aria-label="anchor" href="#arg-rate-limit"></a></dt>
-<dd><p>numeric(1). Non-negative throttling interval in seconds,
-passed to <code><a href="download_run_method.html">download_run_method()</a></code>. Default is 2.</p></dd>
+<dd><p>numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to <code><a href="download_run_method.html">download_run_method()</a></code> for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the <code>"default"</code> compute profile before being passed to each worker.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -177,7 +181,7 @@ and <code>n_files</code> is returned regardless of <code>hash</code>. These desc
 downloads, including files that already exist locally; <code>n_files</code> is the
 number of planned URLs.</p>
 <p>When <code>download = TRUE</code>, after downloading and optional extraction,
-<code>hash = FALSE</code> returns the download summary from <code><a href="download_run_method.html">download_run_method()</a></code>
+<code>hash = FALSE</code> returns the download summary from <code><a href="download_run.html">download_run()</a></code>
 invisibly, including counts of successful, failed, and skipped files.
 With <code>hash = TRUE</code>, returns a visible character scalar containing the
 combined MD5 hash of <code>data_files/</code>.</p>
@@ -192,13 +196,13 @@ combined MD5 hash of <code>data_files/</code>.</p>
 <code>zip_files/</code> and <code>data_files/</code> are sibling directories created beneath
 <code>directory_to_save</code>, including when <code>unzip = FALSE</code> or <code>download = FALSE</code>.</p>
 <p>Preview mode creates the output directories and makes no network requests.
-Individual download failures are recorded by <code><a href="download_run_method.html">download_run_method()</a></code> during
+Individual download failures are recorded by <code><a href="download_run.html">download_run()</a></code> during
 file transfers.</p>
 <p>All archives share <code>data_files/</code> as their extraction destination. Names
 and paths stored inside each archive are preserved. Pass the directory
 containing the extracted <code>PREFIX_YYYY.txt</code> files, normally <code>data_files/</code>,
 as <code>path</code> to <code><a href="process_improve.html">process_improve()</a></code>.</p>
-<p><code><a href="download_run_method.html">download_run_method()</a></code> skips existing non-empty archives in <code>zip_files/</code>.
+<p><code><a href="download_run.html">download_run()</a></code> skips existing non-empty archives in <code>zip_files/</code>.
 Those archives are still passed to extraction when <code>unzip = TRUE</code>.
 Existing extracted <code>.txt</code> files alone do not cause a download to be skipped.</p>
 <p>Hashing covers all files recursively under <code>data_files/</code>, including existing
@@ -211,6 +215,25 @@ data.</p>
     <p>IMPROVE data does not require authentication. Annual downloads contain
 measurement files; site metadata is resolved separately by
 <code><a href="process_improve.html">process_improve()</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="concurrent-downloads">Concurrent downloads<a class="anchor" aria-label="anchor" href="#concurrent-downloads"></a></h2>
+
+
+<p>File downloads use configured daemons in the <code>"default"</code> compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>. For concurrent downloads, configure a fixed local pool
+with <code>mirai::daemons(n, .compute = "default")</code> before calling this function.
+Daemon detection, counting, and task dispatch always use the <code>"default"</code>
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the <code>n</code> workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.</p>
+<p>Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
