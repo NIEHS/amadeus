@@ -478,6 +478,36 @@ testthat::test_that("calc_worker", {
   testthat::expect_s3_class(cwres, "data.frame")
 })
 
+testthat::test_that(
+  "calc_worker(locs_vector=MULTIPOINT, layers=2): preserves metadata",
+  {
+    from <- terra::rast(
+      nrows = 1, ncols = 4, nlyrs = 2,
+      xmin = 0, xmax = 4, ymin = 0, ymax = 1, crs = "EPSG:3857"
+    )
+    terra::values(from) <- cbind(1:4, 5:8)
+    names(from) <- c("tmp_20210504_0000", "tmp_20210504_0100")
+    wkt <- c(
+      "MULTIPOINT ((0.5 0.5), (1.5 0.5))",
+      "MULTIPOINT ((2.5 0.5), (3.5 0.5))"
+    )
+    locs <- sf::st_sf(
+      site_id = c("A", "B"), geometry = sf::st_as_sfc(wkt, crs = 3857)
+    )
+
+    out <- suppressMessages(calc_worker(
+      dataset = "hrrr", from = from,
+      locs_vector = terra::vect(locs),
+      locs_df = data.frame(site_id = locs$site_id, geometry = wkt),
+      time = c(2, 3), time_type = "hour", radius = 0
+    ))
+
+    testthat::expect_identical(out$site_id, rep(c("A", "A", "B", "B"), 2))
+    testthat::expect_identical(out$geometry, rep(wkt[c(1, 1, 2, 2)], 2))
+    testthat::expect_equal(out$tmp_0, 1:8)
+  }
+)
+
 ################################################################################
 ##### calc_summarize_temporal
 testthat::test_that("calc_summarize_temporal returns input when NULL", {

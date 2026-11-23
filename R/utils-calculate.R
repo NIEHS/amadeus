@@ -728,6 +728,7 @@ calc_worker <- function(
     fun = fun,
     weighted = !is.null(weights_prepared)
   )
+  locs_df_original <- locs_df
   for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
     data_layer <- from[[l]]
@@ -798,7 +799,7 @@ calc_worker <- function(
           bind = FALSE,
           na.rm = TRUE
         )
-        locs_df <- locs_df[sites_extracted_layer[[1L]], , drop = FALSE]
+        locs_df <- locs_df_original[sites_extracted_layer[[1L]], , drop = FALSE]
         sites_extracted_layer <- sites_extracted_layer[, -1L, drop = FALSE]
       } else {
         weighted_geoms <- amadeus::calc_prepare_exact_geoms(
