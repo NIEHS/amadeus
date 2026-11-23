@@ -44,8 +44,10 @@ Default is \code{TRUE}.}
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} emits a
 warning. Default is \code{FALSE}.}
 
-\item{show_progress}{logical(1). Show file download progress. Default is
-\code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{hash}{logical(1). Return a combined MD5 hash of the files under
 \code{directory_to_save} instead of the download summary when \code{download = TRUE}.
@@ -54,9 +56,10 @@ Ignored when \code{download = FALSE}. Default is \code{FALSE}.}
 \item{max_tries}{integer(1). Maximum attempts per file download request,
 including the initial attempt. Default is 20.}
 
-\item{rate_limit}{numeric(1). Request-throttling interval in seconds,
-passed to \code{\link[=download_run_method]{download_run_method()}}. Controls the average request rate,
-rather than guaranteeing a minimum gap between requests. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 }
 \value{
 When \code{download = FALSE}, an invisible list containing \code{urls}, \code{destfiles},
@@ -64,7 +67,7 @@ and \code{n_files} is returned regardless of \code{hash}. The file count is the 
 of planned URLs, including files that already exist locally.
 
 When \code{download = TRUE} and \code{hash = FALSE}, returns the download summary from
-\code{\link[=download_run_method]{download_run_method()}} invisibly, including \code{success}, \code{failed}, and
+\code{\link[=download_run]{download_run()}} invisibly, including \code{success}, \code{failed}, and
 \code{skipped} file counts. The summary always contains \code{failed_urls} and
 \code{failed_files} character vectors, both \code{character(0)} when no downloads
 failed, including when every file was skipped.
@@ -90,10 +93,10 @@ and \code{tri_raw_2020_TBL.csv} for \code{"tbl"}. Tribal download URLs use lower
 
 The output directory is created before returning a preview or downloading.
 Preview mode makes no network requests. Individual download failures are
-recorded by \code{\link[=download_run_method]{download_run_method()}} during file transfers.
+recorded by \code{\link[=download_run]{download_run()}} during file transfers.
 
 Previews include all planned files, including those already present locally.
-During downloading, \code{\link[=download_run_method]{download_run_method()}} skips existing non-empty files;
+During downloading, \code{\link[=download_run]{download_run()}} skips existing non-empty files;
 missing or empty destination files are downloaded.
 
 Hashing includes all files recursively under \code{directory_to_save}, including
@@ -104,6 +107,25 @@ TRI data does not require authentication. State and tribal downloads
 are saved with jurisdiction-specific file names, while the U.S.-wide
 download keeps the historical \code{tri_raw_<year>.csv} naming pattern.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_tri(
@@ -118,7 +140,7 @@ download_tri(
 \insertRef{web_usepa2024tri}{amadeus}
 }
 \seealso{
-\code{\link[=download_run_method]{download_run_method()}}, \code{\link[=process_tri]{process_tri()}}
+\code{\link[=download_run]{download_run()}}, \code{\link[=process_tri]{process_tri()}}
 }
 \author{
 Mariana Kassien, Insang Song

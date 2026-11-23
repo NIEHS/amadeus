@@ -36,9 +36,7 @@
 #'   Discovery still queries S3 listings in preview mode. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   Default is `FALSE`.
-#' @param show_progress logical(1). Show per-file download progress. Default
-#'   is `TRUE`; discovery and summary messages may still be printed when
-#'   `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return the combined directory MD5 hash when `TRUE`.
 #'   Default is `FALSE`. Ignored when `download = FALSE`.
 #' @param max_tries integer(1). Maximum attempts per listing or file request,
@@ -46,7 +44,7 @@
 #' @param rate_limit numeric(1). Non-negative request-throttling interval in
 #'   seconds, passed to discovery and downloads. Default is 2. Discovery uses
 #'   a capacity-one bucket; 0 disables discovery throttling. File downloads
-#'   follow the throttling policy in [download_run_method()].
+#'   follow the throttling policy in [download_run()].
 #' @details
 #' `satellite` and `product` are matched with [base::match.arg()], allowing
 #' case-sensitive, unambiguous partial matches. Omitted arguments select the
@@ -56,7 +54,7 @@
 #' Daily listings supply the actual file names. Files are saved under
 #' `directory_to_save/<product-prefix>/<year>/<day-of-year>/<hour>/<filename>`.
 #' The day of year uses three digits, such as `"001"`. Existing non-empty
-#' destination files are skipped by [download_run_method()]; preview results
+#' destination files are skipped by [download_run()]; preview results
 #' include them because discovery does not filter local files.
 #'
 #' Discovery requests one S3 listing page of up to 1000 keys per day and keeps
@@ -66,16 +64,16 @@
 #' A successfully retrieved listing with no matching files emits a message
 #' and contributes no rows. Errors while requesting, parsing, or processing
 #' any listing stop discovery before downloading. Files are not required for
-#' every requested date. If all listings are empty, `download = TRUE` errors
-#' with `"No URLs provided for download."`, whereas `download = FALSE` returns
-#' an empty preview.
+#' every requested date. If all listings are empty, `download = TRUE` fails
+#' the non-empty URL assertion in [download_run()], whereas `download = FALSE`
+#' returns an empty preview.
 #'
 #' Discovery uses a 60-second timeout per request attempt. File downloads use
-#' [download_run_method()]'s default timeout of 3600 seconds.
+#' [download_run()]'s default timeout of 3600 seconds.
 #' @return
 #' With `download = FALSE`, an invisible preview list containing `urls`,
 #' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
-#' summary from [download_run_method()], including `success`, `failed`, and
+#' summary from [download_run()], including `success`, `failed`, and
 #' `skipped` counts. With `hash = TRUE`, a visible combined MD5 hash for all
 #' files under `directory_to_save`, including previously downloaded files.
 #'
@@ -83,7 +81,7 @@
 #' `failed_urls`, and `failed_files`. The two failure vectors are
 #' `character(0)` when no files failed, including when every file was skipped.
 #' @author Mitchell Manware
-#' @seealso [download_data()], [process_goes()], [download_run_method()],
+#' @seealso [download_data()], [process_goes()], [download_run()],
 #'   [download_preview()]
 #' @importFrom httr2 request
 #' @importFrom httr2 req_retry
@@ -101,6 +99,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 # nolint end
 download_goes <- function(
@@ -188,7 +187,7 @@ download_goes <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -259,7 +258,7 @@ download_goes <- function(
 #' output columns if every listing is successfully queried but has no matching
 #' files. Listing errors stop execution instead of returning a table. Row
 #' names are reset.
-#' @seealso [download_goes()], [download_run_method()]
+#' @seealso [download_goes()], [download_run()]
 #' @keywords internal
 #' @noRd
 discover_goes <- function(

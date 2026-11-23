@@ -3741,6 +3741,42 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
 
 
 ################################################################################
+##### MODIS discovery rejects conflicting destination filenames
+
+testthat::test_that(
+  "discover_modis(product=MOD09GA): rejects destination collisions",
+  {
+    filename <- "MOD09GA.A2020001.h10v05.061.2020001000000.hdf"
+    urls <- paste0(
+      c("https://example.org/primary/", "https://example.org/mirror/"),
+      filename
+    )
+    granules <- lapply(urls, function(url) {
+      list(links = list(list(
+        rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+        href = url
+      )))
+    })
+    testthat::local_mocked_bindings(
+      query_modis_granules = function(...) granules,
+      .package = "amadeus"
+    )
+
+    testthat::expect_error(
+      suppressMessages(amadeus:::discover_modis(
+        product = "MOD09GA",
+        version = "061",
+        date = c("2020-01-01", "2020-01-01"),
+        extent = c(-80, 30, -70, 40),
+        directory_to_save = paste0(withr::local_tempdir(), "/")
+      )),
+      "Multiple MODIS URLs map to the same destination file.",
+      fixed = TRUE
+    )
+  }
+)
+
+################################################################################
 ##### CMR pagination uses real response parsing without contacting NASA
 
 testthat::test_that("query_modis_granules(): combines pages using a cursor", {
@@ -3770,7 +3806,7 @@ testthat::test_that("query_modis_granules(): combines pages using a cursor", {
     },
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A full first page must not truncate a query containing 2001 records.
   result <- suppressMessages(amadeus:::query_modis_granules(
     product = "MOD11A1", version = "061",
@@ -3786,7 +3822,7 @@ testthat::test_that("query_modis_granules(): combines pages using a cursor", {
   testthat::expect_identical(
     result[[2001L]]$links[[1L]]$href, "https://example.org/2001.hdf"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Only the continuation header changes; query and request safeguards persist.
   testthat::expect_false("CMR-Search-After" %in% names(requests[[1L]]$headers))
   testthat::expect_identical(
@@ -3812,7 +3848,7 @@ testthat::test_that("query_modis_granules(): requires a continuation cursor", {
     '{"feed":{"entry":[', paste(rep("{}", 2000L), collapse = ","), ']}}'
   ))
   calls <- 0L
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A full page with more advertised hits requires a nonempty continuation.
   for (cursor in list(NULL, "")) {
     testthat::local_mocked_bindings(
@@ -3860,7 +3896,7 @@ testthat::test_that("query_modis_granules(): stops when a cursor repeats", {
     },
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Reject the repeated continuation rather than looping or returning a subset.
   testthat::expect_error(
     amadeus:::query_modis_granules(
@@ -3895,7 +3931,7 @@ testthat::test_that("query_modis_granules(): rejects changing totals", {
     },
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # The catalog total must remain stable throughout a paginated query.
   testthat::expect_error(
     amadeus:::query_modis_granules(
@@ -3922,7 +3958,7 @@ testthat::test_that("query_modis_granules(): rejects premature termination", {
     },
     .package = "httr2"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A short page is an error when it does not account for all advertised hits.
   testthat::expect_error(
     amadeus:::query_modis_granules(

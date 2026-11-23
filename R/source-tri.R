@@ -38,16 +38,13 @@
 #'   Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` emits a
 #'   warning. Default is `FALSE`.
-#' @param show_progress logical(1). Show file download progress. Default is
-#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return a combined MD5 hash of the files under
 #'   `directory_to_save` instead of the download summary when `download = TRUE`.
 #'   Ignored when `download = FALSE`. Default is `FALSE`.
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
-#' @param rate_limit numeric(1). Request-throttling interval in seconds,
-#'   passed to [download_run_method()]. Controls the average request rate,
-#'   rather than guaranteeing a minimum gap between requests. Default is 2.
+#' @inheritParams download_run rate_limit
 #' @details
 #' File names depend on the selected jurisdiction. For example, requests for
 #' 2020 produce `tri_raw_2020.csv` for `"US"`, `tri_raw_2020_NC.csv` for `"NC"`,
@@ -56,10 +53,10 @@
 #'
 #' The output directory is created before returning a preview or downloading.
 #' Preview mode makes no network requests. Individual download failures are
-#' recorded by [download_run_method()] during file transfers.
+#' recorded by [download_run()] during file transfers.
 #'
 #' Previews include all planned files, including those already present locally.
-#' During downloading, [download_run_method()] skips existing non-empty files;
+#' During downloading, [download_run()] skips existing non-empty files;
 #' missing or empty destination files are downloaded.
 #'
 #' Hashing includes all files recursively under `directory_to_save`, including
@@ -71,14 +68,14 @@
 #' of planned URLs, including files that already exist locally.
 #'
 #' When `download = TRUE` and `hash = FALSE`, returns the download summary from
-#' [download_run_method()] invisibly, including `success`, `failed`, and
+#' [download_run()] invisibly, including `success`, `failed`, and
 #' `skipped` file counts. The summary always contains `failed_urls` and
 #' `failed_files` character vectors, both `character(0)` when no downloads
 #' failed, including when every file was skipped.
 #'
 #' When `download = TRUE` and `hash = TRUE`, returns a visible character scalar
 #' containing the combined MD5 hash of the files under `directory_to_save`.
-#' @seealso [download_run_method()], [process_tri()]
+#' @seealso [download_run()], [process_tri()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
@@ -91,6 +88,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
@@ -159,7 +157,7 @@ download_tri <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

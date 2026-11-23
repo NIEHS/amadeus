@@ -49,15 +49,18 @@ instead of the download summary. Uses \code{directory_to_save} for SPEI/EDDI
 and \verb{data_files/} for USDM, including existing files. Default is \code{FALSE};
 ignored when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show file download progress. Default is
-\code{TRUE}. Other status and summary messages may still be printed when
-\code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file request, including
 the initial attempt. Must be at least 1. Default is \code{3L}.}
 
-\item{rate_limit}{numeric(1). Finite, non-negative request-throttling
-interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
+\item{rate_limit}{numeric(1). Request-throttling interval in seconds. Default
+is 2. Passed unchanged to \code{\link[=download_run_method]{download_run_method()}} for sequential downloads.
+For concurrent downloads, multiplied by the configured daemon count for
+the \code{"default"} compute profile before being passed to each worker.}
 
 \item{unzip}{logical(1). Extract USDM archives into \verb{data_files/}.
 Default is \code{TRUE}. Ignored for SPEI and EDDI.}
@@ -111,7 +114,7 @@ repeat validation, directory creation, or download execution.
 
 Previews create the output directories but make no network requests.
 They include existing destination files. Actual downloads use
-\code{\link[=download_run_method]{download_run_method()}}, which skips existing non-empty files and reports
+\code{\link[=download_run]{download_run()}}, which skips existing non-empty files and reports
 individual failures. See the source functions for endpoint limitations
 and extraction behavior.
 
@@ -124,6 +127,25 @@ performed during processing.
 No authentication is required. SPEI and EDDI provide raster inputs;
 USDM provides polygon inputs for the downstream drought workflow.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_drought(

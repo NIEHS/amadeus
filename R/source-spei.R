@@ -39,12 +39,12 @@
 #'
 #' A preview creates the output directory and returns the URL and destination
 #' without contacting the server. Existing files remain in the preview.
-#' Actual downloads use [download_run_method()], which skips existing
+#' Actual downloads use [download_run()], which skips existing
 #' non-empty files and reports failures without selecting another database
 #' version.
 #' @return With `download = FALSE`, an invisible list containing `urls`,
 #'   `destfiles`, and `n_files` (one). Otherwise, an invisible download summary
-#'   from [download_run_method()] when `hash = FALSE`, or a visible character
+#'   from [download_run()] when `hash = FALSE`, or a visible character
 #'   scalar containing the output-directory MD5 hash when `hash = TRUE`.
 #'
 #' The download summary always contains `success`, `failed`, `skipped`,
@@ -61,6 +61,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_spei <- function(
   timescale,
@@ -122,7 +123,7 @@ download_spei <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download, including existing-file checks and failure reporting.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_url,
     destfiles = chr_filename,
     token = NULL,

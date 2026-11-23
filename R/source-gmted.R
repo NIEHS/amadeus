@@ -26,10 +26,10 @@
 #' @param unzip logical(1). Unzip zip files (default TRUE).
 #' @param remove_zip logical(1). Remove zip files after unzipping (default
 #' FALSE).
-#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @inheritParams download_run show_progress
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @inheritParams download_run rate_limit
 #' @details
 #' `statistic` and `resolution` each select one value. Matching is
 #' case-sensitive, and unambiguous abbreviations are accepted. If omitted,
@@ -61,6 +61,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -150,7 +151,7 @@ download_gmted <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_url,
     destfiles = chr_filename,
     token = NULL,

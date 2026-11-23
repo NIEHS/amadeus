@@ -155,7 +155,7 @@ testthat::test_that("download_tri rejects empty, NA, and non-scalar jurisdiction
 testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips existing files', {
   download_urls_seen <- character()
   destfiles_seen <- character()
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Mock HTTP transfers; retain real filtering and download-result handling.
   testthat::local_mocked_bindings(
     req_perform = function(req, path, ...) {
@@ -168,12 +168,12 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
   )
   # ----------------------------------------------------------------------------
   withr::with_tempdir({
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Create a nonempty file that the shared runner should skip.
     existing_file <- "tri_raw_2021_NC.csv"
     existing_content <- c("YEAR,STATE", "2021,NC")
     writeLines(existing_content, existing_file)
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Request both years using whitespace and lowercase jurisdiction input.
     result <- suppressMessages(amadeus::download_tri(
       year = c(2020L, 2021L),
@@ -186,7 +186,7 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
       max_tries = 1L,
       rate_limit = 1
     ))
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Only the missing year should reach the HTTP request.
     testthat::expect_equal(result$success, 1L)
     testthat::expect_equal(result$failed, 0L)
@@ -198,7 +198,7 @@ testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips e
       basename(destfiles_seen),
       "tri_raw_2020_NC.csv"
     )
-    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Verify the new file was written and the existing file was preserved.
     testthat::expect_identical(
       readLines("tri_raw_2020_NC.csv"),

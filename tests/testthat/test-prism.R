@@ -580,7 +580,7 @@ testthat::test_that("validate_zip(): rejects warning-only archive listings", {
     },
     .package = "utils"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # A listing warning must not be treated as successful archive validation.
   testthat::expect_error(
     amadeus:::validate_zip(path),
@@ -600,7 +600,7 @@ testthat::test_that("validate_zip(): handles an empty response preview", {
     unzip = function(...) stop("Cannot read archive listing."),
     .package = "utils"
   )
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # An empty response still reports the archive name without a preview suffix.
   testthat::expect_equal(file.size(path), 0)
   error <- tryCatch(amadeus:::validate_zip(path), error = identity)

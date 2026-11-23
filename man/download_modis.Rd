@@ -53,8 +53,10 @@ queries CMR in preview mode; data files are not downloaded.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.}
 
-\item{show_progress}{logical(1). Show per-file download progress. Discovery
-and summary messages may still be printed when \code{FALSE}.}
+\item{show_progress}{logical(1). Show per-file messages and download progress
+bars during sequential downloads. Default is \code{TRUE}. Ignored during
+concurrent downloads, where per-file progress is disabled. Status and
+summary messages may still be printed when \code{FALSE}.}
 
 \item{hash}{logical(1). Return the combined directory MD5 hash when \code{TRUE}.
 Ignored when \code{download = FALSE}.}
@@ -65,12 +67,12 @@ including the first attempt. Default is 20.}
 \item{rate_limit}{numeric(1). Non-negative request-throttling interval in
 seconds, passed to discovery and downloads. Default is 2. Discovery uses
 a capacity-one bucket; 0 disables discovery throttling. File downloads
-follow the throttling policy in \code{\link[=download_run_method]{download_run_method()}}.}
+follow the throttling policy in \code{\link[=download_run]{download_run()}}.}
 }
 \value{
 With \code{download = FALSE}, an invisible preview list containing \code{urls},
 \code{destfiles}, and \code{n_files}. Otherwise, with \code{hash = FALSE}, the invisible
-download summary from \code{\link[=download_run_method]{download_run_method()}}. With \code{hash = TRUE}, a visible
+download summary from \code{\link[=download_run]{download_run()}}. With \code{hash = TRUE}, a visible
 combined MD5 hash for all files under \code{directory_to_save}.
 
 The download summary always contains \code{success}, \code{failed}, \code{skipped},
@@ -106,8 +108,27 @@ endpoints. A file count is reported without claiming daily or monthly
 completeness for tiled, swath, or composite products.
 
 Discovery keeps the existing 120-second per-attempt timeout; file downloads
-use \code{\link[=download_run_method]{download_run_method()}}'s default timeout.
+use \code{\link[=download_run]{download_run()}}'s default timeout.
 }
+\section{Concurrent downloads}{
+
+File downloads use configured daemons in the \code{"default"} compute profile,
+or run sequentially when that profile has no configured daemons.
+Daemon creation and shutdown are managed by the caller using
+\code{\link[mirai:daemons]{mirai::daemons()}}. For concurrent downloads, configure a fixed local pool
+with \code{mirai::daemons(n, .compute = "default")} before calling this function.
+Daemon detection, counting, and task dispatch always use the \code{"default"}
+compute profile, regardless of the active profile. Daemon counting and rate
+scaling assume that the pool still contains the \code{n} workers configured by
+that call, with no workers added separately or pool resizing during
+downloads. Each worker receives one URL/destination pair per task; the
+remaining request arguments are constant across tasks.
+
+Source-specific validation, URL discovery, archive extraction, and directory
+hashing run in the calling process. Only file downloads are dispatched to
+workers.
+}
+
 \examples{
 \dontrun{
 download_modis(
@@ -129,7 +150,7 @@ download_modis(
 \insertRef{article_roman2018vnp46}{amadeus}
 }
 \seealso{
-\code{\link[=download_data]{download_data()}}, \code{\link[=download_merra2]{download_merra2()}}, \code{\link[=download_run_method]{download_run_method()}}
+\code{\link[=download_data]{download_data()}}, \code{\link[=download_merra2]{download_merra2()}}, \code{\link[=download_run]{download_run()}}
 }
 \author{
 Mitchell Manware, Insang Song

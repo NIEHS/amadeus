@@ -37,7 +37,7 @@
 #' including when extraction is disabled. Preview results include existing
 #' archive paths and require no network requests.
 #'
-#' [download_run_method()] skips existing non-empty archives and records
+#' [download_run()] skips existing non-empty archives and records
 #' individual download failures. All planned archives are subsequently passed
 #' to [download_unzip()], including existing archives, with the selected
 #' `unzip` flag. Paths inside archives are preserved. Extraction errors can
@@ -45,7 +45,7 @@
 #' success. Pass `data_files/` to [process_drought()] for USDM processing.
 #' @return With `download = FALSE`, an invisible list containing `urls`,
 #'   archive `destfiles`, and `n_files`. Otherwise, after optional extraction
-#'   and cleanup, an invisible summary from [download_run_method()] when
+#'   and cleanup, an invisible summary from [download_run()] when
 #'   `hash = FALSE`, or a visible character scalar containing the combined
 #'   MD5 hash of `data_files/` when `hash = TRUE`.
 #'
@@ -62,6 +62,7 @@
 #'   acknowledgement = TRUE
 #' )
 #' }
+#' @inheritSection download_run Concurrent downloads
 #' @export
 download_usdm <- function(
   date,
@@ -130,7 +131,7 @@ download_usdm <- function(
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- download_run_method(
+  download_result <- download_run(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

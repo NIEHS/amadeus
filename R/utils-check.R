@@ -28,7 +28,7 @@
 #' @return Called for validation and warnings; callers should ignore the
 #'   return value. An invalid argument stops execution with an error.
 #' @seealso [download_setup_dir()], [download_preview()],
-#' [download_run_method()]
+#' [download_run()], [download_run_method()]
 #' @keywords internal
 #' @noRd
 download_check <- function(
