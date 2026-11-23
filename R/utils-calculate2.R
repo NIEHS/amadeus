@@ -524,10 +524,12 @@ calc_extract2 <- function(
         layer,
         terra::vect(locs_vector),
         method = "simple",
-        ID = FALSE,
+        ID = TRUE,
         bind = FALSE,
         na.rm = TRUE
       )
+      locs_df <- locs_df[sites_extracted_layer[[1L]], , drop = FALSE]
+      sites_extracted_layer <- sites_extracted_layer[, -1L, drop = FALSE]
     } else {
       # ------------------------------------------------------------------------
       # {exactextractr} for points and weighted values.

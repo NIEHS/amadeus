@@ -794,10 +794,12 @@ calc_worker <- function(
           data_layer,
           locs_vector,
           method = "simple",
-          ID = FALSE,
+          ID = TRUE,
           bind = FALSE,
           na.rm = TRUE
         )
+        locs_df <- locs_df[sites_extracted_layer[[1L]], , drop = FALSE]
+        sites_extracted_layer <- sites_extracted_layer[, -1L, drop = FALSE]
       } else {
         weighted_geoms <- amadeus::calc_prepare_exact_geoms(
           locs_vector = locs_vector,
