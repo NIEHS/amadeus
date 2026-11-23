@@ -86,4 +86,5 @@
       mustWork = TRUE
     )
   )
+  .amadeus$df_hrrr <- metadata_hrrr()
 }

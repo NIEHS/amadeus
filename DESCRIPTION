@@ -22,6 +22,7 @@ Imports:
     httr2,
     methods,
     mirai (>= 2.4.0),
+    mori,
     Rdpack,
     rlang,
     sf,

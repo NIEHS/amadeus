@@ -15,6 +15,7 @@ process_hrrr <- function(
   # Check common arguments.
   # ----------------------------------------------------------------------------
   # Check source-specific arguments.
+  checkmate::assert_choice(variable, .amadeus$df_hrrr$layer_name)
   # ----------------------------------------------------------------------------
   # Coerce `date` to vector of 2 if not already.
   date <- fl_dates(sequence_dates(date, hyphen = TRUE))
@@ -35,7 +36,7 @@ process_hrrr <- function(
     paths = chr_datapaths,
     extent = extent,
     variable = variable,
-    short = "T2M"
+    short = .amadeus$df_hrrr$short_name[.amadeus$df_hrrr$layer_name == variable]
   )
 }
 
@@ -168,5 +169,64 @@ resolve_paths <- function(
       chr_paths,
       value = TRUE
     )
+  )
+}
+
+################################################################################
+calculate_hrrr <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  .by_time = NULL,
+  ...
+) {
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  # ----------------------------------------------------------------------------
+  # Perform extraction/zonal statistics.
+  sf_extracted <- calc_worker_mirai(
+    dataset = "hrrr",
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    variable = 1,
+    level = 2,
+    time = c(3, 4),
+    time_type = "hour",
+    radius = radius,
+    fun = fun,
+    weights = weights,
+    geom = geom,
+    ...
+  )
+  # ----------------------------------------------------------------------------
+  # Summarize by time if requested.
+  lgl_summarized <- FALSE
+  if (!is.null(.by_time)) {
+    sf_extracted <- amadeus::calc_summarize_by(
+      covar = sf_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = "level"
+    )
+    lgl_summarized <- TRUE
+  }
+  if (lgl_summarized && "time" %in% names(sf_extracted)) {
+    sf_extracted$time <- as.POSIXct(sf_extracted$time, tz = "UTC")
+  }
+  # ----------------------------------------------------------------------------
+  # Return cleaned output.
+  amadeus::calc_return_locs(
+    covar = sf_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
   )
 }
