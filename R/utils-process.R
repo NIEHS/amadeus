@@ -576,7 +576,7 @@ stack_hourly <- function(
     function(x) {
       # ------------------------------------------------------------------------
       # Import full raster data from path (e.g. .nc, .nc4, .grib, etc).
-      rast_x <- terra::rast(x, win = extent)
+      rast_x <- terra::rast(x, win = extent, md = FALSE)
       # ------------------------------------------------------------------------
       # Identify variable-specific layers.
       idx_var <- grep(
