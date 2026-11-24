@@ -33,13 +33,14 @@ metadata_merra2 <- function(list = TRUE) {
           temporal_coverage_start = x$temporal_coverage_start,
           access_url = x$access_url,
           product_version = x$product_version,
-          requires_token = list_merra2$data_sources[[
-            1
-          ]]$requires_authentication,
-          native_format = switch(
-            x$native_format,
-            netcdf4_cf = ".nc4",
-            netcdf_cf = ".nc"
+          requires_token = ifelse(
+            x$data_source == "amadeus:source/nasa_gmao_merra2",
+            TRUE,
+            FALSE
+          ),
+          extension = paste0(
+            ".",
+            tools::file_ext(x$format_details$filename_pattern)
           )
         )
       }
@@ -252,7 +253,7 @@ download_merra2 <- function(
             paste0(
               "FWI.MERRA2.CORRECTED.Daily.Default.",
               date,
-              df_p$native_format
+              df_p$extension
             )
           )
           df_x$url <- with(df_x, paste0(base, year, "/", file))
