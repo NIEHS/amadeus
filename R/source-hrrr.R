@@ -12,7 +12,7 @@
 #' vertical levels, and reference raster labels. No downloaded HRRR files or
 #' internet connection are required. Supply a unique short name to identify
 #' a field, or a variable code and optional levels to select related fields.
-#' Omit both arguments to browse the complete catalogue.
+#' Omit `variable` and `level` to browse the complete catalogue.
 #'
 #' @param variable character vector or `NULL`. Unique field short names such
 #'   as `"TMP_2MAGL"`, `"TMP_SFC"`, or `"TMP_850MB"`, or NCEP variable codes
@@ -26,14 +26,27 @@
 #'   `"1 hybrid level"`. Matching is case-insensitive. The default `NULL`
 #'   retains all levels for the selected variables. Unknown levels, or
 #'   requested variables with none of the selected levels, raise an error.
+#' @param accumulation numeric(1) or `NULL`. Whole-hour precipitation
+#'   accumulation duration from 1 through 48. Used to construct the APCP
+#'   layer label independently of forecast lead. The default `NULL` retains
+#'   the unprefixed reference label. Other variables are unaffected.
 #'
 #' @details
-#' The standalone table is installed at `extdata/hrrr_variables.csv`. It
+#' The standalone table is installed at `extdata/df_hrrr.csv`. It
 #' contains one row per variable-level combination, combining the NCEP CONUS
 #' pressure, native, surface, and sub-hourly forecast-hour-02 inventories
 #' retrieved on 2026-11-23. It is a reference catalogue, not a full historical
 #' inventory or a guarantee that a field exists for every product, date,
 #' initialization cycle, or forecast hour.
+#'
+#' In the CSV, the APCP `layer_name` contains an
+#' `{accumulation_prefix}` placeholder. This function replaces it with an
+#' empty string when `accumulation = NULL`, or a duration such as `"01 hr "`
+#' when `accumulation = 1`. Returned layer names contain no placeholder.
+#' The duration describes the precipitation accumulation interval, not the
+#' forecast lead. Constructing a label does not verify that the interval
+#' exists in a particular file. An unprefixed label does not imply that
+#' precipitation is instantaneous.
 #'
 #' `short_name` uniquely identifies a variable-level combination within the
 #' catalogue. It combines the original NCEP code, retained in `variable`,
@@ -99,6 +112,7 @@
 #' metadata_hrrr(c("TMP", "DPT", "UGRD"))
 #' metadata_hrrr(c("TMP_2MAGL", "TMP_SFC", "TMP_850MB"))
 #' metadata_hrrr("TMP", level = "850 mb")
+#' metadata_hrrr("APCP_SFC", accumulation = 1)
 #'
 #' # Resolve a unique short name to its full reference layer name.
 #' temperature <- metadata_hrrr("tmp_2magl")
@@ -112,10 +126,14 @@
 #' paste0(temperature$short_name, "_20210504_0200")
 #'
 #' # Access the standalone CSV directly.
-#' system.file("extdata", "hrrr_variables.csv", package = "amadeus")
+#' system.file("extdata", "df_hrrr.csv", package = "amadeus")
 #'
 #' @export
-metadata_hrrr <- function(variable = NULL, level = NULL) {
+metadata_hrrr <- function(
+  variable = NULL,
+  level = NULL,
+  accumulation = NULL
+) {
   # ----------------------------------------------------------------------------
   # Check optional variable and level selectors.
   checkmate::assert_character(
@@ -132,16 +150,37 @@ metadata_hrrr <- function(variable = NULL, level = NULL) {
     any.missing = FALSE,
     null.ok = TRUE
   )
+  checkmate::assert_integerish(
+    accumulation,
+    lower = 1L,
+    upper = 48L,
+    len = 1L,
+    any.missing = FALSE,
+    null.ok = TRUE
+  )
   # ----------------------------------------------------------------------------
   # Read the standalone catalogue without inspecting data files.
   df_variables <- utils::read.csv(
     system.file(
       "extdata",
-      "hrrr_variables.csv",
+      "df_hrrr.csv",
       package = "amadeus",
       mustWork = TRUE
     ),
     stringsAsFactors = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Resolve precipitation's optional accumulation-duration label.
+  chr_accumulation_prefix <- if (is.null(accumulation)) {
+    ""
+  } else {
+    sprintf("%02d hr ", as.integer(accumulation))
+  }
+  df_variables$layer_name <- gsub(
+    "{accumulation_prefix}",
+    chr_accumulation_prefix,
+    df_variables$layer_name,
+    fixed = TRUE
   )
   # ----------------------------------------------------------------------------
   # Resolve field identifiers or variable codes in the requested order.
@@ -468,13 +507,15 @@ process_hrrr <- function(
   extent = NULL,
   daily_agg = FALSE,
   fun = "mean",
+  accumulation = NULL,
   ...
 ) {
   # ----------------------------------------------------------------------------
   # Check common arguments.
   # ----------------------------------------------------------------------------
   # Check source-specific arguments.
-  checkmate::assert_choice(variable, .amadeus$df_hrrr$layer_name)
+  df_hrrr <- metadata_hrrr(accumulation = accumulation)
+  checkmate::assert_choice(variable, df_hrrr$layer_name)
   checkmate::assert_integerish(
     forecast_hour,
     lower = 0L,
@@ -504,7 +545,7 @@ process_hrrr <- function(
     paths = chr_datapaths,
     extent = extent,
     variable = variable,
-    short = .amadeus$df_hrrr$short_name[.amadeus$df_hrrr$layer_name == variable]
+    short = df_hrrr$short_name[match(variable, df_hrrr$layer_name)]
   )
 }
 

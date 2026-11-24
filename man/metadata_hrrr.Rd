@@ -10,7 +10,7 @@ GDAL GRIB metadata and unit handling:
 \url{https://gdal.org/en/stable/drivers/raster/grib.html}.
 }
 \usage{
-metadata_hrrr(variable = NULL, level = NULL)
+metadata_hrrr(variable = NULL, level = NULL, accumulation = NULL)
 }
 \arguments{
 \item{variable}{character vector or \code{NULL}. Unique field short names such
@@ -26,6 +26,11 @@ such as \code{"2 m above ground"}, \code{"surface"}, \code{"850 mb"}, or
 \code{"1 hybrid level"}. Matching is case-insensitive. The default \code{NULL}
 retains all levels for the selected variables. Unknown levels, or
 requested variables with none of the selected levels, raise an error.}
+
+\item{accumulation}{numeric(1) or \code{NULL}. Whole-hour precipitation
+accumulation duration from 1 through 48. Used to construct the APCP
+layer label independently of forecast lead. The default \code{NULL} retains
+the unprefixed reference label. Other variables are unaffected.}
 }
 \value{
 A data.frame with character columns \code{short_name} (unique variable-level
@@ -42,15 +47,24 @@ Read a bundled catalogue of HRRR variable short names, descriptions,
 vertical levels, and reference raster labels. No downloaded HRRR files or
 internet connection are required. Supply a unique short name to identify
 a field, or a variable code and optional levels to select related fields.
-Omit both arguments to browse the complete catalogue.
+Omit \code{variable} and \code{level} to browse the complete catalogue.
 }
 \details{
-The standalone table is installed at \code{extdata/hrrr_variables.csv}. It
+The standalone table is installed at \code{extdata/df_hrrr.csv}. It
 contains one row per variable-level combination, combining the NCEP CONUS
 pressure, native, surface, and sub-hourly forecast-hour-02 inventories
 retrieved on 2026-11-23. It is a reference catalogue, not a full historical
 inventory or a guarantee that a field exists for every product, date,
 initialization cycle, or forecast hour.
+
+In the CSV, the APCP \code{layer_name} contains an
+\code{{accumulation_prefix}} placeholder. This function replaces it with an
+empty string when \code{accumulation = NULL}, or a duration such as \code{"01 hr "}
+when \code{accumulation = 1}. Returned layer names contain no placeholder.
+The duration describes the precipitation accumulation interval, not the
+forecast lead. Constructing a label does not verify that the interval
+exists in a particular file. An unprefixed label does not imply that
+precipitation is instantaneous.
 
 \code{short_name} uniquely identifies a variable-level combination within the
 catalogue. It combines the original NCEP code, retained in \code{variable},
@@ -98,6 +112,7 @@ metadata_hrrr()
 metadata_hrrr(c("TMP", "DPT", "UGRD"))
 metadata_hrrr(c("TMP_2MAGL", "TMP_SFC", "TMP_850MB"))
 metadata_hrrr("TMP", level = "850 mb")
+metadata_hrrr("APCP_SFC", accumulation = 1)
 
 # Resolve a unique short name to its full reference layer name.
 temperature <- metadata_hrrr("tmp_2magl")
@@ -111,7 +126,7 @@ which(layer_names \%in\% temperature$layer_name)
 paste0(temperature$short_name, "_20210504_0200")
 
 # Access the standalone CSV directly.
-system.file("extdata", "hrrr_variables.csv", package = "amadeus")
+system.file("extdata", "df_hrrr.csv", package = "amadeus")
 
 }
 \seealso{

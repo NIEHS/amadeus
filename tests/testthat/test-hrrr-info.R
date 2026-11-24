@@ -26,13 +26,16 @@ testthat::test_that("metadata_hrrr(variable = NULL): returns a standalone catalo
     unique(unlist(strsplit(info$products, ";", fixed = TRUE))),
     c("prs", "nat", "sfc", "subh")
   )
-  testthat::expect_identical(
-    info,
-    utils::read.csv(
-      system.file("extdata", "hrrr_variables.csv", package = "amadeus"),
-      stringsAsFactors = FALSE
-    )
+  expected <- utils::read.csv(
+    system.file(
+      "extdata", "df_hrrr.csv", package = "amadeus", mustWork = TRUE
+    ),
+    stringsAsFactors = FALSE
   )
+  expected$layer_name <- gsub(
+    "{accumulation_prefix}", "", expected$layer_name, fixed = TRUE
+  )
+  testthat::expect_identical(info, expected)
 })
 
 ################################################################################

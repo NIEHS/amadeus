@@ -2,6 +2,45 @@
 ##### unit and integration tests for NOAA HRRR functions
 
 ################################################################################
+testthat::test_that(
+  "process_hrrr(path = positional, accumulation = 1): preserves argument binding",
+  {
+    testthat::local_mocked_bindings(
+      stack_hourly = function(paths, extent, variable, short) {
+        list(paths = paths, extent = extent, variable = variable, short = short)
+      },
+      .package = "amadeus"
+    )
+    path <- withr::local_tempdir()
+    files <- file.path(
+      path,
+      c(
+        "hrrr.20210504.t00z.wrfsfcf00.grib2",
+        "hrrr.20210504.t00z.wrfsfcf02.grib2"
+      )
+    )
+    file.create(files)
+    extent <- c(-100, -90, 30, 40)
+    reference <- "SFC=Ground or water surface; Total precipitation [kg/(m^2)]"
+    hourly <- "SFC=Ground or water surface; 01 hr Total precipitation [kg/(m^2)]"
+
+    result <- process_hrrr("2021-05-04", reference, 0, path, extent)
+    testthat::expect_identical(result$paths, files[1])
+    testthat::expect_identical(result$extent, extent)
+    testthat::expect_identical(result$variable, reference)
+    testthat::expect_identical(result$short, "APCP_SFC")
+
+    result <- process_hrrr(
+      "2021-05-04", hourly, 2, path, extent, accumulation = 1
+    )
+    testthat::expect_identical(result$paths, files[2])
+    testthat::expect_identical(result$extent, extent)
+    testthat::expect_identical(result$variable, hourly)
+    testthat::expect_identical(result$short, "APCP_SFC")
+  }
+)
+
+################################################################################
 testthat::test_that("download_hrrr(download = FALSE): warns about deprecation", {
   testthat::local_mocked_bindings(
     download_run = function(...) stop("Unexpected download in preview mode"),
