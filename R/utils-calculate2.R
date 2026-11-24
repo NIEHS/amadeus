@@ -192,6 +192,117 @@ process_locs_radius_sf <- function(
 ################################################################################
 
 ################################################################################
+#' Pack one raster layer without losing its source reading mode
+#' @description
+#' Describe a file-backed layer using its source, band, reading mode, window,
+#' and extraction metadata. In-memory layers use [terra::wrap()].
+#' @param x SpatRaster or NULL. One extraction or prepared weight layer.
+#' @details
+#' A terra proxy does not retain whether a source was opened through GDAL's
+#' classic or multidimensional API. Those APIs can assign different band
+#' numbers to the same variable. Multidimensional sources additionally need
+#' their array name because band numbers are relative to that array.
+#'
+#' terra currently exposes the source reading mode only through its pointer's
+#' `isMD` property. Older versions without that property use classic access.
+#' Only the resulting logical flag is serialized, never the pointer.
+#' @return A plain source descriptor, a PackedSpatRaster for an in-memory
+#'   layer, or NULL. No file-backed cell values are loaded during packing.
+#' @seealso `calc_unwrap()`, [terra::sources()]
+#' @keywords internal auxiliary
+#' @noRd
+calc_wrap <- function(x) {
+  # ----------------------------------------------------------------------------
+  # Retain absent weights and require a single raster layer.
+  if (is.null(x)) {
+    return(NULL)
+  }
+  checkmate::assert_true(terra::nlyr(x) == 1L)
+  # ----------------------------------------------------------------------------
+  # Wrap cell values directly when the layer has no file source.
+  source <- terra::sources(x, bands = TRUE)
+  if (all(source$source == "")) {
+    return(terra::wrap(x, proxy = TRUE))
+  }
+  # ----------------------------------------------------------------------------
+  # Identify the original source reading mode.
+  checkmate::assert_true(nrow(source) == 1L)
+  md <- tryCatch(x@pntr$isMD, error = function(e) FALSE)
+  checkmate::assert_flag(md)
+  # ----------------------------------------------------------------------------
+  # Store source selection, geometry, and metadata for the worker.
+  structure(
+    list(
+      source = source$source,
+      band = source$bands,
+      md = md,
+      subds = if (md) terra::varnames(x) else 0L,
+      extent = as.vector(terra::ext(x)),
+      nrow = nrow(x),
+      ncol = ncol(x),
+      crs = terra::crs(x),
+      names = names(x),
+      time = terra::time(x),
+      time_info = terra::timeInfo(x),
+      units = terra::units(x),
+      depth = terra::depth(x)
+    ),
+    class = "amadeus_raster_proxy"
+  )
+}
+
+################################################################################
+#' Reconstruct a worker raster using its original source reading mode
+#' @description
+#' Reopen a file-backed layer with the recorded band, array, and window,
+#' verify its geometry, then restore its extraction metadata.
+#' @param x Object returned by `calc_wrap()`, or a PackedSpatRaster.
+#' @return A SpatRaster or NULL. A source whose geometry no longer agrees
+#'   with the packed layer raises an error before extraction.
+#' @seealso `calc_wrap()`, [terra::rast()]
+#' @keywords internal auxiliary
+#' @noRd
+calc_unwrap <- function(x) {
+  # ----------------------------------------------------------------------------
+  # Unwrap in-memory layers and retain NULL weights.
+  if (!inherits(x, "amadeus_raster_proxy")) {
+    return(terra::unwrap(x))
+  }
+  # ----------------------------------------------------------------------------
+  # Reopen the selected band and window using the original reading mode.
+  raster <- terra::rast(
+    x$source,
+    lyrs = x$band,
+    subds = x$subds,
+    md = x$md,
+    win = terra::ext(x$extent)
+  )
+  # ----------------------------------------------------------------------------
+  # Check reconstructed geometry before extracting any values.
+  template <- terra::rast(
+    nrows = x$nrow, ncols = x$ncol,
+    extent = terra::ext(x$extent), crs = x$crs
+  )
+  if (!terra::compareGeom(raster, template, res = TRUE, stopOnError = FALSE)) {
+    stop("Worker raster geometry differs from the original layer: ", x$source,
+         call. = FALSE)
+  }
+  # ----------------------------------------------------------------------------
+  # Restore the layer name and time metadata.
+  names(raster) <- x$names
+  if (isTRUE(x$time_info$time)) {
+    terra::time(raster, tstep = x$time_info$step) <- x$time
+  } else {
+    terra::time(raster) <- NULL
+  }
+  # ----------------------------------------------------------------------------
+  # Restore units and depth, then return the reconstructed layer.
+  terra::units(raster) <- x$units
+  terra::depth(raster) <- x$depth
+  raster
+}
+
+################################################################################
 #' Dispatch raster extraction sequentially or across mirai daemons
 #' @description
 #' Prepare locations and optional weights, extract each raster layer, and
@@ -239,10 +350,11 @@ process_locs_radius_sf <- function(
 #' within each layer. Temporal aggregation and final geometry conversion are
 #' performed by the calling calculate function.
 #'
-#' When [mirai::daemons_set()] is true, raster layers are packed with
-#' `terra::wrap(..., proxy = TRUE)` and passed to [mirai::mirai_map()]. Workers
-#' must have access to any underlying raster files and the required packages.
-#' Prepared weights are packed separately. Locations are always shared with
+#' When [mirai::daemons_set()] is true, `calc_wrap()` records each
+#' file-backed layer's source, band, reading mode, and window for workers.
+#' In-memory layers use [terra::wrap()]. Workers must have access to the
+#' underlying files and the same package code. Prepared weights use the same
+#' packing path. Locations are always shared with
 #' `mori::share()` in this branch, requiring workers on the same host with
 #' access to the same shared-memory environment; locality is not checked here.
 #' Worker errors stop result collection. Without a daemon pool, extraction
@@ -328,16 +440,13 @@ calc_worker_mirai <- function(
     ))
     # --------------------------------------------------------------------------
     # Wrap each layer of the listed SpatRaster objects for pass to daemons.
-    list_wrapped <- lapply(
-      list_from,
-      function(x) terra::wrap(x, proxy = TRUE)
-    )
+    list_wrapped <- lapply(list_from, calc_wrap)
     # --------------------------------------------------------------------------
     # Share extraction locations across all configured daemons.
     list_args$locs_vector <- mori::share(list_args$locs_vector)
     # --------------------------------------------------------------------------
     if (!is.null(list_args$weights_prepared)) {
-      list_args$weights_prepared <- terra::wrap(rast_weights)
+      list_args$weights_prepared <- calc_wrap(rast_weights)
     }
     # --------------------------------------------------------------------------
     # Devel messages.
@@ -381,8 +490,8 @@ calc_worker_mirai <- function(
 #' @description
 #' Read variable, time, and optional level metadata from a layer, extract its
 #' values at prepared locations, and attach location metadata to the results.
-#' @param layer SpatRaster or PackedSpatRaster. One raster layer, packed with
-#'   [terra::wrap()] when `mirai = TRUE`.
+#' @param layer SpatRaster, PackedSpatRaster, or source descriptor. One raster
+#'   layer, packed with `calc_wrap()` when `mirai = TRUE`.
 #' @param dataset character(1). Source identifier passed to
 #'   [amadeus::calc_time()] and [amadeus::calc_message()].
 #' @param locs_vector sf. Prepared locations in the layer CRS, including any
@@ -406,9 +515,9 @@ calc_worker_mirai <- function(
 #' @param max_cells numeric(1). Maximum cells loaded at once by
 #'   [exactextractr::exact_extract()]. Defaults to `1e8`; unused for
 #'   unweighted point extraction.
-#' @param weights_prepared NULL, SpatRaster, or PackedSpatRaster. Prepared
-#'   single-layer weights, packed when `mirai = TRUE`. No weight preparation
-#'   or alignment is performed here.
+#' @param weights_prepared NULL, SpatRaster, PackedSpatRaster, or source
+#'   descriptor. Prepared single-layer weights, packed when `mirai = TRUE`.
+#'   No weight preparation or alignment is performed here.
 #' @param fun_extract character(1). Single extraction summary operation,
 #'   already resolved to a weighted operation when appropriate. Unused for
 #'   unweighted point extraction.
@@ -452,8 +561,8 @@ calc_extract2 <- function(
   # ----------------------------------------------------------------------------
   # Unwrap {terra} objects if daemons detected.
   if (mirai) {
-    layer <- terra::unwrap(layer)
-    weights_prepared <- terra::unwrap(weights_prepared)
+    layer <- amadeus:::calc_unwrap(layer)
+    weights_prepared <- amadeus:::calc_unwrap(weights_prepared)
   }
   # ----------------------------------------------------------------------------
   # Split layer names.
